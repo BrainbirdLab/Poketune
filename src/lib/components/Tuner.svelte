@@ -101,6 +101,8 @@
 
     let analyserNode: AnalyserNode;
 
+    let stream: MediaStream;
+
     let interval: number;
 
     function stop() {
@@ -124,36 +126,38 @@
             Frequency = 0;
             detectedClarity = 0;
         });
+
+        stream.getTracks().forEach((track) => track.stop());
+
+        analyserNode.disconnect();
     }
 
-    function start() {
+    async function start() {
         console.log("start");
 
         //if closed
         if (audioContext?.state != "running") {
             //create new audio context
-            audioContext = new window.AudioContext();
-            analyserNode = audioContext.createAnalyser();
+            
+            stream = await navigator.mediaDevices
+            .getUserMedia({ audio: true });
+            
+            if (stream){
 
-            navigator.mediaDevices
-                .getUserMedia({ audio: true })
-                .then((stream) => {
-                    audioContext
+                audioContext = new window.AudioContext();
+                analyserNode = audioContext.createAnalyser();
+                audioContext
                         .createMediaStreamSource(stream)
                         .connect(analyserNode);
 
-                    isListening = true;
-                    
-                    if (audioContext.state === "running") {
-                        interval = setInterval(() => {
-                            updatePitch(analyserNode, audioContext.sampleRate);
-                        }, 100);
-                    }
-                })
-
-                .catch((error) => {
-                    console.error("Error accessing microphone:", error);
-                });
+                isListening = true;
+                
+                if (audioContext.state === "running") {
+                    interval = setInterval(() => {
+                        updatePitch(analyserNode, audioContext.sampleRate);
+                    }, 100);
+                }
+            }
         }
 
         //if running
