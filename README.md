@@ -1,38 +1,61 @@
-# create-svelte
+# PokeTune - Musical Instrument Tuner
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+PokeTune is a Progressive Web App (PWA) designed to help you tune your musical instruments with ease. Built using SvelteJS, this app provides a convenient way to achieve accurate tuning right from your web browser on any device.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **User-Friendly Interface**: PokeTune boasts an intuitive and user-friendly interface, making it accessible to both beginners and experienced musicians.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+- **Multiple Instrument Support**: Whether you're tuning a guitar, piano, violin, or any other instrument, PokeTune offers support for a wide range of musical instruments.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+- **Real-time Tuning**: With real-time feedback, you can adjust the tuning of your instrument and see the changes in pitch instantly on the app.
 
-## Developing
+- **Visual Aid**: PokeTune provides visual aids, such as needle indicators or color-coded displays, to help you accurately tune your instrument.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- **Responsive Design**: The app is designed responsively, allowing you to use it seamlessly on various devices, including desktops, tablets, and smartphones.
 
-```bash
-npm run dev
+## Installation
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+PokeTune is a Progressive Web App, which means you can access it directly through your web browser without needing to install it from an app store. Simply navigate to the PokeTune website using your preferred web browser.
 
-## Building
+## Usage
 
-To create a production version of your app:
+1. **Access the App**: Open your web browser and navigate to the PokeTune website.
 
-```bash
-npm run build
-```
+2. **Select Instrument**: Choose the instrument you want to tune from the available options.
 
-You can preview the production build with `npm run preview`.
+3. **Tune Your Instrument**: Play the string or sound the note you want to tune. Adjust the tuning pegs or keys while observing the visual aid on the app. Aim to align the indicator with the target pitch.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+4. **Real-time Feedback**: As you adjust the tuning, the app will provide real-time feedback, helping you achieve accurate tuning.
+
+5. **Repeat as Needed**: Repeat the tuning process for each string or note of your instrument until you're satisfied with the tuning.
+
+## Technologies Used
+
+- SvelteJS: The app is built using the SvelteJS framework, allowing for efficient and reactive user interfaces.
+
+- Web Audio API: PokeTune utilizes the Web Audio API to process audio signals and provide real-time pitch detection.
+
+## Contributing
+
+Contributions to PokeTune are welcome! If you'd like to contribute, please follow these steps:
+
+1. Fork the repository.
+
+2. Create a new branch for your feature or bug fix.
+
+3. Make your changes and ensure they are appropriately tested.
+
+4. Submit a pull request, explaining the changes you've made.
+
+## Feedback and Support
+
+If you encounter any issues while using PokeTune or have suggestions for improvements, please feel free to open an issue on the GitHub repository.
+
+## License
+
+PokeTune is released under the [GNU GPL License](LICENSE).
+
+---
+
+Enjoy tuning your musical instruments with PokeTune! If you find it helpful, consider sharing it with your musician friends.
