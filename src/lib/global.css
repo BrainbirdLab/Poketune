@@ -1,0 +1,27 @@
+@font-face {
+	font-family: Now;
+	src: url('/fonts/now-web.woff2');
+}
+
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Now';
+	color: white;
+	user-select: none;
+}
+
+/*
+Remove scrollbars
+*/
+
+::-webkit-scrollbar {
+	width: 0px;
+}
+
+
+body{
+	background-color: #0b1d37;
+	overflow: hidden;
+}
