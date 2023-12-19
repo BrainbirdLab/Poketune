@@ -84,9 +84,9 @@ self.addEventListener('fetch', (e) => {
 
 
 self.addEventListener('message', (e) => {
-	console.log(e.data);
+	//console.log(e.data);
 	if (e.data && e.data.type === 'SKIP_WAITING') {
-		console.log('Service Worker: Skip Waiting');
+		console.log('Service Worker: Updated');
 		self.skipWaiting();
 	}
 });
