@@ -45,8 +45,7 @@
         justify-content: center;
         align-items: center;
         border-radius: 10px;
-        background: #ffffff20;
-        border: 3px solid #fff;
+        border: 3px solid #ffffff1e;
         transition: 100ms ease-in-out;
     }
 
