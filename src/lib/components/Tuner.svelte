@@ -297,6 +297,8 @@
     canvas{
         position: absolute;
         top: 25%;
+        left: 50%;
+        transform: translateX(-50%);
         opacity: 1;
         transition: 100ms;
         &.hidden{
