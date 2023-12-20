@@ -3,11 +3,19 @@
     import SelectInstrument from "$lib/components/SelectInstrument.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
     import {selectedInstrument} from "$lib/store";
+    import {fly} from "svelte/transition";
+    import { onMount } from 'svelte';
 
+    let ready = false;
+
+    onMount(() => {
+        ready = true;
+    })
 </script>
 
+{#if ready}
 <div class="container">
-    <div class="title">
+    <div class="title" in:fly={{x: 10}}>
         <div class="t">
             PokeTune <img src="/images/icon(Custom).png" alt="Logo" width="50px" />
         </div>
@@ -18,8 +26,15 @@
             </button>
         {/if}
     </div>
-    <SelectInstrument />
+    {#if $selectedInstrument == "None"}
+        <SelectInstrument />
+    {:else}
+    <div in:fly={{x: 100}}>
+        <Tuner/>
+    </div>
+    {/if}
 </div>
+{/if}
 
 <style lang="scss">
     .container {
@@ -41,14 +56,13 @@
         color: #fff;
         font-weight: 700;
         position: absolute;
+        background: var(--primary);
         top: 0;
+
         display: flex;
-        left: 0;
         padding: 10px;
         gap: 10px;
         width: min(100vw, 500px);
-        left: 50%;
-        transform: translateX(-50%);
         align-items: center;
         justify-content: space-between;
 

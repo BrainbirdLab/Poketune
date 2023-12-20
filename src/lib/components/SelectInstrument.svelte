@@ -1,17 +1,16 @@
 <script lang="ts">
     //import animation libs to fly in the instrument buttons
-    import { fly } from 'svelte/transition';
-    import { onMount } from 'svelte';
-    import Tuner from './Tuner.svelte';
+    import { fade, fly } from 'svelte/transition';;
     import {instrumentNames} from '$lib/tuner';
     import {selectedInstrument} from '$lib/store';
 
 </script>
 
-{#if $selectedInstrument == "None"}
+
+<div class="wrapper">
     <div class="instruments">
         {#each instrumentNames as instrument, i}
-            <div class="instrument" in:fly|global={{y: 100*i + 100}}>
+            <div class="instrument" in:fly|global={{y: 100*(i+1)}}>
                 <input type="radio" id="{instrument}" name="instrument" bind:group={$selectedInstrument} value={instrument} />
                 <!-- svelte-ignore a11y-label-has-associated-control -->
                 <label for="{instrument}">
@@ -21,13 +20,40 @@
             </div>
         {/each}
     </div>
-{:else}
-    <div in:fly={{x: 100}}>
-        <Tuner/>
-    </div>
-{/if}
+</div>
+<div class="footer" in:fade>
+    <a href="https://github.com/itsfuad/Poketune" target="_blank" rel="noopener noreferrer">
+        View on GitHub
+    </a>
+</div>
 
-<style>
+<style lang="scss">
+    .footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+        color: #fff;
+        background: var(--primary);
+        a {
+            color: #fff;
+            text-decoration: underline;
+        }
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        align-content: center;
+        height: 100%;
+        overflow: hidden;
+    }
+
     .instruments {
         display: flex;
         flex-wrap: wrap;
@@ -35,12 +61,15 @@
         justify-content: center;
         align-items: center;
         gap: 5%;
+        padding: 30px;
+        overflow: scroll;
+        align-content: flex-start;
     }
 
     .instrument {
         display: flex;
-        width: max(15vw, 120px);
-        height: max(20vw, 200px);
+        width: max(15vw, 100px);
+        height: max(20vw, 180px);
         flex-direction: row;
         justify-content: center;
         align-items: center;

@@ -497,6 +497,7 @@
         justify-content: center;
         align-items: flex-end;
         font-size: 10rem;
+        height: 10rem;
         opacity: 0.2;
         margin-bottom: 30px;
     }
