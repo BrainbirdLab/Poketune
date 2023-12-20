@@ -1,109 +1,116 @@
-<!-- PitchDetector.svelte -->
 <script lang="ts">
+    const chromaticNotes = [
+        "C",
+        "C#",
+        "D",
+        "D#",
+        "E",
+        "F",
+        "F#",
+        "G",
+        "G#",
+        "A",
+        "A#",
+        "B",
+    ];
 
-    import { PitchDetector } from "pitchy";
-
-    let detectedFrequency = 0;
-    let detectedClarity = 0;
-
-    let audioContext: AudioContext;
-    let analyserNode: AnalyserNode;
-
-    let interval: number;
-
-    function stop() {
-        console.log("stop");
-
-        if (audioContext.state === "closed") {
-            console.log("Already closed");
-            return;
-        }
-
-        if (interval){
-            clearInterval(interval);
-        }
-
-        audioContext.close().then(() => {
-            console.log("closed");
-        });
+    enum INSTRUMENT {
+        GUITAR,
+        BASS,
+        UKULELE,
+        CHROMATIC,
     }
 
-    function start() {
-        console.log("start");
+    function tuneInstrument(instrument: INSTRUMENT, pitch: number) {
+        const standardGuiterTuning: { [key: string]: number } = {
+            E2: 82.41,
+            A2: 110.0,
+            D3: 146.83,
+            G3: 196.0,
+            B3: 246.94,
+            E4: 329.63,
+        };
 
-        //if closed
-        if (audioContext?.state != "running") {
-            console.log("closed");
-            //create new audio context
-            audioContext = new window.AudioContext();
-            analyserNode = audioContext.createAnalyser();
+        const standardBassTuning: { [key: string]: number } = {
+            E1: 41.2,
+            A1: 55.0,
+            D2: 73.42,
+            G2: 98.0,
+            B2: 123.47,
+            E3: 164.81,
+        };
 
-            navigator.mediaDevices
-                .getUserMedia({ audio: true })
-                .then((stream) => {
-                    audioContext
-                        .createMediaStreamSource(stream)
-                        .connect(analyserNode);
+        const standardUkuleleTuning: { [key: string]: number } = {
+            G4: 392.0,
+            C4: 261.63,
+            E4: 329.63,
+            A4: 440.0,
+        };
 
-                    if (audioContext.state === "running") {
-                        interval = setInterval(() => {
-                            updatePitch(analyserNode, audioContext.sampleRate);
-                        }, 200);
-                    }
-                })
-        
-                .catch((error) => {
-                    console.error("Error accessing microphone:", error);
-                });
-        }
+        if (instrument == INSTRUMENT.GUITAR) {
+            console.log("Guitar");
+            console.log(getClosestNote(standardGuiterTuning, pitch));
+        } else if (instrument == INSTRUMENT.BASS) {
+            console.log("Bass");
+            console.log(getClosestNote(standardBassTuning, pitch));
+        } else if (instrument == INSTRUMENT.UKULELE) {
+            console.log("Ukulele");
+            console.log(getClosestNote(standardUkuleleTuning, pitch));
+        } else if (instrument == INSTRUMENT.CHROMATIC) {
+            console.log("Chromatic");
 
-        //if running
-        if (audioContext.state === "running") {
-            console.log("running");
-        }
-    }
+            const frequency = Math.round(pitch);
 
-    let count = 0;
-    
-    function updatePitch(analyserNode: AnalyserNode, sampleRate: number) {
-        console.log("updatePitch ", count++);
-        const detector = PitchDetector.forFloat32Array(analyserNode.fftSize);
-        const input = new Float32Array(detector.inputLength);
-
-        analyserNode.getFloatTimeDomainData(input);
-        const [pitch, clarity] = detector.findPitch(input, sampleRate);
-        if (clarity !== null) {
-            detectedClarity = Math.round(clarity * 100);
-        }
-
-        if (clarity > 0.8) {
-            detectedFrequency = 0;
-            if (pitch !== null) {
-                detectedFrequency = Math.round(pitch * 10) / 10;
+            if (pitch < 16.35) {
+                pitch = 16.35;
+            } else if (pitch > 7902.13) {
+                pitch = 7902.13;
             }
-        } else {
-            detectedFrequency = 0;
+
+            const noteIndex =
+                Math.round((Math.log(pitch / 440) / Math.log(2)) * 12) + 57;
+            //const noteIndex = ((Math.round(Math.log(pitch / 440) / Math.log(2) * 12) + 69) + 12) % 12;
+            const note = chromaticNotes[noteIndex % 12];
+            console.log(noteIndex % 12);
+            const octave = Math.floor(noteIndex / 12);
+            const expectedFrequency = 440 * Math.pow(2, (noteIndex - 57) / 12);
+            const cent = Math.round(
+                (1200 * Math.log(frequency / expectedFrequency)) / Math.log(2),
+            );
+
+            console.log(
+                `${note}${octave}(${expectedFrequency.toFixed(
+                    2,
+                )}) (${frequency} Hz, ${cent} cents)`,
+            );
+        }
+
+        function getClosestNote(
+            standardTuning: { [key: string]: number },
+            pitch: number,
+        ) {
+            let closestNote = "";
+            let diff = 1000000;
+
+            Object.keys(standardTuning).forEach((note) => {
+                //console.log(`standardTuning[{note}]: ${standardTuning[note]} - pitch: ${pitch} < diff: ${diff}`);
+                //console.log(`Note: ${standardTuning[note]} - diff: ${Math.abs(standardTuning[note] - pitch)}`);
+                if (Math.abs(standardTuning[note] - pitch) < Math.abs(diff)) {
+                    diff = standardTuning[note] - pitch;
+                    closestNote = note;
+                }
+            });
+
+            let cents = Math.floor(
+                1200 * Math.log2(pitch / standardTuning[closestNote]),
+            );
+
+            return {
+                note: closestNote,
+                cents: cents,
+            };
         }
     }
+
+    tuneInstrument(INSTRUMENT.CHROMATIC, 1000.32);
 </script>
-
-<h1>Real-time Pitch Detector</h1>
-<div id="detected-frequency">
-    Detected Frequency: {detectedFrequency.toFixed(2)} Hz
-    Clarity of Pitch: {detectedClarity}%
-</div>
-
-<button on:click={start}>Start</button>
-<button on:click={stop}>Stop</button>
-
-<style>
-    button{
-        background-color: #fff;
-        color: #000;
-        border: none;
-        padding: 10px;
-        border-radius: 10px;
-        margin: 10px;
-        cursor: pointer;
-    }
-</style>

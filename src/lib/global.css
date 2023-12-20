@@ -20,8 +20,11 @@ Remove scrollbars
 	width: 0px;
 }
 
+:root{
+	--primary: #0b1d37;
+}
 
 body{
-	background-color: #0b1d37;
+	background-color: var(--primary);
 	overflow: hidden;
 }

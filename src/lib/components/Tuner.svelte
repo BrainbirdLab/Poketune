@@ -1,30 +1,15 @@
 <script lang="ts">
+    import { tuneInstrument } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
 
-    export let instrument: string = "Chromatic";
-
     let MeterElem: HTMLElement;
 
-    let Octave: number | string = "-";
-    let Note = "-";
-    let Cent = 22;
-
-    const notes = [
-        "C",
-        "C#",
-        "D",
-        "D#",
-        "E",
-        "F",
-        "F#",
-        "G",
-        "G#",
-        "A",
-        "A#",
-        "B",
-    ];
+    let Octave: number;
+    let Note: string;
+    let Cent = 0;
+    let degree = 22;
 
     let canvas: HTMLCanvasElement;
 
@@ -120,10 +105,9 @@
         audioContext.close().then(() => {
             console.log("closed");
             isListening = false;
-            Note = "-";
-            Octave = "-";
             Cent = 0;
             Frequency = 0;
+            Note = "";
             detectedClarity = 0;
         });
 
@@ -179,74 +163,70 @@
 
         if (clarity < 0.8) {
             Frequency = 0;
-            Note = "-";
-            Octave = "-";
             Cent = 0;
             return;
         }
 
-        const noteIndex = Math.round(Math.log(pitch / 440) / Math.log(2) * 12) + 57;
-        Note = notes[noteIndex % 12];
-        Octave = Math.floor(noteIndex / 12);
-        const expectedFrequency = 440 * Math.pow(2, (noteIndex - 57) / 12);
-        Cent = Math.round(1200 * Math.log(pitch / expectedFrequency) / Math.log(2));
-        Frequency = Math.round(pitch);
+        const tune = tuneInstrument(pitch);
 
-        if (Cent > 45) {
-            Cent = 45;
-        } else if (Cent < -45) {
-            Cent = -45;
+        Note = tune.note;
+        Octave = tune.octave;
+        Cent = tune.cent;
+        degree = Cent;
+        Frequency = Math.round(pitch * 100) / 100;
+
+
+        if (degree > 45) {
+            degree = 45;
+        } else if (degree < -45) {
+            degree = -45;
         }
 
     }
 </script>
 
-<div class="instrument">
-    <img src="/images/{instrument}(Custom).png" alt={instrument} width="60px" />
-</div>
-
 <div class="tuner">
+    <div class="info">
+        <div class="freq">f: {Frequency} Hz</div>
+        <div class="clarity">Clarity: {detectedClarity}%</div>
+        <div class="cent">{Cent} C</div>
+    </div>
+    {#if Note} 
+    <div class="noteName" in:fly|global={{y: 5}}>
+        {Note}{Octave}
+    </div>
+    {:else}
+    <div class="noteName" in:fly|global={{y: 5}}>
+        -.-
+    </div>
+    {/if}
     <div class="meter" bind:this={MeterElem}>
         <div class="range">
-            <div
-                class="meter-scale meter-scale-strong"
-                in:fly={{ y: 10, delay: 100 }}
-            >
-                ♭
+            <div class="scale">
+                {#each [-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50] as num, i}
+                    <div class="point">
+                        <div class="meter-scale" class:strong={i == 0 || i == 5 || i == 11} in:fly={{ y: 10, delay: 100 * i }}/>
+                        <div class="number">{num}</div>
+                    </div>
+                {/each}
+                <div class="pointer" 
+                    style="width: {Math.abs(Cent) || 2}px;
+                            background: {Math.abs(Cent) < 10 ? "#00ff6a" : Math.abs(Cent) > 10 && Math.abs(Cent) < 20 ? "yellow" : "orange"}
+                    "
+                    class:left={Cent < -2}
+                    class:right={Cent > 2}
+                ></div>
             </div>
-            <div class="meter-scale" in:fly={{ y: 10, delay: 150 }} />
-            <div class="meter-scale" in:fly={{ y: 10, delay: 200 }} />
-            <div class="meter-scale" in:fly={{ y: 10, delay: 250 }} />
-            <div class="meter-scale" in:fly={{ y: 10, delay: 300 }} />
-            <div
-                class="meter-scale meter-scale-strong"
-                in:fly={{ y: 10, delay: 350 }}
-            >
-                ♮
-            </div>
-            <div class="meter-scale" in:fly={{ y: 10, delay: 400 }} />
-            <div class="meter-scale" in:fly={{ y: 10, delay: 450 }} />
-            <div class="meter-scale" in:fly={{ y: 10, delay: 500 }} />
-            <div class="meter-scale" in:fly={{ y: 10, delay: 550 }} />
-            <div
-                class="meter-scale meter-scale-strong"
-                in:fly={{ y: 10, delay: 600 }}
-            >
-                ♯
-            </div>
-        </div>
-        <div
-            in:fade={{ duration: 1000 }}
-            class="meter-pointer"
-            style="transform: rotate({Cent}deg);"
-        />
-        <div class="meter-dot" />
-        <div class="noteName">
-            <div class="toneName">
-                {Note}{Octave}
-            </div>
-            <div class="frequency">
-                {Frequency}Hz | {detectedClarity}%
+            <div class="labels">
+                <div class="label" in:fly={{ y: 10, delay: 100 }}> 
+                    ♭
+                </div>
+                <div class="label" in:fly={{ y: 10, delay: 350 }}>
+                    ♮
+                </div>
+                <div class="label" in:fly={{ y: 10, delay: 600 }}>
+                    ♯
+                </div>
             </div>
         </div>
     </div>
@@ -262,7 +242,7 @@
     {/if}
 </div>
 
-<style>
+<style lang="scss">
     .tuner {
         display: flex;
         flex-direction: column;
@@ -272,134 +252,166 @@
         border-radius: 10px;
     }
 
-    .instrument {
-        position: fixed;
-        top: 0;
-        right: 0;
-        padding: 10px;
-    }
-
     .meter {
         position: relative;
-        width: 200px;
-        height: 200px;
         border-radius: 5px;
         background: #2c3e5000;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
+        margin-bottom: 40px;
+    }
+
+    .info{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        margin-top: 60px;
+        width: 100%;
+        position: relative;
+
+        .freq{
+            position: absolute;
+            left: 0;
+        }
+
+        .clarity{
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .cent{
+            position: absolute;
+            right: 0;
+        }
+    }
+
+    .range{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+        width: 100%;
+        position: relative;
+        padding: 0 10px;
+
+        .scale, .labels{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            position: relative;
+            text-align: center;
+        }
+
+        .pointer{
+            position: absolute;
+            width: 2px;
+            height: 18px;
+            left: 50%;
+            border-radius: 2px;
+            transition: 100ms;
+            transform: translateX(-50%);
+            &.left{
+                transform: translateX(calc(-100% + 2px));
+                border-top-left-radius: 10px;
+                border-bottom-left-radius: 10px;
+            }
+            &.right{
+                transform: translateX(calc(0% - 2px));
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+        }
+    }
+
+    .point{
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        .number{
+            position: absolute;
+            font-size: 0.6rem;
+            text-align: center;
+            bottom: -10px;
+            background: var(--primary);
+        }
     }
 
     .meter-scale {
-        width: 1px;
-        height: 100%;
-        transform-origin: bottom;
-        transition: transform 0.2s;
-        box-sizing: border-box;
-        border-top: 10px solid;
-        position: absolute;
-        right: 50%;
-        top: 0;
-        z-index: -1;
-    }
-
-    .meter-scale:nth-child(1) {
-        transform: rotate(-45deg);
-    }
-
-    .meter-scale:nth-child(2) {
-        transform: rotate(-36deg);
-    }
-
-    .meter-scale:nth-child(3) {
-        transform: rotate(-27deg);
-    }
-
-    .meter-scale:nth-child(4) {
-        transform: rotate(-18deg);
-    }
-
-    .meter-scale:nth-child(5) {
-        transform: rotate(-9deg);
-    }
-
-    .meter-scale:nth-child(6) {
-        transform: rotate(0deg);
-    }
-
-    .meter-scale:nth-child(7) {
-        transform: rotate(9deg);
-    }
-
-    .meter-scale:nth-child(8) {
-        transform: rotate(18deg);
-    }
-
-    .meter-scale:nth-child(9) {
-        transform: rotate(27deg);
-    }
-
-    .meter-scale:nth-child(10) {
-        transform: rotate(36deg);
-    }
-
-    .meter-scale:nth-child(11) {
-        transform: rotate(45deg);
-    }
-
-    .meter-scale-strong {
         width: 2px;
-        border-top-width: 20px;
-    }
+        height: 25px;
+        background: #aec4e651;
 
-    .meter-dot {
-        width: 10px;
-        height: 10px;
-        background: #2c3e50;
-        border-radius: 50%;
-        position: absolute;
-        bottom: -5px;
-        right: 50%;
-        margin-right: -4px;
-    }
-
-    .meter-pointer {
-        width: 2px;
-        height: 100%;
-        background: #2c3e50;
-        transform: rotate(22deg);
-        transform-origin: bottom;
-        transition: transform 0.5s;
-        position: absolute;
-        right: 50%;
-        z-index: -3;
+        &.strong {
+            width: 2px;
+            height: 35px;
+        }
     }
 
     .noteName {
         font-weight: bold;
-
-        position: absolute;
         display: flex;
         flex-direction: row;
-        width: 250px;
-        justify-content: space-between;
-        bottom: -10px;
+        width: 100%;
+        justify-content: center;
+        font-size: 10rem;
+        opacity: 0.2;
     }
 
     .listenActionButton {
         border: none;
         outline: none;
         padding: 10px;
-        width: 60px;
-        border-radius: 10px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
         background: #266dfa;
         cursor: pointer;
         transition: 100ms;
+        position: relative;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 0;
+        }
+        50% {
+            opacity: 0.9;
+        }
+        100% {
+            transform: scale(2);
+            opacity: 0;
+        }
     }
 
     .stop {
         background: #ff0000;
+        &::after{
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background: #ffffff30;
+            opacity: 0;
+            z-index: -1;
+            transform: scale(1);
+            animation: pulse 800ms infinite;
+        }
     }
 
     .listenActionButton:hover {

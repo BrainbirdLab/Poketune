@@ -3,21 +3,21 @@
     import { fly } from 'svelte/transition';
     import { onMount } from 'svelte';
     import Tuner from './Tuner.svelte';
+    import {instrumentNames} from '$lib/tuner';
+    import {selectedInstrument} from '$lib/store';
 
-    let instruments = ['Guitar', 'Ukulele', 'Bass', 'Chromatic'];
-    let selectedInstrument: string;
-    
+
     onMount(() => {
         //set the selected instrument to the first instrument in the list
-        selectedInstrument = 'Chromatic';
+        selectedInstrument.set("Ukulele");
     });
 </script>
 
-{#if selectedInstrument == 'Not Selected'}
+{#if $selectedInstrument == "None"}
     <div class="instruments">
-        {#each instruments as instrument, i}
+        {#each instrumentNames as instrument, i}
             <div class="instrument" in:fly={{y: 100*i + 100}}>
-                <input type="radio" id="{instrument}" name="instrument" bind:group={selectedInstrument} value={instrument} />
+                <input type="radio" id="{instrument}" name="instrument" bind:group={$selectedInstrument} value={i} />
                 <!-- svelte-ignore a11y-label-has-associated-control -->
                 <label for="{instrument}">
                     <img src="/images/{instrument}(Custom).png" alt="{instrument}">
@@ -26,9 +26,9 @@
             </div>
         {/each}
     </div>
-{:else if selectedInstrument && selectedInstrument != 'Not Selected'}
+{:else}
     <div in:fly={{x: 100}}>
-        <Tuner bind:instrument="{selectedInstrument}"/>
+        <Tuner/>
     </div>
 {/if}
 
