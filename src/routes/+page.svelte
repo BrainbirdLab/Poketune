@@ -47,6 +47,8 @@
         padding: 10px;
         gap: 10px;
         width: min(100vw, 500px);
+        left: 50%;
+        transform: translateX(-50%);
         align-items: center;
         justify-content: space-between;
 
