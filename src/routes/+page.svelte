@@ -1,5 +1,6 @@
 <script>
 
+    import SelectInstrument from "$lib/components/SelectInstrument.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
     import {selectedInstrument} from "$lib/store";
 
@@ -10,12 +11,14 @@
         <div class="t">
             PokeTune <img src="/images/icon(Custom).png" alt="Logo" width="50px" />
         </div>
-        <div class="instrument">
-            <img src="/images/{$selectedInstrument}(Custom).png" alt="{$selectedInstrument}" width="60px" />
-            <div class="name">{$selectedInstrument}</div>
-        </div>
+        {#if $selectedInstrument != "None"}
+            <button class="instrument" on:click={()=>{selectedInstrument.set("None")}}>
+                <img src="/images/{$selectedInstrument}(Custom).png" alt="{$selectedInstrument}" width="60px" />
+                <div class="name">Change</div>
+            </button>
+        {/if}
     </div>
-    <Tuner />
+    <SelectInstrument />
 </div>
 
 <style lang="scss">
@@ -25,6 +28,12 @@
         align-items: center;
         justify-content: center;
         height: 100vh;
+    }
+
+    button{
+        background: transparent;
+        border: none;
+        cursor: pointer;
     }
 
     .title {
@@ -55,9 +64,11 @@
             height: 100%;
             width: 60px;
             justify-content: center;
+            cursor: pointer;
             .name{
                 position: absolute;
                 font-size: 12px;
+                font-weight: 700;
                 color: #f0c449;
                 bottom: -15px;
             }

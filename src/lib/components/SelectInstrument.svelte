@@ -6,18 +6,13 @@
     import {instrumentNames} from '$lib/tuner';
     import {selectedInstrument} from '$lib/store';
 
-
-    onMount(() => {
-        //set the selected instrument to the first instrument in the list
-        selectedInstrument.set("Ukulele");
-    });
 </script>
 
 {#if $selectedInstrument == "None"}
     <div class="instruments">
         {#each instrumentNames as instrument, i}
-            <div class="instrument" in:fly={{y: 100*i + 100}}>
-                <input type="radio" id="{instrument}" name="instrument" bind:group={$selectedInstrument} value={i} />
+            <div class="instrument" in:fly|global={{y: 100*i + 100}}>
+                <input type="radio" id="{instrument}" name="instrument" bind:group={$selectedInstrument} value={instrument} />
                 <!-- svelte-ignore a11y-label-has-associated-control -->
                 <label for="{instrument}">
                     <img src="/images/{instrument}(Custom).png" alt="{instrument}">

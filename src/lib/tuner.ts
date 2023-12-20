@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { selectedInstrument } from "./store";
+import { selectedInstrument, pitchShiftBy } from "./store";
 
 const chromaticNotes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
@@ -11,7 +11,7 @@ export const instrumentNames = [
     'Chromatic'
 ];
 
-type Tuning = {
+export type Tuning = {
     note: string;
     octave: number;
     frequency: number;
@@ -19,7 +19,7 @@ type Tuning = {
     cent: number;
 };
 
-function getReferenceNotes(shiftBy = 0): {[key: string]: Tuning}{
+export function getReferenceNotes(): {[key: string]: Tuning}{
 
     if (get(selectedInstrument) == "Chromatic") {
         return {}
@@ -44,13 +44,13 @@ function getReferenceNotes(shiftBy = 0): {[key: string]: Tuning}{
             break;
     }
 
-    //if shiftBy is not 0, then we need to shift the notes and octaves
-    if (shiftBy != 0) {
+    //if get(pitchShiftBy) is not 0, then we need to shift the notes and octaves
+    if (get(pitchShiftBy) != 0) {
         for (let i = 0; i < instrumentNotes.length; i++) {
             const noteIndex = chromaticNotes.indexOf(instrumentNotes[i]);
-            const shiftedNoteIndex = (noteIndex + shiftBy) % chromaticNotes.length;
+            const shiftedNoteIndex = (noteIndex + get(pitchShiftBy) + (chromaticNotes.length) * 10) % chromaticNotes.length;
             instrumentNotes[i] = chromaticNotes[shiftedNoteIndex];
-            instrumentOctaves[i] += Math.floor((noteIndex + shiftBy) / chromaticNotes.length);
+            instrumentOctaves[i] += Math.floor((noteIndex + get(pitchShiftBy)) / chromaticNotes.length);
         }
     }
 
@@ -92,7 +92,7 @@ export function getNote(frequency: number): Tuning {
     };
 }
 
-function getFrequency(note: string, octave: number): number {
+export function getFrequency(note: string, octave: number): number {
     const noteIndex = chromaticNotes.indexOf(note);
     const frequency = 440 * Math.pow(2, (noteIndex - 57 + octave * 12) / 12);
     return frequency;
@@ -129,7 +129,7 @@ export function tuneInstrument(pitch: number): Tuning {
         };
 
     } else {
-        const standardTuning = getReferenceNotes(0);
+        const standardTuning = getReferenceNotes();
         const closestNote = getClosestNote(standardTuning, pitch);
         return closestNote;
     }

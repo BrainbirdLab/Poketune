@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { tuneInstrument } from "$lib/tuner";
+    import { pitchShiftBy, selectedInstrument } from "$lib/store";
+    import { getFrequency, getReferenceNotes, tuneInstrument, type Tuning } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
     import { onMount } from "svelte";
-    import { fade, fly } from "svelte/transition";
+    import { fade, fly, slide } from "svelte/transition";
 
-    let MeterElem: HTMLElement;
 
     let Octave: number;
     let Note: string;
@@ -89,6 +89,12 @@
     let stream: MediaStream;
 
     let interval: number;
+
+    let notes: {[key: string]: Tuning} = getReferenceNotes();
+
+    pitchShiftBy.subscribe((val) => {
+        notes = getReferenceNotes();
+    });
 
     function stop() {
         console.log("stop");
@@ -181,36 +187,48 @@
         } else if (degree < -45) {
             degree = -45;
         }
+    }
 
+    function incrementPitchBy(num: number) {
+        pitchShiftBy.update((val) => {
+            //if first note frequency is more than 16.35 Hz or last note frequency is less than 7902.13 Hz then only increment
+            return val+num;
+        });
+        const tempNotes = getReferenceNotes();
+        const obj = Object.values(tempNotes);
+        const firstNote = obj[0].frequency;
+        const lastNote = obj[obj.length - 1].frequency;
+
+        if (firstNote < 16.35 || lastNote > 7902.13) {
+            pitchShiftBy.update((val) => {
+                return val-num;
+            });
+        }
     }
 </script>
 
+<canvas class:hidden={!isListening && !Note} in:fly={{ x: 40, delay: 500 }} bind:this={canvas} />
 <div class="tuner">
-    <div class="info">
-        <div class="freq">f: {Frequency} Hz</div>
-        <div class="clarity">Clarity: {detectedClarity}%</div>
-        <div class="cent">{Cent} C</div>
-    </div>
     {#if Note} 
     <div class="noteName" in:fly|global={{y: 5}}>
-        {Note}{Octave}
+        {Note} <div class="octave">{Octave}</div>
     </div>
     {:else}
     <div class="noteName" in:fly|global={{y: 5}}>
         -.-
     </div>
     {/if}
-    <div class="meter" bind:this={MeterElem}>
+    <div class="meter">
         <div class="range">
             <div class="scale">
-                {#each [-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50] as num, i}
+                {#each [-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60] as num, i}
                     <div class="point">
-                        <div class="meter-scale" class:strong={i == 0 || i == 5 || i == 11} in:fly={{ y: 10, delay: 100 * i }}/>
-                        <div class="number">{num}</div>
+                        <div class="meter-scale" class:strong={i == 0 || i == 6 || i == 12} in:fly|global={{ y: 10, delay: 40 * (i+1) }}/>
+                        <div class="number" in:fly|global={{ y: 10, delay: 40 * (i+1) }}>{num}</div>
                     </div>
                 {/each}
                 <div class="pointer" 
-                    style="width: {Math.abs(Cent) || 2}px;
+                    style="width: max(calc({(Cent > 60 ? 60 : Cent < -60 ? -60 : Cent) || 2}% - 4%), 2%);
                             background: {Math.abs(Cent) < 10 ? "#00ff6a" : Math.abs(Cent) > 10 && Math.abs(Cent) < 20 ? "yellow" : "orange"}
                     "
                     class:left={Cent < -2}
@@ -230,7 +248,39 @@
             </div>
         </div>
     </div>
-    <canvas in:fly={{ x: 40, delay: 500 }} bind:this={canvas} />
+    <div class="info">
+        <div class="freq">f: {Frequency} Hz</div>
+        <div class="clarity">Clarity: {detectedClarity}% {detectedClarity > 80 ? "👍" : "👎"}</div>
+        <div class="cent">{Cent} C {Math.abs(Cent) < 10 ? "😁" : "😢"}</div>
+    </div>
+    {#if $selectedInstrument != "Chromatic"}
+        <div class="notes">
+            {#key $pitchShiftBy}
+            {#each Object.values(notes) as note, i}
+                <div class="note">
+                    <div class="name" in:fly|global={{y: 5, delay: 40*(i+1)}}>{note.note}{note.octave}</div>
+                    <div class="freq" in:fly|global={{y: 5, delay: 40*(i+1)}}>{note.frequency.toFixed(2)} Hz</div>
+                </div>
+            {/each}
+            {/key}
+        </div>
+        <div class="pitch">
+            <button class="pitchChanger" on:click={()=>{
+                incrementPitchBy(-1);
+            }}> - </button>
+            {#key $pitchShiftBy}
+            <div class="pitchShift" in:fly={{y: 10, duration: 500}} >
+                {$pitchShiftBy > 0 ? "+" : ""}{$pitchShiftBy}
+            </div>
+            {/key}
+            <button class="pitchChanger" on:click={()=>{
+                incrementPitchBy(1);
+            }}> + </button>
+            {#if Math.abs($pitchShiftBy) > 10}
+                <button transition:slide={{axis: 'x'}} class="button">Reset</button>
+            {/if}
+        </div>
+    {/if}
     {#if isListening}
         <button in:fade class="listenActionButton stop" on:click={stop}
             >Stop</button
@@ -243,6 +293,44 @@
 </div>
 
 <style lang="scss">
+
+    canvas{
+        position: absolute;
+        top: 25%;
+        opacity: 1;
+        transition: 100ms;
+        &.hidden{
+            opacity: 0;
+        }
+    }
+
+    .notes{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 20px;
+
+        .note{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            font-size: 1rem;
+            text-align: center;
+
+            .freq{
+                font-size: 0.6rem;
+                color: #ffffff80;
+            }
+        }
+    }
+
     .tuner {
         display: flex;
         flex-direction: column;
@@ -250,6 +338,48 @@
         justify-content: center;
         background: rgba(0, 128, 128, 0);
         border-radius: 10px;
+        height: 100%;
+    }
+
+    .pitchChanger, .button{
+        border: none;
+        outline: none;
+        padding: 10px;
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+        background: #2c3e50;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover{
+            filter: brightness(0.9);
+        }
+    }
+
+    .button{
+        width: max-content;
+        height: 35px;
+        margin: 10px;
+    }
+
+    .pitch{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+    }
+
+    .pitchShift{
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 10px;
     }
 
     .meter {
@@ -259,7 +389,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-direction: column;
+        flex-direction: row;
         margin-bottom: 40px;
     }
 
@@ -271,7 +401,7 @@
         gap: 10px;
         font-size: 0.7rem;
         font-weight: bold;
-        margin-top: 60px;
+        padding: 15px 20px 20px 20px;
         width: 100%;
         position: relative;
 
@@ -307,7 +437,7 @@
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            gap: 20px;
+            gap: 27px;
             width: 100%;
             position: relative;
             text-align: center;
@@ -319,7 +449,7 @@
             height: 18px;
             left: 50%;
             border-radius: 2px;
-            transition: 100ms;
+            //transition: 100ms;
             transform: translateX(-50%);
             &.left{
                 transform: translateX(calc(-100% + 2px));
@@ -365,8 +495,16 @@
         flex-direction: row;
         width: 100%;
         justify-content: center;
+        align-items: flex-end;
         font-size: 10rem;
         opacity: 0.2;
+        margin-bottom: 30px;
+    }
+
+    .octave{
+        font-size: 4rem;
+        margin-left: 5px;
+        margin-bottom: 10px;
     }
 
     .listenActionButton {
@@ -380,6 +518,7 @@
         cursor: pointer;
         transition: 100ms;
         position: relative;
+        margin-top: 30px;
     }
 
     @keyframes pulse {
@@ -391,7 +530,7 @@
             opacity: 0.9;
         }
         100% {
-            transform: scale(2);
+            transform: scale(1.6);
             opacity: 0;
         }
     }
