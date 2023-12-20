@@ -68,8 +68,10 @@
 
     .instrument {
         display: flex;
-        width: max(15vw, 100px);
-        height: max(20vw, 180px);
+        width: max(10vw, 100px);
+        height: max(16vw, 160px);
+        max-width: 90vw;
+        max-height: 90vh;
         flex-direction: row;
         justify-content: center;
         align-items: center;
