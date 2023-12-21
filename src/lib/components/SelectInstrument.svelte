@@ -50,7 +50,7 @@
         align-items: center;
         justify-content: center;
         align-content: center;
-        height: 100%;
+        height: 77vh;
         overflow: hidden;
     }
 
@@ -59,7 +59,7 @@
         flex-wrap: wrap;
         flex-direction: row;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         gap: 5%;
         padding: 30px;
         overflow: scroll;
@@ -68,15 +68,13 @@
 
     .instrument {
         display: flex;
-        width: max(10vw, 100px);
-        height: max(16vw, 160px);
         max-width: 90vw;
         max-height: 90vh;
         flex-direction: row;
         justify-content: center;
+        min-width: 150px;
         align-items: center;
         border-radius: 10px;
-        border: 3px solid #ffffff1e;
         transition: 100ms ease-in-out;
     }
 

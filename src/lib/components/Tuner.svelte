@@ -501,16 +501,16 @@
                     </div>
                 {/each}
             </div>
+            {#if isListening}
+                <button in:fade class="listenActionButton stop" on:click={stop}
+                    >Stop</button
+                >
+            {:else}
+                <button in:fade class="listenActionButton start" on:click={start}
+                    >Start</button
+                >
+            {/if}
         </div>
-    {/if}
-    {#if isListening}
-        <button in:fade class="listenActionButton stop" on:click={stop}
-            >Stop</button
-        >
-    {:else}
-        <button in:fade class="listenActionButton start" on:click={start}
-            >Start</button
-        >
     {/if}
 </div>
 
@@ -544,6 +544,7 @@
         padding: 0 10px;
         margin-bottom: -25px;
         width: 100%;
+        position: relative;
     }
 
     .notes {
@@ -597,11 +598,12 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         background: rgba(0, 128, 128, 0);
         border-radius: 10px;
         height: 100%;
         width: 100%;
+        overflow: scroll;
     }
 
     .pitchChanger,
@@ -779,7 +781,7 @@
         font-size: 7rem;
         height: 10rem;
         color: #2c3e50;
-        margin-bottom: 50px;
+        margin-bottom: 40px;
         .octave {
             font-size: 3rem;
             margin-left: 5px;
@@ -798,7 +800,8 @@
         background: #266dfa;
         cursor: pointer;
         transition: 100ms;
-        position: relative;
+        position: absolute;
+        bottom: -45px;
     }
 
     @keyframes pulse {

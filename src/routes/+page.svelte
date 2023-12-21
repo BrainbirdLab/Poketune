@@ -42,7 +42,6 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 100vh;
     }
 
     button{
@@ -53,20 +52,20 @@
 
     .tunerWrapper{
         width: min(100vw, 450px);
+        height: 85vh;
+        overflow: hidden;
     }
 
     .title {
         font-size: 1.4rem;
         color: #fff;
         font-weight: 700;
-        position: absolute;
         background: var(--primary);
-        top: 0;
-
         display: flex;
-        padding: 10px;
+        padding: 10px 10px 0 10px;
         gap: 10px;
         width: min(100vw, 500px);
+        height: 80px;
         align-items: center;
         justify-content: space-between;
 
