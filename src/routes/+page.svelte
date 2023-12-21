@@ -83,6 +83,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            width: 100px;
             img{
                 width: 60px;
             }
