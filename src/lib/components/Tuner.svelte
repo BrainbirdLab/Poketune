@@ -225,10 +225,11 @@
         Octave = tune.octave;
         Cent = tune.cent;
         Frequency = Math.round(pitch * 100) / 100;
-        if (Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
+        
+        if (($selectedInstrument != "Chromatic" && $selectedInstrument != "None") && Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
             tunedNotes.add(Note + Octave);
             tunedNotes = new Set<string>(tunedNotes);
-
+            console.log(tunedNotes, notes);
             //if correct note is played and all notes are not tuned
             if (
                 lastNote != Note + Octave
