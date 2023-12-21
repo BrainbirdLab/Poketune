@@ -17,7 +17,7 @@
 <div class="container">
     <div class="title" in:fly={{x: 10}}>
         <div class="t">
-            PokeTune <img src="/images/icon(Custom).png" alt="Logo" width="50px" />
+            PokeTune <img src="/images/icon(Custom).png" alt="Logo" class="logo" width="50px" />
         </div>
         {#if $selectedInstrument != "None"}
             <button class="instrument" on:click={()=>{selectedInstrument.set("None")}}>
@@ -92,7 +92,7 @@
             top: 2px;
             right: 0;
             img{
-                width: 60px;
+                width: 35px;
             }
             .name{
                 position: absolute;
