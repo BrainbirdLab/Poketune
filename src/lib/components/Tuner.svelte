@@ -1,11 +1,14 @@
 <script lang="ts">
     import { confetti } from '@neoconfetti/svelte';
     import { pitchShiftBy, selectedInstrument } from "$lib/store";
-    import { getReferenceNotes, tuneInstrument, type Tuning } from "$lib/tuner";
+    import { getFrequency, getReferenceNotes, tuneInstrument, type Tuning } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
     import { onDestroy, onMount } from "svelte";
     import { fade, fly, slide } from "svelte/transition";
-
+    
+    //load audio
+    const correctNoteSound = new Audio('/sounds/correct.mp3');
+    const allDoneSound = new Audio('/sounds/allDone.mp3');
 
     let Octave: number;
     let Note: string;
@@ -86,6 +89,20 @@
 
     onMount(() => {
         drawCanvas();
+        const pitchShift = localStorage.getItem("pitchShiftBy") || "0";
+        if (pitchShift) {
+            //if pitch shift is <= 10 or >= -10 then only set, else set to 0
+            if (Math.abs(Number(pitchShift)) <= 10) {
+                pitchShiftBy.set(Number(pitchShift));
+            } else {
+                pitchShiftBy.set(0);
+            }
+        }
+
+        pitchShiftBy.subscribe((val) => {
+            notes = getReferenceNotes();
+            localStorage.setItem("pitchShiftBy", val.toString());
+        });
     });
 
     onDestroy(() => {
@@ -105,10 +122,6 @@
 
     $: leftNotes = Object.values(notes).slice(0, Object.values(notes).length / 2);
     $: rightNotes = Object.values(notes).slice(Object.values(notes).length / 2);
-
-    pitchShiftBy.subscribe((val) => {
-        notes = getReferenceNotes();
-    });
 
     function stop() {
         console.log("stop");
@@ -136,8 +149,7 @@
             detectedClarity = 0;
         });
 
-        tunedNotes.clear();
-        tunedNotes = new Set<string>(tunedNotes);
+        reset();
 
         stream.getTracks().forEach((track) => track.stop());
 
@@ -178,6 +190,9 @@
         }
     }
 
+    let lastNote = "";
+    let complete = false;
+
     function updatePitch(analyserNode: AnalyserNode, sampleRate: number) {
         //console.log("updatePitch ", count++);
         const detector = PitchDetector.forFloat32Array(analyserNode.fftSize);
@@ -202,8 +217,32 @@
         Cent = tune.cent;
         Frequency = Math.round(pitch * 100) / 100;
         if (Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
+
             tunedNotes.add(Note+Octave);
             tunedNotes = new Set<string>(tunedNotes);
+            
+            //if correct note is played and all notes are not tuned
+            if (lastNote != Note+Octave && tunedNotes.size != Object.values(notes).length) {
+                correctNoteSound.currentTime = 0;
+                correctNoteSound.play();
+
+                
+            } else if (lastNote != Note+Octave && tunedNotes.size == Object.values(notes).length && !complete) {
+                allDoneSound.currentTime = 0;
+                allDoneSound.play();
+                complete = true;
+            }
+
+            const elem = document.getElementById(Note+Octave);
+
+            if (elem) {
+                elem.classList.add("played");
+                setTimeout(() => {
+                    elem.classList.remove("played");
+                }, 1000);
+            }
+            
+            lastNote = Note+Octave;
         }
     }
 
@@ -222,9 +261,58 @@
                 return val-num;
             });
         } else {
-            tunedNotes.clear();
-            tunedNotes = new Set<string>(tunedNotes);
+            reset();
         }
+    }
+
+    function handleClickOnNote(node: HTMLElement){
+        node.onclick = (e) => {
+            const target = e.target as HTMLElement;
+
+            if (!target){
+                return;
+            }
+
+            const frequencyStr = target.dataset.frequency;
+            if (!frequencyStr){
+                return;
+            }
+
+            const frequency = Number(frequencyStr);
+
+            if (!frequency){
+                return;
+            }
+
+            //generate acoustic guitar sound of that frequency
+            const audioContext = new AudioContext();
+            const osc = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            gainNode.gain.value = 0.6;
+            osc.frequency.value = frequency;
+            osc.type = "sine";
+            osc.start();
+
+            // Make the sound fade out slowly
+            gainNode.gain.setValueAtTime(1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+            osc.stop(audioContext.currentTime + 2);
+        }
+
+        return {
+            destroy(){
+                node.onclick = null;
+            }
+        }
+    }
+
+    function reset(){
+        tunedNotes.clear();
+        tunedNotes = new Set<string>(tunedNotes);
+        lastNote = "";
+        complete = false;
     }
 </script>
 
@@ -284,10 +372,10 @@
             <div class="conf" use:confetti></div>
         {/if}
 
-        <div class="noteVisual">
+        <div class="noteVisual" use:handleClickOnNote>
             <div class="notes left"> <!-- Display E A D -->
                 {#each Object.values(leftNotes) as note, i}
-                    <div class="note" in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
+                    <div class="note" id="{note.note}{note.octave}" data-frequency={note.frequency} in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
                         <div class="name">{note.note}{note.octave}</div>
                         <div class="freq">{note.frequency.toFixed(2)} Hz</div>
                     </div>
@@ -315,7 +403,7 @@
             </div>
             <div class="notes right"> <!-- Display G B E -->
                 {#each Object.values(rightNotes) as note, i}
-                    <div class="note" in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
+                    <div class="note" id="{note.note}{note.octave}" data-frequency={note.frequency} in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
                         <div class="name">{note.note}{note.octave}</div>
                         <div class="freq">{note.frequency.toFixed(2)} Hz</div>
                     </div>
@@ -375,6 +463,10 @@
         flex-wrap: wrap;
         width: 100%;
         gap: 5px;
+        
+        &.left{
+            flex-direction: column-reverse;
+        }
 
         .note{
             display: flex;
@@ -388,16 +480,26 @@
             border-radius: 10px;
             border: 2px solid #ffffff30;
             width: 80px;
-
+            transition: 100ms;
+            cursor: pointer;
+            
             &.tuned{
                 border: 2px solid #2ecc71;
             }
-
+            
             .freq{
                 font-size: 0.6rem;
                 color: #ffffff80;
             }
+
+            > *{
+                pointer-events: none;
+            }
         }
+    }
+    
+    :global(.note.played){
+        background: #2ecc7074;
     }
 
     .tuner {
