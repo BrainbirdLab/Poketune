@@ -6,7 +6,12 @@
 
 </script>
 
-
+<div class="title" in:fly={{x: 10}}>
+    <div class="t">
+        PokeTune
+    </div>
+    <img src="/images/icon(Custom).png" alt="Logo" class="logo" width="50px" />
+</div>
 <div class="wrapper">
     <div class="instruments">
         {#each instrumentNames as instrument, i}
@@ -28,6 +33,31 @@
 </div>
 
 <style lang="scss">
+    .title {
+        font-size: 1.3rem;
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        padding: 0px 10px 0 10px;
+        gap: 10px;
+        width: min(100vw, 500px);
+        height: 35px;
+        align-items: center;
+        justify-content: flex-start;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+        width: 100%;
+        background: var(--primary);
+
+        .t{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    }
     .footer {
         position: absolute;
         bottom: 0;
@@ -50,7 +80,7 @@
         align-items: center;
         justify-content: center;
         align-content: center;
-        height: 77vh;
+        height: 100vh;
         overflow: hidden;
     }
 
@@ -60,22 +90,28 @@
         flex-direction: row;
         justify-content: center;
         align-items: flex-start;
-        gap: 5%;
-        padding: 30px;
+        gap: 25px;
+        padding: 30px 10px;
         overflow: scroll;
         align-content: flex-start;
     }
 
     .instrument {
         display: flex;
-        max-width: 90vw;
-        max-height: 90vh;
         flex-direction: row;
         justify-content: center;
-        min-width: 150px;
+        width: clamp(100px, 20vw, 160px);
+        aspect-ratio: 1/1.3;
         align-items: center;
         border-radius: 10px;
         transition: 100ms ease-in-out;
+
+        img{
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
     }
 
     .instrument input {

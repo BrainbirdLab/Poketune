@@ -135,15 +135,15 @@
     $: rightNotes = Object.values(notes).slice(Object.values(notes).length / 2);
 
     function stop() {
-        console.log("stop");
+        //console.log("stop");
 
         if (!audioContext) {
-            console.log("No audio context");
+            //console.log("No audio context");
             return;
         }
 
         if (audioContext.state === "closed") {
-            console.log("Already closed");
+            //console.log("Already closed");
             return;
         }
 
@@ -371,6 +371,16 @@
     }
 </script>
 
+{#if $selectedInstrument != "None"}
+<button class="changeInstrument" on:click={()=>{selectedInstrument.set("None")}}>
+    <div class="lab">Change Instrument</div>
+    <div class="current">
+        <img src="/images/{$selectedInstrument}(Custom).png" alt="{$selectedInstrument}" width="60px" />
+        <div class="name">{$selectedInstrument}</div>
+    </div>
+</button>
+{/if}
+
 <div class="tuner">
     <div class="noteContainer">
         {#if Note}
@@ -453,13 +463,15 @@
                 {/each}
             </div>
             <div class="pitch">
-                <button
+                <div class="label">Change pitch</div>
+                <div class="settings">
+                    <button
                     class="pitchChanger"
                     on:click={() => {
                         incrementPitchBy(-1);
                     }}
                 >
-                    -
+                <i class="fa-solid fa-minus"></i>
                 </button>
                 {#key $pitchShiftBy}
                     <div class="pitchShift" in:fly={{ y: 10, duration: 500 }}>
@@ -472,7 +484,7 @@
                         incrementPitchBy(1);
                     }}
                 >
-                    +
+                <i class="fa-solid fa-plus"></i>
                 </button>
                 {#if Math.abs($pitchShiftBy) > 10}
                     <button
@@ -482,9 +494,10 @@
                             pitchShiftBy.set(0);
                             tunedNotes.clear();
                             tunedNotes = new Set(tunedNotes);
-                        }}>Reset</button
+                        }}><i class="fa-solid fa-rotate-left"></i></button
                     >
                 {/if}
+                </div>
             </div>
             <div class="notes right">
                 <!-- Display G B E -->
@@ -506,17 +519,65 @@
         <div class="buttons on-off">
             {#if isListening}
                 <button in:fade class="listenActionButton stop" on:click={stop}
-                    >Stop</button
+                    ><i class="fa-solid fa-guitar"></i></button
                 >
             {:else}
                 <button in:fade class="listenActionButton start" on:click={start}
-                    >Start</button
+                    ><i class="fa-solid fa-guitar"></i></button
                 >
             {/if}
         </div>
 </div>
 
 <style lang="scss">
+
+
+
+    .changeInstrument {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: absolute;
+        top: 2px;
+        gap: 5px;
+        right: 0;
+        padding: 0 10px;
+        background: transparent;
+        border: none;
+        outline: none;
+
+        .lab{
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            filter: drop-shadow(0px 0px 50px #000000);
+        }
+
+        .current{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            img{
+                width: 35px;
+                position: relative;
+            }
+            .name{
+                font-size: 0.8rem;
+                position: relative;
+                font-weight: 700;
+                color: #ffffff;
+                filter: drop-shadow(0px 0px 50px #000000);
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+    }
+
     .conf {
         position: absolute;
         top: 50%;
@@ -527,7 +588,7 @@
 
     canvas {
         position: absolute;
-        bottom: 0;
+        bottom: -10px;
         left: 50%;
         transform: translateX(-50%);
         opacity: 1;
@@ -606,6 +667,7 @@
         border-radius: 10px;
         height: 100%;
         width: 100%;
+        gap: 10px;
         overflow: scroll;
     }
 
@@ -638,11 +700,22 @@
 
     .pitch {
         display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
         position: relative;
         width: 100%;
+        font-size: 0.7rem;
+        color: #2c3e50;
+
+        .settings{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            width: 100%;
+        }
     }
 
     .pitchShift {
@@ -793,8 +866,8 @@
         border: none;
         outline: none;
         padding: 10px;
-        width: 80px;
-        height: 80px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         background: #266dfa;
         cursor: pointer;
@@ -821,11 +894,14 @@
 
     .on-off{
         position: relative;
-        height: 120px;
-        width: 120px;
+        height: 50px;
+        width: 50px;
         display: flex;
         justify-content: center;
         align-items: center;
+        i{
+            font-size: 1.5rem;
+        }
     }
 
     .on-off:has(.stop){

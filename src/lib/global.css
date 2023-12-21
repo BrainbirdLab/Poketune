@@ -1,3 +1,5 @@
+@import url('fontawesome/css/all.min.css');
+
 @font-face {
 	font-family: Now;
 	src: url('/fonts/now-web.woff2');
