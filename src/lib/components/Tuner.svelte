@@ -231,19 +231,19 @@
 
             //if correct note is played and all notes are not tuned
             if (
-                lastNote != Note + Octave &&
-                tunedNotes.size != Object.values(notes).length
+                lastNote != Note + Octave
             ) {
-                correctNoteSound.currentTime = 0;
-                correctNoteSound.play();
-            } else if (
-                lastNote != Note + Octave &&
-                tunedNotes.size == Object.values(notes).length &&
-                !complete
-            ) {
-                allDoneSound.currentTime = 0;
-                allDoneSound.play();
-                complete = true;
+                if (
+                    tunedNotes.size == Object.values(notes).length &&
+                    !complete
+                ) {
+                    allDoneSound.currentTime = 0;
+                    allDoneSound.play();
+                    complete = true;
+                } else {
+                    correctNoteSound.currentTime = 0;
+                    correctNoteSound.play();
+                }
             }
 
             const elem = document.getElementById(Note + Octave);
@@ -360,19 +360,6 @@
                 node.onclick = null;
             },
         };
-    }
-
-    function makeDistortionCurve(amount: number) {
-        const k = amount;
-        const n_samples = 44100;
-        const curve = new Float32Array(n_samples);
-        const deg = Math.PI / 180;
-        let x: number;
-        for (let i = 0; i < n_samples; ++i) {
-            x = (i * 2) / n_samples - 1;
-            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
-        }
-        return curve;
     }
 
     function reset() {
@@ -576,13 +563,13 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 5px;
-            padding: 10px;
-            font-size: 1rem;
+            font-size: 100%;
             text-align: center;
             border-radius: 10px;
+            padding: 10px;
             border: 2px solid #ffffff30;
-            width: 80px;
+            width: 100%;
+            max-width: 80px;
             transition: 100ms;
             cursor: pointer;
 
@@ -591,7 +578,7 @@
             }
 
             .freq {
-                font-size: 0.6rem;
+                font-size: 60%;
                 color: #ffffff80;
             }
 
