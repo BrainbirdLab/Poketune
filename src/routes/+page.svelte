@@ -22,14 +22,14 @@
         {#if $selectedInstrument != "None"}
             <button class="instrument" on:click={()=>{selectedInstrument.set("None")}}>
                 <img src="/images/{$selectedInstrument}(Custom).png" alt="{$selectedInstrument}" width="60px" />
-                <div class="name">Change</div>
+                <div class="name">{$selectedInstrument}</div>
             </button>
         {/if}
     </div>
     {#if $selectedInstrument == "None"}
         <SelectInstrument />
     {:else}
-    <div in:fly={{x: 100}}>
+    <div class="tunerWrapper" in:fly={{x: 100}}>
         <Tuner/>
     </div>
     {/if}
@@ -49,6 +49,10 @@
         background: transparent;
         border: none;
         cursor: pointer;
+    }
+
+    .tunerWrapper{
+        width: min(100vw, 450px);
     }
 
     .title {
@@ -79,12 +83,18 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            img{
+                width: 60px;
+            }
             .name{
                 position: absolute;
-                font-size: 12px;
+                font-size: 1.1rem;
                 font-weight: 700;
-                color: #f0c449;
-                bottom: -15px;
+                color: #ffffff;
+                filter: drop-shadow(0px 0px 50px #000000);
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
             }
         }
     }

@@ -2,14 +2,13 @@
     import { pitchShiftBy, selectedInstrument } from "$lib/store";
     import { getFrequency, getReferenceNotes, tuneInstrument, type Tuning } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { fade, fly, slide } from "svelte/transition";
 
 
     let Octave: number;
     let Note: string;
     let Cent = 0;
-    let degree = 22;
 
     let canvas: HTMLCanvasElement;
 
@@ -17,7 +16,14 @@
 
     let audioContext: AudioContext;
 
+    let tunedNotes = new Set<string>();
+
     function drawCanvas() {
+
+        if (!canvas) {
+            return;
+        }
+
         const canvasContext = canvas.getContext(
             "2d",
         ) as CanvasRenderingContext2D;
@@ -81,6 +87,10 @@
         drawCanvas();
     });
 
+    onDestroy(() => {
+        stop();
+    });
+
     let Frequency = 0;
     let detectedClarity = 0;
 
@@ -99,6 +109,11 @@
     function stop() {
         console.log("stop");
 
+        if (!audioContext) {
+            console.log("No audio context");
+            return;
+        }
+
         if (audioContext.state === "closed") {
             console.log("Already closed");
             return;
@@ -116,6 +131,9 @@
             Note = "";
             detectedClarity = 0;
         });
+
+        tunedNotes.clear();
+        tunedNotes = new Set<string>(tunedNotes);
 
         stream.getTracks().forEach((track) => track.stop());
 
@@ -178,14 +196,10 @@
         Note = tune.note;
         Octave = tune.octave;
         Cent = tune.cent;
-        degree = Cent;
         Frequency = Math.round(pitch * 100) / 100;
-
-
-        if (degree > 45) {
-            degree = 45;
-        } else if (degree < -45) {
-            degree = -45;
+        if (Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
+            tunedNotes.add(Note+Octave);
+            tunedNotes = new Set<string>(tunedNotes);
         }
     }
 
@@ -203,6 +217,9 @@
             pitchShiftBy.update((val) => {
                 return val-num;
             });
+        } else {
+            tunedNotes.clear();
+            tunedNotes = new Set<string>(tunedNotes);
         }
     }
 </script>
@@ -228,11 +245,13 @@
                     </div>
                 {/each}
                 <div class="pointer" 
-                    style="width: max(calc({(Cent > 60 ? 60 : Cent < -60 ? -60 : Cent) || 2}% - 4%), 2%);
-                            background: {Math.abs(Cent) < 10 ? "#00ff6a" : Math.abs(Cent) > 10 && Math.abs(Cent) < 20 ? "yellow" : "orange"}
-                    "
+                    style="width: max(calc((100% / 12)*{(Math.abs(Cent))/10}), 2%);"
                     class:left={Cent < -2}
                     class:right={Cent > 2}
+                    class:strong={Math.abs(Cent) < 10}
+                    class:average={Math.abs(Cent) > 10 && Math.abs(Cent) < 20}
+                    class:weak={Math.abs(Cent) > 20 && Math.abs(Cent) < 30}
+                    class:poor={Math.abs(Cent) > 30}
                 ></div>
             </div>
             <div class="labels">
@@ -257,7 +276,7 @@
         <div class="notes">
             {#key $pitchShiftBy}
             {#each Object.values(notes) as note, i}
-                <div class="note">
+                <div class="note" class:tuned={tunedNotes.has(note.note+note.octave)}>
                     <div class="name" in:fly|global={{y: 5, delay: 40*(i+1)}}>{note.note}{note.octave}</div>
                     <div class="freq" in:fly|global={{y: 5, delay: 40*(i+1)}}>{note.frequency.toFixed(2)} Hz</div>
                 </div>
@@ -315,6 +334,7 @@
         width: 100%;
         margin-top: 20px;
         margin-bottom: 20px;
+        gap: 5px;
 
         .note{
             display: flex;
@@ -325,6 +345,12 @@
             padding: 10px;
             font-size: 1rem;
             text-align: center;
+            border-radius: 10px;
+            border: 2px solid #ffffff30;
+
+            &.tuned{
+                border: 2px solid #2ecc71;
+            }
 
             .freq{
                 font-size: 0.6rem;
@@ -341,6 +367,7 @@
         background: rgba(0, 128, 128, 0);
         border-radius: 10px;
         height: 100%;
+        width: 100%;
     }
 
     .pitchChanger, .button{
@@ -393,11 +420,13 @@
         justify-content: center;
         flex-direction: row;
         margin-bottom: 40px;
+        width: 100%;
     }
 
     .info{
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
         gap: 10px;
@@ -406,22 +435,6 @@
         padding: 15px 20px 20px 20px;
         width: 100%;
         position: relative;
-
-        .freq{
-            position: absolute;
-            left: 0;
-        }
-
-        .clarity{
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .cent{
-            position: absolute;
-            right: 0;
-        }
     }
 
     .range{
@@ -439,8 +452,7 @@
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            gap: 27px;
-            width: 100%;
+            width: 90%;
             position: relative;
             text-align: center;
         }
@@ -448,20 +460,37 @@
         .pointer{
             position: absolute;
             width: 2px;
+            max-width: calc((100% / 12) * 6);
             height: 18px;
             left: 50%;
             border-radius: 2px;
             //transition: 100ms;
             transform: translateX(-50%);
             &.left{
-                transform: translateX(calc(-100% + 2px));
-                border-top-left-radius: 10px;
-                border-bottom-left-radius: 10px;
+                transform: translateX(-100%);
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
             }
             &.right{
-                transform: translateX(calc(0% - 2px));
-                border-top-right-radius: 10px;
-                border-bottom-right-radius: 10px;
+                transform: translateX(0%);
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+            }
+
+            &.strong{
+                background: #2ecc71;
+            }
+
+            &.average{
+                background: #f1c40f;
+            }
+
+            &.weak{
+                background: #e67e22;
+            }
+
+            &.poor{
+                background: #e74c3c;
             }
         }
     }

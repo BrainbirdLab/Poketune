@@ -48,16 +48,12 @@
         };
 
         if (instrument == INSTRUMENT.GUITAR) {
-            console.log("Guitar");
             console.log(getClosestNote(standardGuiterTuning, pitch));
         } else if (instrument == INSTRUMENT.BASS) {
-            console.log("Bass");
             console.log(getClosestNote(standardBassTuning, pitch));
         } else if (instrument == INSTRUMENT.UKULELE) {
-            console.log("Ukulele");
             console.log(getClosestNote(standardUkuleleTuning, pitch));
         } else if (instrument == INSTRUMENT.CHROMATIC) {
-            console.log("Chromatic");
 
             const frequency = Math.round(pitch);
 
@@ -76,12 +72,6 @@
             const expectedFrequency = 440 * Math.pow(2, (noteIndex - 57) / 12);
             const cent = Math.round(
                 (1200 * Math.log(frequency / expectedFrequency)) / Math.log(2),
-            );
-
-            console.log(
-                `${note}${octave}(${expectedFrequency.toFixed(
-                    2,
-                )}) (${frequency} Hz, ${cent} cents)`,
             );
         }
 
