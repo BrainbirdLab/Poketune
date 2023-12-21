@@ -1,14 +1,27 @@
 <script lang="ts">
-    import { confetti } from '@neoconfetti/svelte';
+    import { confetti } from "@neoconfetti/svelte";
     import { pitchShiftBy, selectedInstrument } from "$lib/store";
-    import { getFrequency, getReferenceNotes, tuneInstrument, type Tuning } from "$lib/tuner";
+    import {
+        getFrequency,
+        getReferenceNotes,
+        tuneInstrument,
+        type Tuning,
+    } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
     import { onDestroy, onMount } from "svelte";
     import { fade, fly, slide } from "svelte/transition";
-    
+
     //load audio
-    const correctNoteSound = new Audio('/sounds/correct.mp3');
-    const allDoneSound = new Audio('/sounds/allDone.mp3');
+    const correctNoteSound = new Audio("/sounds/correct.mp3");
+    const allDoneSound = new Audio("/sounds/allDone.mp3");
+
+    const guitarSound = new Audio("/sounds/guitar.mp3");
+    const ukuleleSound = new Audio("/sounds/ukulele.mp3");
+    const bassSound = new Audio("/sounds/bass.mp3");
+
+    guitarSound.load();
+    ukuleleSound.load();
+    bassSound.load();
 
     let Octave: number;
     let Note: string;
@@ -23,7 +36,6 @@
     let tunedNotes = new Set<string>();
 
     function drawCanvas() {
-
         if (!canvas) {
             return;
         }
@@ -44,7 +56,6 @@
             canvasContext.lineTo(canvas.width, canvas.height / 2);
             canvasContext.stroke();
         } else {
-
             canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
             canvasContext.lineWidth = 2;
             canvasContext.strokeStyle = "#2c3e50";
@@ -55,33 +66,30 @@
 
             const dataArray = new Uint8Array(bufferLength);
 
-            
-            if (bufferLength && analyserNode){
-
+            if (bufferLength && analyserNode) {
                 analyserNode.getByteTimeDomainData(dataArray);
-    
+
                 //console.log(bufferLength, dataArray);
                 let sliceWidth = (WIDTH * 1.0) / bufferLength;
                 let x = 0;
-    
+
                 for (let i = 0; i < bufferLength; i++) {
                     let v = dataArray[i] / 128.0;
-    
+
                     let y = (v * HEIGHT) / 2;
-    
+
                     if (i === 0) {
                         canvasContext.moveTo(x, y);
                     } else {
                         canvasContext.lineTo(x, y);
                     }
-    
+
                     x += sliceWidth;
                 }
-    
+
                 canvasContext.lineTo(canvas.width, canvas.height / 2);
                 canvasContext.stroke();
             }
-
         }
 
         requestAnimationFrame(drawCanvas);
@@ -118,9 +126,12 @@
 
     let interval: number;
 
-    let notes: {[key: string]: Tuning} = getReferenceNotes();
+    let notes: { [key: string]: Tuning } = getReferenceNotes();
 
-    $: leftNotes = Object.values(notes).slice(0, Object.values(notes).length / 2);
+    $: leftNotes = Object.values(notes).slice(
+        0,
+        Object.values(notes).length / 2,
+    );
     $: rightNotes = Object.values(notes).slice(Object.values(notes).length / 2);
 
     function stop() {
@@ -162,20 +173,18 @@
         //if closed
         if (audioContext?.state != "running") {
             //create new audio context
-            
-            stream = await navigator.mediaDevices
-            .getUserMedia({ audio: true });
-            
-            if (stream){
 
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            if (stream) {
                 audioContext = new window.AudioContext();
                 analyserNode = audioContext.createAnalyser();
                 audioContext
-                        .createMediaStreamSource(stream)
-                        .connect(analyserNode);
+                    .createMediaStreamSource(stream)
+                    .connect(analyserNode);
 
                 isListening = true;
-                
+
                 if (audioContext.state === "running") {
                     interval = setInterval(() => {
                         updatePitch(analyserNode, audioContext.sampleRate);
@@ -217,23 +226,27 @@
         Cent = tune.cent;
         Frequency = Math.round(pitch * 100) / 100;
         if (Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
-
-            tunedNotes.add(Note+Octave);
+            tunedNotes.add(Note + Octave);
             tunedNotes = new Set<string>(tunedNotes);
-            
+
             //if correct note is played and all notes are not tuned
-            if (lastNote != Note+Octave && tunedNotes.size != Object.values(notes).length) {
+            if (
+                lastNote != Note + Octave &&
+                tunedNotes.size != Object.values(notes).length
+            ) {
                 correctNoteSound.currentTime = 0;
                 correctNoteSound.play();
-
-                
-            } else if (lastNote != Note+Octave && tunedNotes.size == Object.values(notes).length && !complete) {
+            } else if (
+                lastNote != Note + Octave &&
+                tunedNotes.size == Object.values(notes).length &&
+                !complete
+            ) {
                 allDoneSound.currentTime = 0;
                 allDoneSound.play();
                 complete = true;
             }
 
-            const elem = document.getElementById(Note+Octave);
+            const elem = document.getElementById(Note + Octave);
 
             if (elem) {
                 elem.classList.add("played");
@@ -241,15 +254,15 @@
                     elem.classList.remove("played");
                 }, 1000);
             }
-            
-            lastNote = Note+Octave;
+
+            lastNote = Note + Octave;
         }
     }
 
     function incrementPitchBy(num: number) {
         pitchShiftBy.update((val) => {
             //if first note frequency is more than 16.35 Hz or last note frequency is less than 7902.13 Hz then only increment
-            return val+num;
+            return val + num;
         });
         const tempNotes = getReferenceNotes();
         const obj = Object.values(tempNotes);
@@ -258,57 +271,111 @@
 
         if (firstNote < 16.35 || lastNote > 7902.13) {
             pitchShiftBy.update((val) => {
-                return val-num;
+                return val - num;
             });
         } else {
             reset();
         }
     }
 
-    function handleClickOnNote(node: HTMLElement){
-        node.onclick = (e) => {
+    let audioBuffer: AudioBuffer | null = null;
+
+    async function playNote(frequency: number){
+       
+        let dividerFrequency: number = 0;
+        //load audio
+        let url = '';
+        if ($selectedInstrument == "Guitar"){
+            url = "/sounds/guitar.mp3";
+            dividerFrequency = getFrequency("E", 2);
+        } else if ($selectedInstrument == "Ukulele"){
+            url = "/sounds/ukulele.mp3";
+            dividerFrequency = getFrequency("G", 4);
+        } else if ($selectedInstrument == "Bass"){
+            url = "/sounds/bass.mp3";
+            dividerFrequency = getFrequency("E", 1);
+        }
+
+        const noteAudioContext = new AudioContext();
+
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        audioBuffer = await noteAudioContext.decodeAudioData(arrayBuffer);
+
+        const source = noteAudioContext.createBufferSource();
+        source.buffer = audioBuffer;
+
+        const gainNode = noteAudioContext.createGain();
+        const distortion = noteAudioContext.createWaveShaper();
+        const phaser = noteAudioContext.createDelay();
+        phaser.delayTime.value = 0.1;
+
+        gainNode.connect(noteAudioContext.destination);
+        distortion.connect(gainNode);
+        phaser.connect(distortion);
+        source.connect(gainNode);
+
+
+        gainNode.gain.setValueAtTime(1, noteAudioContext.currentTime);
+
+        gainNode.gain.exponentialRampToValueAtTime(
+            0.1,
+            noteAudioContext.currentTime + 1,
+        );
+
+        gainNode.gain.exponentialRampToValueAtTime(
+            0.1,
+            noteAudioContext.currentTime + 1.01,
+        );
+
+        source.playbackRate.value = frequency / dividerFrequency;
+        source.start();
+    }
+
+    function handleClickOnNote(node: HTMLElement) {
+
+        node.onclick = async (e) => {
             const target = e.target as HTMLElement;
 
-            if (!target){
+            if (!target) {
                 return;
             }
 
             const frequencyStr = target.dataset.frequency;
-            if (!frequencyStr){
+            if (!frequencyStr) {
                 return;
             }
 
             const frequency = Number(frequencyStr);
 
-            if (!frequency){
+            if (!frequency) {
                 return;
             }
 
-            //generate acoustic guitar sound of that frequency
-            const audioContext = new AudioContext();
-            const osc = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            gainNode.gain.value = 0.6;
-            osc.frequency.value = frequency;
-            osc.type = "sine";
-            osc.start();
-
-            // Make the sound fade out slowly
-            gainNode.gain.setValueAtTime(1, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-            osc.stop(audioContext.currentTime + 2);
-        }
+            await playNote(frequency);
+        };
 
         return {
-            destroy(){
+            destroy() {
                 node.onclick = null;
-            }
-        }
+            },
+        };
     }
 
-    function reset(){
+    function makeDistortionCurve(amount: number) {
+        const k = amount;
+        const n_samples = 44100;
+        const curve = new Float32Array(n_samples);
+        const deg = Math.PI / 180;
+        let x: number;
+        for (let i = 0; i < n_samples; ++i) {
+            x = (i * 2) / n_samples - 1;
+            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+        }
+        return curve;
+    }
+
+    function reset() {
         tunedNotes.clear();
         tunedNotes = new Set<string>(tunedNotes);
         lastNote = "";
@@ -318,28 +385,42 @@
 
 <div class="tuner">
     <div class="noteContainer">
-        {#if Note} 
-        <div class="noteName" in:fly|global={{y: 5}}>
-            {Note} <div class="octave">{Octave}</div>
-        </div>
+        {#if Note}
+            <div class="noteName" in:fly|global={{ y: 5 }}>
+                {Note}
+                <div class="octave">{Octave}</div>
+            </div>
         {:else}
-        <div class="noteName" in:fly|global={{y: 5}}>
-            -.-
-        </div>
+            <div class="noteName" in:fly|global={{ y: 5 }}>-.-</div>
         {/if}
-        <canvas class:hidden={!isListening && !Note} in:fly={{ x: 40, delay: 500 }} bind:this={canvas} />
+        <canvas
+            class:hidden={!isListening && !Note}
+            in:fly={{ x: 40, delay: 500 }}
+            bind:this={canvas}
+        />
     </div>
     <div class="meter">
         <div class="range">
             <div class="scale">
                 {#each [-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60] as num, i}
                     <div class="point">
-                        <div class="meter-scale" class:strong={i == 0 || i == 6 || i == 12} in:fly|global={{ y: 10, delay: 40 * (i+1) }}/>
-                        <div class="number" in:fly|global={{ y: 10, delay: 40 * (i+1) }}>{num}</div>
+                        <div
+                            class="meter-scale"
+                            class:strong={i == 0 || i == 6 || i == 12}
+                            in:fly|global={{ y: 10, delay: 40 * (i + 1) }}
+                        />
+                        <div
+                            class="number"
+                            in:fly|global={{ y: 10, delay: 40 * (i + 1) }}
+                        >
+                            {num}
+                        </div>
                     </div>
                 {/each}
-                <div class="pointer" 
-                    style="width: max(calc((100% / 12)*{(Math.abs(Cent))/10}), 2%);"
+                <div
+                    class="pointer"
+                    style="width: max(calc((100% / 12)*{Math.abs(Cent) /
+                        10}), 2%);"
                     class:left={Cent < -2}
                     class:right={Cent > 2}
                     class:strong={Math.abs(Cent) < 10}
@@ -349,61 +430,84 @@
                 ></div>
             </div>
             <div class="labels">
-                <div class="label" in:fly={{ y: 10, delay: 100 }}> 
-                    ♭
-                </div>
-                <div class="label" in:fly={{ y: 10, delay: 350 }}>
-                    ♮
-                </div>
-                <div class="label" in:fly={{ y: 10, delay: 600 }}>
-                    ♯
-                </div>
+                <div class="label" in:fly={{ y: 10, delay: 100 }}>♭</div>
+                <div class="label" in:fly={{ y: 10, delay: 350 }}>♮</div>
+                <div class="label" in:fly={{ y: 10, delay: 600 }}>♯</div>
             </div>
         </div>
     </div>
     <div class="info">
         <div class="freq">f: {Frequency} Hz</div>
-        <div class="clarity">Clarity: {detectedClarity}% {detectedClarity > 80 ? "👍" : "👎"}</div>
+        <div class="clarity">
+            Clarity: {detectedClarity}% {detectedClarity > 80 ? "👍" : "👎"}
+        </div>
         <div class="cent">{Cent} C {Math.abs(Cent) < 10 ? "😁" : "😢"}</div>
     </div>
     {#if $selectedInstrument != "Chromatic"}
-
         {#if tunedNotes.size == Object.values(notes).length}
             <div class="conf" use:confetti></div>
         {/if}
 
         <div class="noteVisual" use:handleClickOnNote>
-            <div class="notes left"> <!-- Display E A D -->
+            <div class="notes left">
+                <!-- Display E A D -->
                 {#each Object.values(leftNotes) as note, i}
-                    <div class="note" id="{note.note}{note.octave}" data-frequency={note.frequency} in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
+                    <div
+                        class="note"
+                        id="{note.note}{note.octave}"
+                        data-frequency={note.frequency}
+                        in:fly|global={{ y: 5, delay: 40 * (i + 1) }}
+                        class:tuned={tunedNotes.has(note.note + note.octave)}
+                    >
                         <div class="name">{note.note}{note.octave}</div>
                         <div class="freq">{note.frequency.toFixed(2)} Hz</div>
                     </div>
                 {/each}
             </div>
             <div class="pitch">
-                <button class="pitchChanger" on:click={()=>{
-                    incrementPitchBy(-1);
-                }}> - </button>
+                <button
+                    class="pitchChanger"
+                    on:click={() => {
+                        incrementPitchBy(-1);
+                    }}
+                >
+                    -
+                </button>
                 {#key $pitchShiftBy}
-                <div class="pitchShift" in:fly={{y: 10, duration: 500}} >
-                    {$pitchShiftBy > 0 ? "+" : ""}{$pitchShiftBy}
-                </div>
+                    <div class="pitchShift" in:fly={{ y: 10, duration: 500 }}>
+                        {$pitchShiftBy > 0 ? "+" : ""}{$pitchShiftBy}
+                    </div>
                 {/key}
-                <button class="pitchChanger" on:click={()=>{
-                    incrementPitchBy(1);
-                }}> + </button>
+                <button
+                    class="pitchChanger"
+                    on:click={() => {
+                        incrementPitchBy(1);
+                    }}
+                >
+                    +
+                </button>
                 {#if Math.abs($pitchShiftBy) > 10}
-                    <button transition:slide={{axis: 'x'}} class="button" on:click={() => {
-                        pitchShiftBy.set(0);
-                        tunedNotes.clear();
-                        tunedNotes = new Set(tunedNotes);
-                    }}>Reset</button>
+                    <button
+                        transition:slide={{ axis: "x" }}
+                        class="button"
+                        on:click={() => {
+                            pitchShiftBy.set(0);
+                            tunedNotes.clear();
+                            tunedNotes = new Set(tunedNotes);
+                        }}>Reset</button
+                    >
                 {/if}
             </div>
-            <div class="notes right"> <!-- Display G B E -->
+            <div class="notes right">
+                <!-- Display G B E -->
                 {#each Object.values(rightNotes) as note, i}
-                    <div class="note" id="{note.note}{note.octave}" data-frequency={note.frequency} in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
+                    <div
+                        class="note"
+                        id="{note.note}{note.octave}"
+                        data-frequency={note.frequency}
+                        in:fly|global={{ y: 5, delay: 40 * (i + 1) }}
+                        class:tuned={tunedNotes.has(note.note + note.octave)}
+                    >
                         <div class="name">{note.note}{note.octave}</div>
                         <div class="freq">{note.frequency.toFixed(2)} Hz</div>
                     </div>
@@ -423,8 +527,7 @@
 </div>
 
 <style lang="scss">
-
-    .conf{
+    .conf {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -432,19 +535,19 @@
         pointer-events: none;
     }
 
-    canvas{
+    canvas {
         position: absolute;
         bottom: -20%;
         left: 50%;
         transform: translateX(-50%);
         opacity: 1;
         transition: 100ms;
-        &.hidden{
+        &.hidden {
             opacity: 0;
         }
     }
 
-    .noteVisual{
+    .noteVisual {
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -455,7 +558,7 @@
         width: 100%;
     }
 
-    .notes{
+    .notes {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -463,12 +566,12 @@
         flex-wrap: wrap;
         width: 100%;
         gap: 5px;
-        
-        &.left{
+
+        &.left {
             flex-direction: column-reverse;
         }
 
-        .note{
+        .note {
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -482,23 +585,23 @@
             width: 80px;
             transition: 100ms;
             cursor: pointer;
-            
-            &.tuned{
+
+            &.tuned {
                 border: 2px solid #2ecc71;
             }
-            
-            .freq{
+
+            .freq {
                 font-size: 0.6rem;
                 color: #ffffff80;
             }
 
-            > *{
+            > * {
                 pointer-events: none;
             }
         }
     }
-    
-    :global(.note.played){
+
+    :global(.note.played) {
         background: #2ecc7074;
     }
 
@@ -513,7 +616,8 @@
         width: 100%;
     }
 
-    .pitchChanger, .button{
+    .pitchChanger,
+    .button {
         border: none;
         outline: none;
         padding: 10px;
@@ -528,18 +632,18 @@
         align-items: center;
         justify-content: center;
 
-        &:hover{
+        &:hover {
             filter: brightness(0.9);
         }
     }
 
-    .button{
+    .button {
         width: max-content;
         height: 35px;
         margin: 10px;
     }
 
-    .pitch{
+    .pitch {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -548,7 +652,7 @@
         width: 100%;
     }
 
-    .pitchShift{
+    .pitchShift {
         font-size: 1.5rem;
         font-weight: bold;
         margin: 10px;
@@ -567,7 +671,7 @@
         width: 100%;
     }
 
-    .info{
+    .info {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
@@ -581,7 +685,7 @@
         position: relative;
     }
 
-    .range{
+    .range {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -591,7 +695,8 @@
         position: relative;
         padding: 0 10px;
 
-        .scale, .labels{
+        .scale,
+        .labels {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -601,7 +706,7 @@
             text-align: center;
         }
 
-        .pointer{
+        .pointer {
             position: absolute;
             width: 2px;
             max-width: calc((100% / 12) * 6);
@@ -610,41 +715,41 @@
             border-radius: 2px;
             //transition: 100ms;
             transform: translateX(-50%);
-            &.left{
+            &.left {
                 transform: translateX(-100%);
                 border-top-left-radius: 5px;
                 border-bottom-left-radius: 5px;
             }
-            &.right{
+            &.right {
                 transform: translateX(0%);
                 border-top-right-radius: 5px;
                 border-bottom-right-radius: 5px;
             }
 
-            &.strong{
+            &.strong {
                 background: #2ecc71;
             }
 
-            &.average{
+            &.average {
                 background: #f1c40f;
             }
 
-            &.weak{
+            &.weak {
                 background: #e67e22;
             }
 
-            &.poor{
+            &.poor {
                 background: #e74c3c;
             }
         }
     }
 
-    .point{
+    .point {
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
         align-items: center;
-        .number{
+        .number {
             position: absolute;
             font-size: 0.6rem;
             text-align: center;
@@ -687,14 +792,13 @@
         height: 10rem;
         color: #2c3e50;
         margin-bottom: 50px;
-        .octave{
+        .octave {
             font-size: 3rem;
             margin-left: 5px;
             margin-bottom: 10px;
             color: #2c3e50;
         }
     }
-
 
     .listenActionButton {
         border: none;
@@ -725,7 +829,7 @@
 
     .stop {
         background: #ff0000;
-        &::after{
+        &::after {
             content: "";
             position: absolute;
             width: 100%;

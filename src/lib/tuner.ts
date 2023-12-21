@@ -36,7 +36,7 @@ export function getReferenceNotes(): {[key: string]: Tuning}{
             break;
         case "Bass":
             instrumentNotes = ["E", "A", "D", "G"];
-            instrumentOctaves = [1, 2, 2, 3];
+            instrumentOctaves = [1, 1, 2, 2];
             break;
         case "Ukulele":
             instrumentNotes = ["G", "C", "E", "A"];
