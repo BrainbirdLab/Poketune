@@ -106,4 +106,20 @@
             }
         }
     }
+
+    @media (min-width: 768px){
+        .title{
+            font-size: 1.4rem;
+            padding: 35px 10px 0 10px;
+            .instrument{
+                width: 80px;
+                img{
+                    width: 50px;
+                }
+                .name{
+                    font-size: 1rem;
+                }
+            }
+        }
+    }
 </style>

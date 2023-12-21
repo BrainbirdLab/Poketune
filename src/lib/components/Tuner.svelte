@@ -848,4 +848,24 @@
     .listenActionButton:hover {
         filter: brightness(0.97);
     }
+
+    //for larger screens increase font size
+    @media (min-width: 768px) {
+        .noteName {
+            font-size: 10rem;
+            height: 15rem;
+            .octave {
+                font-size: 4rem;
+            }
+        }
+
+        .notes {
+            .note {
+                font-size: 120%;
+                padding: 10px;
+                width: 100%;
+                max-width: 100px;
+            }
+        }
+    }
 </style>
