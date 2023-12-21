@@ -1,6 +1,7 @@
 <script lang="ts">
+    import { confetti } from '@neoconfetti/svelte';
     import { pitchShiftBy, selectedInstrument } from "$lib/store";
-    import { getFrequency, getReferenceNotes, tuneInstrument, type Tuning } from "$lib/tuner";
+    import { getReferenceNotes, tuneInstrument, type Tuning } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
     import { onDestroy, onMount } from "svelte";
     import { fade, fly, slide } from "svelte/transition";
@@ -278,16 +279,19 @@
         <div class="cent">{Cent} C {Math.abs(Cent) < 10 ? "😁" : "😢"}</div>
     </div>
     {#if $selectedInstrument != "Chromatic"}
+
+        {#if tunedNotes.size == Object.values(notes).length}
+            <div class="conf" use:confetti></div>
+        {/if}
+
         <div class="noteVisual">
             <div class="notes left"> <!-- Display E A D -->
-                {#key $pitchShiftBy}
                 {#each Object.values(leftNotes) as note, i}
                     <div class="note" in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
                         <div class="name">{note.note}{note.octave}</div>
                         <div class="freq">{note.frequency.toFixed(2)} Hz</div>
                     </div>
                 {/each}
-                {/key}
             </div>
             <div class="pitch">
                 <button class="pitchChanger" on:click={()=>{
@@ -302,18 +306,20 @@
                     incrementPitchBy(1);
                 }}> + </button>
                 {#if Math.abs($pitchShiftBy) > 10}
-                    <button transition:slide={{axis: 'x'}} class="button">Reset</button>
+                    <button transition:slide={{axis: 'x'}} class="button" on:click={() => {
+                        pitchShiftBy.set(0);
+                        tunedNotes.clear();
+                        tunedNotes = new Set(tunedNotes);
+                    }}>Reset</button>
                 {/if}
             </div>
             <div class="notes right"> <!-- Display G B E -->
-                {#key $pitchShiftBy}
                 {#each Object.values(rightNotes) as note, i}
                     <div class="note" in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
                         <div class="name">{note.note}{note.octave}</div>
                         <div class="freq">{note.frequency.toFixed(2)} Hz</div>
                     </div>
                 {/each}
-                {/key}
             </div>
         </div>
     {/if}
@@ -329,6 +335,14 @@
 </div>
 
 <style lang="scss">
+
+    .conf{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
 
     canvas{
         position: absolute;
@@ -348,7 +362,8 @@
         justify-content: center;
         align-items: center;
         gap: 10px;
-        margin-bottom: -100px;
+        padding: 0 10px;
+        margin-bottom: -25px;
         width: 100%;
     }
 
@@ -359,8 +374,6 @@
         align-items: center;
         flex-wrap: wrap;
         width: 100%;
-        margin-top: 20px;
-        margin-bottom: 20px;
         gap: 5px;
 
         .note{
@@ -374,7 +387,7 @@
             text-align: center;
             border-radius: 10px;
             border: 2px solid #ffffff30;
-            width: 55%;
+            width: 80px;
 
             &.tuned{
                 border: 2px solid #2ecc71;
@@ -429,8 +442,8 @@
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        gap: 10px;
         position: relative;
+        width: 100%;
     }
 
     .pitchShift{
@@ -592,7 +605,6 @@
         cursor: pointer;
         transition: 100ms;
         position: relative;
-        margin-top: 30px;
     }
 
     @keyframes pulse {

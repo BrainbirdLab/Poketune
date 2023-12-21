@@ -22,6 +22,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@neoconfetti/svelte": "^2.2.0",
 		"pitchy": "^4.0.7"
 	}
 }
