@@ -102,6 +102,9 @@
 
     let notes: {[key: string]: Tuning} = getReferenceNotes();
 
+    $: leftNotes = Object.values(notes).slice(0, Object.values(notes).length / 2);
+    $: rightNotes = Object.values(notes).slice(Object.values(notes).length / 2);
+
     pitchShiftBy.subscribe((val) => {
         notes = getReferenceNotes();
     });
@@ -224,17 +227,19 @@
     }
 </script>
 
-<canvas class:hidden={!isListening && !Note} in:fly={{ x: 40, delay: 500 }} bind:this={canvas} />
 <div class="tuner">
-    {#if Note} 
-    <div class="noteName" in:fly|global={{y: 5}}>
-        {Note} <div class="octave">{Octave}</div>
+    <div class="noteContainer">
+        {#if Note} 
+        <div class="noteName" in:fly|global={{y: 5}}>
+            {Note} <div class="octave">{Octave}</div>
+        </div>
+        {:else}
+        <div class="noteName" in:fly|global={{y: 5}}>
+            -.-
+        </div>
+        {/if}
+        <canvas class:hidden={!isListening && !Note} in:fly={{ x: 40, delay: 500 }} bind:this={canvas} />
     </div>
-    {:else}
-    <div class="noteName" in:fly|global={{y: 5}}>
-        -.-
-    </div>
-    {/if}
     <div class="meter">
         <div class="range">
             <div class="scale">
@@ -273,31 +278,43 @@
         <div class="cent">{Cent} C {Math.abs(Cent) < 10 ? "😁" : "😢"}</div>
     </div>
     {#if $selectedInstrument != "Chromatic"}
-        <div class="notes">
-            {#key $pitchShiftBy}
-            {#each Object.values(notes) as note, i}
-                <div class="note" class:tuned={tunedNotes.has(note.note+note.octave)}>
-                    <div class="name" in:fly|global={{y: 5, delay: 40*(i+1)}}>{note.note}{note.octave}</div>
-                    <div class="freq" in:fly|global={{y: 5, delay: 40*(i+1)}}>{note.frequency.toFixed(2)} Hz</div>
-                </div>
-            {/each}
-            {/key}
-        </div>
-        <div class="pitch">
-            <button class="pitchChanger" on:click={()=>{
-                incrementPitchBy(-1);
-            }}> - </button>
-            {#key $pitchShiftBy}
-            <div class="pitchShift" in:fly={{y: 10, duration: 500}} >
-                {$pitchShiftBy > 0 ? "+" : ""}{$pitchShiftBy}
+        <div class="noteVisual">
+            <div class="notes left"> <!-- Display E A D -->
+                {#key $pitchShiftBy}
+                {#each Object.values(leftNotes) as note, i}
+                    <div class="note" in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
+                        <div class="name">{note.note}{note.octave}</div>
+                        <div class="freq">{note.frequency.toFixed(2)} Hz</div>
+                    </div>
+                {/each}
+                {/key}
             </div>
-            {/key}
-            <button class="pitchChanger" on:click={()=>{
-                incrementPitchBy(1);
-            }}> + </button>
-            {#if Math.abs($pitchShiftBy) > 10}
-                <button transition:slide={{axis: 'x'}} class="button">Reset</button>
-            {/if}
+            <div class="pitch">
+                <button class="pitchChanger" on:click={()=>{
+                    incrementPitchBy(-1);
+                }}> - </button>
+                {#key $pitchShiftBy}
+                <div class="pitchShift" in:fly={{y: 10, duration: 500}} >
+                    {$pitchShiftBy > 0 ? "+" : ""}{$pitchShiftBy}
+                </div>
+                {/key}
+                <button class="pitchChanger" on:click={()=>{
+                    incrementPitchBy(1);
+                }}> + </button>
+                {#if Math.abs($pitchShiftBy) > 10}
+                    <button transition:slide={{axis: 'x'}} class="button">Reset</button>
+                {/if}
+            </div>
+            <div class="notes right"> <!-- Display G B E -->
+                {#key $pitchShiftBy}
+                {#each Object.values(rightNotes) as note, i}
+                    <div class="note" in:fly|global={{y: 5, delay: 40*(i+1)}} class:tuned={tunedNotes.has(note.note+note.octave)} >
+                        <div class="name">{note.note}{note.octave}</div>
+                        <div class="freq">{note.frequency.toFixed(2)} Hz</div>
+                    </div>
+                {/each}
+                {/key}
+            </div>
         </div>
     {/if}
     {#if isListening}
@@ -315,7 +332,7 @@
 
     canvas{
         position: absolute;
-        top: 25%;
+        bottom: -20%;
         left: 50%;
         transform: translateX(-50%);
         opacity: 1;
@@ -325,9 +342,19 @@
         }
     }
 
-    .notes{
+    .noteVisual{
         display: flex;
         flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: -100px;
+        width: 100%;
+    }
+
+    .notes{
+        display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
@@ -347,6 +374,7 @@
             text-align: center;
             border-radius: 10px;
             border: 2px solid #ffffff30;
+            width: 55%;
 
             &.tuned{
                 border: 2px solid #2ecc71;
@@ -420,6 +448,7 @@
         justify-content: center;
         flex-direction: row;
         margin-bottom: 40px;
+        margin-top: 25px;
         width: 100%;
     }
 
@@ -520,6 +549,18 @@
         }
     }
 
+    .noteContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        position: relative;
+        margin-bottom: -20px;
+        pointer-events: none;
+    }
+
     .noteName {
         font-weight: bold;
         display: flex;
@@ -527,17 +568,18 @@
         width: 100%;
         justify-content: center;
         align-items: flex-end;
-        font-size: 10rem;
+        font-size: 7rem;
         height: 10rem;
-        opacity: 0.2;
-        margin-bottom: 30px;
+        color: #2c3e50;
+        margin-bottom: 50px;
+        .octave{
+            font-size: 3rem;
+            margin-left: 5px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
     }
 
-    .octave{
-        font-size: 4rem;
-        margin-left: 5px;
-        margin-bottom: 10px;
-    }
 
     .listenActionButton {
         border: none;
