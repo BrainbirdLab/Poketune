@@ -571,10 +571,10 @@
             font-size: 100%;
             text-align: center;
             border-radius: 10px;
-            padding: 10px;
+            padding: 5px;
             border: 2px solid #ffffff30;
             width: 100%;
-            max-width: 80px;
+            max-width: 65px;
             transition: 100ms;
             cursor: pointer;
 
@@ -778,7 +778,7 @@
         width: 100%;
         justify-content: center;
         align-items: flex-end;
-        font-size: 7rem;
+        font-size: 6rem;
         height: 10rem;
         color: #607d8b;
         .octave {

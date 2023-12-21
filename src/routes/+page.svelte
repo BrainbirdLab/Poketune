@@ -62,17 +62,17 @@
     }
 
     .title {
-        font-size: 1.4rem;
+        font-size: 1rem;
         color: #fff;
         font-weight: 700;
-        background: var(--primary);
         display: flex;
-        padding: 10px 10px 0 10px;
+        padding: 0px 10px 0 10px;
         gap: 10px;
         width: min(100vw, 500px);
-        height: 80px;
+        height: 35px;
         align-items: center;
         justify-content: space-between;
+        position: relative;
 
         .t{
             display: flex;
@@ -88,6 +88,9 @@
             justify-content: center;
             cursor: pointer;
             width: 100px;
+            position: absolute;
+            top: 2px;
+            right: 0;
             img{
                 width: 60px;
             }
