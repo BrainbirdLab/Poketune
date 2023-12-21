@@ -5,6 +5,7 @@
     import {selectedInstrument} from "$lib/store";
     import {fly} from "svelte/transition";
     import { onMount } from 'svelte';
+    import Metronome from "$lib/components/Metronome.svelte";
 
     let ready = false;
 
@@ -31,7 +32,7 @@
     {:else if $selectedInstrument != "Metronome"}
     <Tuner/>
     {:else}
-        Under Construction 🚧
+        <Metronome/>
     {/if}
 </div>
 {/if}
