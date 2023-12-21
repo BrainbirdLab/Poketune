@@ -8,7 +8,8 @@ export const instrumentNames = [
     'Guitar',
     'Bass',
     'Ukulele',
-    'Chromatic'
+    'Chromatic',
+    'Metronome',
 ];
 
 export type Tuning = {
