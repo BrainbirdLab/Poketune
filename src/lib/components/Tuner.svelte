@@ -501,6 +501,9 @@
                     </div>
                 {/each}
             </div>
+        </div>
+        {/if}
+        <div class="buttons on-off">
             {#if isListening}
                 <button in:fade class="listenActionButton stop" on:click={stop}
                     >Stop</button
@@ -511,7 +514,6 @@
                 >
             {/if}
         </div>
-    {/if}
 </div>
 
 <style lang="scss">
@@ -525,11 +527,12 @@
 
     canvas {
         position: absolute;
-        bottom: -20%;
+        bottom: 0;
         left: 50%;
         transform: translateX(-50%);
         opacity: 1;
         transition: 100ms;
+        z-index: -1;
         &.hidden {
             opacity: 0;
         }
@@ -542,8 +545,8 @@
         align-items: center;
         gap: 10px;
         padding: 0 10px;
-        margin-bottom: -25px;
         width: 100%;
+        margin-bottom: -25px;
         position: relative;
     }
 
@@ -598,7 +601,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: center;
         background: rgba(0, 128, 128, 0);
         border-radius: 10px;
         height: 100%;
@@ -656,8 +659,6 @@
         align-items: center;
         justify-content: center;
         flex-direction: row;
-        margin-bottom: 40px;
-        margin-top: 25px;
         width: 100%;
     }
 
@@ -767,7 +768,6 @@
         gap: 10px;
         width: 100%;
         position: relative;
-        margin-bottom: -20px;
         pointer-events: none;
     }
 
@@ -780,13 +780,12 @@
         align-items: flex-end;
         font-size: 7rem;
         height: 10rem;
-        color: #2c3e50;
-        margin-bottom: 40px;
+        color: #607d8b;
         .octave {
             font-size: 3rem;
             margin-left: 5px;
             margin-bottom: 10px;
-            color: #2c3e50;
+            color: #607d8b;
         }
     }
 
@@ -800,8 +799,6 @@
         background: #266dfa;
         cursor: pointer;
         transition: 100ms;
-        position: absolute;
-        bottom: -45px;
     }
 
     @keyframes pulse {
@@ -820,6 +817,18 @@
 
     .stop {
         background: #ff0000;
+    }
+
+    .on-off{
+        position: relative;
+        height: 120px;
+        width: 120px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .on-off:has(.stop){
         &::after {
             content: "";
             position: absolute;

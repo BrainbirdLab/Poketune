@@ -52,8 +52,13 @@
 
     .tunerWrapper{
         width: min(100vw, 450px);
-        height: 85vh;
+        height: 100%;
         overflow: hidden;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: -1;
     }
 
     .title {
