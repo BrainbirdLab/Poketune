@@ -2,7 +2,6 @@
     //import animation libs to fly in the instrument buttons
     import { fade, fly } from 'svelte/transition';;
     import {instrumentNames} from '$lib/tuner';
-    import {selectedInstrument} from '$lib/store';
 
 </script>
 
@@ -15,20 +14,16 @@
 <div class="wrapper">
     <div class="instruments">
         {#each instrumentNames as instrument, i}
-            <div class="instrument" in:fly|global={{y: 100*(i+1)}}>
-                <input type="radio" id="{instrument}" name="instrument" bind:group={$selectedInstrument} value={instrument} />
-                <!-- svelte-ignore a11y-label-has-associated-control -->
-                <label for="{instrument}">
-                    <img src="/images/{instrument}(Custom).png" alt="{instrument}">
-                    <span>{instrument}</span>
-                </label>
-            </div>
+            <a class="instrument" in:fly|global={{y: 100*(i+1)}} href="/{instrument}">
+                <img src="/images/{instrument}(Custom).png" alt="{instrument}">
+                <span>{instrument}</span>
+            </a>
         {/each}
     </div>
 </div>
 <div class="footer" in:fade>
     <a href="https://github.com/itsfuad/Poketune" target="_blank" rel="noopener noreferrer">
-        View on GitHub
+        View on GitHub <i class="fa-solid fa-code"></i>
     </a>
 </div>
 
@@ -38,10 +33,9 @@
         color: #fff;
         font-weight: 700;
         display: flex;
-        padding: 0px 10px 0 10px;
+        padding: 0 10px;
         gap: 10px;
         width: min(100vw, 500px);
-        height: 35px;
         align-items: center;
         justify-content: flex-start;
         position: fixed;
@@ -105,31 +99,33 @@
         align-items: center;
         border-radius: 10px;
         transition: 100ms ease-in-out;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 5px;
+        text-decoration: none;
+
+        *{
+            pointer-events: none;
+        }
 
         img{
             width: 100%;
             height: 100%;
             object-fit: contain;
             display: block;
+            transition: 100ms;
         }
-    }
 
-    .instrument input {
-        display: none;
-    }
-
-    .instrument label {
-        color: #fff;
-        font-weight: 700;
-        cursor: pointer;
-        width: 100%;
-        height: 100%;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 5px;
-        align-items: center;
+        &:hover img{
+            filter:
+            drop-shadow(3px 3px 5px #ffca0a);
+            //drop-shadow(3px 3px 5px #000000)
+        }
     }
 
     .instrument:has(input[type=radio]:checked) {

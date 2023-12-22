@@ -1,5 +1,5 @@
 <script lang="ts">
-    import "$lib/global.css";
+    import "$lib/global.scss";
     import { onMount } from "svelte";
 
     async function detectSWUpdate(){

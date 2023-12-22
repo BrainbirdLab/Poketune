@@ -7,10 +7,21 @@ declare let self: ServiceWorkerGlobalScope;
 
 const CACHE = `cache-${version}`;
 
+const routes = [
+	'/',
+	'/Guiter',
+	'/Bass',
+	'/Ukulele',
+	'/Chromatic',
+	'/Metronome',
+];
+
 const ASSETS = [
 	...build,
 	...files,
+	...routes,
 ]
+
 
 //Call Install Event
 self.addEventListener('install', (e) => {

@@ -1,29 +1,83 @@
 
 <script lang="ts">
-    let bpm = 120;
-    //user can choose from may pattern
-    //pattern - 1: 1, 2, 3, 4; 1, 2, 3, 4; 1, 2, 3, 4; 1, 2, 3, 4;
-    //pattern - 2: 1, 2, 3; 1, 2, 3; 1, 2, 3; 1, 2, 3;
-    //pattern - 3: 1, 2; 1, 2; 1, 2; 1, 2;
-    //pattern - 4: 1; 1; 1; 1;
-    //pattern - 5: 1, 2, 3; 1, 2, 3; 1, 2, 3, 4, 5; 1, 2, 3, 4, 5;
+    import { onDestroy, onMount } from "svelte";
+    import Range from "./Range.svelte";
+    import {writable, type Unsubscriber, type Writable} from "svelte/store";
+    import { fly, slide } from "svelte/transition";
 
-    //now name the pattern and put them in a object
-    const patterns: {[key: string]: number[]} = {
-        '4/4': [1, 2, 3, 4],
-        '3/4': [1, 2, 3],
-        '2/4': [1, 2],
-        '1/4': [1],
-        '5/4': [1, 2, 3, 1, 2, 3, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5] 
-    };
+    const bpm = writable(120);
+    const pattern = writable(4);
 
-    let selected = '4/4';
-    let beat: HTMLElement;
-
+    let tickDirection = 1;
+    
     let index = -1;
-
+    
     let playing = false;
-    let timer: number;
+    
+    const patterns: Writable<{[key: string]: boolean}> = writable({});
+    
+
+    let bpmUnsub: Unsubscriber;
+        
+    let patternUnsub: Unsubscriber;
+
+    let allPatternsUnsub: Unsubscriber;
+
+    function patternSaver(val: number){
+        console.log('pattern changed to ', val);
+        patterns.set({});
+        for (let i = 0; i < val; i++) {
+            patterns.update((val) => {
+                val[i] = false;
+                return val;
+            });
+        }
+        localStorage.setItem('pattern', val.toString());
+    }
+
+    function bpmSaver(val: number){
+        console.log('bpm changed to ', val);
+        localStorage.setItem('bpm', val.toString());
+    }
+
+    function allPatternsSaver(val: {[key: string]: boolean}){
+        console.log('active pattern changed to', val);
+        localStorage.setItem('activePattern', JSON.stringify(val));
+    }
+
+    onMount(() => {
+
+        const b = localStorage.getItem('bpm');
+        const p = localStorage.getItem('pattern');
+        const a = localStorage.getItem('activePattern');
+        
+        bpmUnsub = bpm.subscribe(bpmSaver);
+        if (b) {
+            bpm.set(Number(b));
+            console.log('set bpm');
+        } else {
+            bpm.set(120);
+            console.log('set default bpm');
+        }
+        patternUnsub = pattern.subscribe(patternSaver);
+        if (p) {
+            pattern.set(Number(p));
+            console.log('set pattern');
+        } else {
+            pattern.set(4);
+            console.log('set default pattern');
+        }
+        allPatternsUnsub = patterns.subscribe(allPatternsSaver);
+        if (a) {
+            patterns.set(JSON.parse(a));
+            console.log('set active pattern');
+        } else {
+            patterns.set({});
+            console.log('set default active pattern');
+        }
+
+    });
+    
 
     const context = new AudioContext();
     
@@ -41,161 +95,206 @@
         o.stop(context.currentTime + 0.03);
     }
 
+    let timeoutId: number;
+
+    function scheduleNextBeat() {
+        timeoutId = setTimeout(() => {
+            index++;
+            tickDirection *= -1;
+            const bt = $patterns[index % $pattern];
+            if (bt) {
+                playSound(true);
+            } else {
+                playSound();
+            }
+
+            //reset the index
+            if (index >= $pattern) {
+                index = 0;
+            }
+
+            scheduleNextBeat();
+        }, (60 / $bpm) * 1000);
+    }
+
     async function play() {
         playing = !playing;
         if (playing) {
             if (context.state === 'suspended') {
                 await context.resume();
             }
-
-            timer = setInterval(() => {
-                index++;
-                console.log(index);
-                if (index > patterns[selected].length - 1) {
-                    index = 0;
-                }
-                playSound(patterns[selected][index] === 1);
-            }, (60 / bpm) * 1000);
+            scheduleNextBeat();
         } else {
-            console.log('stoped');
-            clearInterval(timer);
-            index = -1;
+            console.log('stopped');
+            clearTimeout(timeoutId);
         }
     }
+
+    function selectSnare(node: HTMLElement) {
+        
+        node.onclick = (e) => {
+            const target = e.target as HTMLElement;
+            if (target.classList.contains('beat')) {
+                const index = target.dataset.beat as string;
+                patterns.update((val) => {
+                    val[index] = !val[index];
+                    return val;
+                });
+            }
+        };
+
+        return {
+            destroy() {
+                node.onclick = null;
+            }
+        };
+    }
+
+    onDestroy(() => {
+        clearTimeout(timeoutId);
+        bpmUnsub();
+        patternUnsub();
+        allPatternsUnsub();
+    });
 
 </script>
 
 <div class="wrapper">
-    <div class="bpm">
-        <div class="label">BPM {bpm}</div>
-        <!-- use range -->
-        <input type="range" min="60" max="240" step="1" bind:value={bpm} />
+
+    <div class="metronome">
+        <img src="/images/metronome-body.png" alt="body">
+        <img id="hand" src="/images/metronome-hand.png" alt="needle" class="needle" style="transform: rotate({playing ? 20*tickDirection : 0}deg); transition: {(60 / $bpm) * 1000}ms ease-in-out;">
     </div>
-    <div class="pattern">
-        <div class="label">Pattern</div>
-        <select bind:value={selected}>
-            {#each Object.keys(patterns) as pattern}
-                <option value={pattern}>{pattern}</option>
-            {/each}
-        </select>
+
+    <div class="beats" use:selectSnare>
+        {#each Object.entries($patterns) as pattern, i}
+            <div in:fly={{y: 10}} out:fly={{y: 10, duration: 50}} class="beat" class:playing={i == index} data-beat={i} class:snare={pattern[1]}>{i+1}</div>
+        {/each}
+    </div>
+
+    <div class="inputs">
+        <div class="input">
+            <div class="label">BPM <i class="fa-solid fa-drum"></i></div>
+            <Range fieldName="bpm" bind:value={$bpm} min={40} max={208} step={2}/>
+        </div>
+        <div class="input">
+            <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
+            <Range fieldName="pattern" bind:value={$pattern} min={1} max={16} step={1} reference={4}/>
+        </div>
     </div>
     <div class="play pause">
-        <button on:click={play}>
-            {playing ? 'Pause' : 'Play'}
+        <button class="startButton" class:stop={playing} on:click={play}>
+            {#if playing}
+            <i class="fa-solid fa-pause"></i>
+            {:else}
+            <i class="fa-solid fa-play"></i>
+            {/if}
         </button>
     </div>
 </div>
 
-<div class="display">
-    <div class="beat" bind:this={beat}></div>
-    <div class="count">{
-            playing ? patterns[selected][index] || "Starting..." : "Play to start"
-        }</div>
-</div>
 
 <style lang="scss">
-    .wrapper {
+
+    .beats{
         display: flex;
         flex-direction: row;
-        align-items: flex-end;
+        flex-wrap: wrap;
+        align-items: center;
         justify-content: center;
         gap: 10px;
+        width: 100%;
+        max-width: 650px;
+        padding: 10px;
+        .beat{
+            background: #182c44;
+            border-radius: 10px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+
+            &.playing{
+                border: 2px solid #b291ff;
+            }
+
+            &.snare{
+                background: #b291ff40;
+            }
+        }
+    }
+
+    .metronome{
+        position: relative;
+        width: 250px;
+        height: 200px;
+        overflow: hidden;
+        img{
+            width: 100%;
+            height: 250px;
+            aspect-ratio: 1/1;
+            display: block;
+            position: absolute;
+            z-index: 1;
+            &#hand{
+                transform-origin: center;
+            }
+        }
+
+        //shadow of the body
+        &:before{
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 10%;
+            background: #00000040;
+            bottom: 25px;
+            left: 0;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        //shadow of the needle
+        #hand{
+            filter: drop-shadow(-4px -2px 4px #000000e1);
+        }
+    }
+
+    .inputs{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10%;
+        width: 100%;
+        flex-wrap: wrap;
+        padding: 10px;
+
+        .input{
+            .label i{
+                color: #b291ff;
+            }
+            padding-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
         padding: 10px;
         background: var(--primary);
         border-radius: 10px;
         margin: 10px 0;
-    }
-
-    .bpm,
-    .pattern {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-    }
-
-    .label {
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: #ffffff;
-    }
-
-    input{
-        width: 100px;
-        padding: 5px 10px;
-        border-radius: 5px;
-        background: transparent;
-        border: 1px solid #ffffff;
-        color: #ffffff;
-        font-size: 1rem;
-        font-weight: 700;
-        outline: none;
-    }
-
-    select {
-        padding: 5px 10px;
-        border-radius: 5px;
-        background: transparent;
-        border: 1px solid #ffffff;
-        color: #ffffff;
-        font-size: 1rem;
-        font-weight: 700;
-        outline: none;
-    }
-
-    .play {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-    }
-
-    button {
-        padding: 5px 10px;
-        border-radius: 5px;
-        background: transparent;
-        border: 1px solid #ffffff;
-        color: #ffffff;
-        font-size: 1rem;
-        font-weight: 700;
-        outline: none;
-        cursor: pointer;
-    }
-
-    .display {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        margin-top: 10px;
-    }
-
-    .beat {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: #ffffff;
-        opacity: 0.5;
-    }
-
-    .count {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #ffffff;
-    }
-
-    @keyframes beat {
-        0% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.2);
-        }
-        100% {
-            transform: scale(1);
-        }
     }
 </style>

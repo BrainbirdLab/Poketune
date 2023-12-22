@@ -1,4 +1,5 @@
 <script lang="ts">
+    
     import { confetti } from "@neoconfetti/svelte";
     import { pitchShiftBy, selectedInstrument } from "$lib/store";
     import {
@@ -12,16 +13,12 @@
     import { fade, fly, slide } from "svelte/transition";
 
     //load audio
-    const correctNoteSound = new Audio("/sounds/correct.mp3");
-    const allDoneSound = new Audio("/sounds/allDone.mp3");
+    let correctNoteSound: HTMLAudioElement;
+    let allDoneSound: HTMLAudioElement;
 
-    const guitarSound = new Audio("/sounds/guitar.mp3");
-    const ukuleleSound = new Audio("/sounds/ukulele.mp3");
-    const bassSound = new Audio("/sounds/bass.mp3");
-
-    guitarSound.load();
-    ukuleleSound.load();
-    bassSound.load();
+    let guitarSound: HTMLAudioElement;
+    let ukuleleSound: HTMLAudioElement;
+    let bassSound: HTMLAudioElement;
 
     let Octave: number;
     let Note: string;
@@ -34,6 +31,36 @@
     let audioContext: AudioContext;
 
     let tunedNotes = new Set<string>();
+
+    onMount(() => {
+
+        correctNoteSound = new Audio("/sounds/correct.mp3");
+        allDoneSound = new Audio("/sounds/allDone.mp3");
+
+        guitarSound = new Audio("/sounds/guitar.mp3");
+        ukuleleSound = new Audio("/sounds/ukulele.mp3");
+        bassSound = new Audio("/sounds/bass.mp3");
+
+        drawCanvas();
+        const pitchShift = localStorage.getItem("pitchShiftBy") || "0";
+        if (pitchShift) {
+            //if pitch shift is <= 10 or >= -10 then only set, else set to 0
+            if (Math.abs(Number(pitchShift)) <= 10) {
+                pitchShiftBy.set(Number(pitchShift));
+            } else {
+                pitchShiftBy.set(0);
+            }
+        }
+
+        pitchShiftBy.subscribe((val) => {
+            notes = getReferenceNotes();
+            localStorage.setItem("pitchShiftBy", val.toString());
+        });
+        });
+
+        onDestroy(() => {
+        stop();
+    });
 
     function drawCanvas() {
         if (!canvas) {
@@ -50,7 +77,7 @@
             //draw  a straight line
             canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
             canvasContext.lineWidth = 2;
-            canvasContext.strokeStyle = "#2c3e50";
+            canvasContext.strokeStyle = "var(--secondary)";
             canvasContext.beginPath();
             canvasContext.moveTo(0, HEIGHT / 2);
             canvasContext.lineTo(canvas.width, canvas.height / 2);
@@ -58,7 +85,7 @@
         } else {
             canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
             canvasContext.lineWidth = 2;
-            canvasContext.strokeStyle = "#2c3e50";
+            canvasContext.strokeStyle = "var(--secondary)";
 
             canvasContext.beginPath();
 
@@ -95,27 +122,6 @@
         requestAnimationFrame(drawCanvas);
     }
 
-    onMount(() => {
-        drawCanvas();
-        const pitchShift = localStorage.getItem("pitchShiftBy") || "0";
-        if (pitchShift) {
-            //if pitch shift is <= 10 or >= -10 then only set, else set to 0
-            if (Math.abs(Number(pitchShift)) <= 10) {
-                pitchShiftBy.set(Number(pitchShift));
-            } else {
-                pitchShiftBy.set(0);
-            }
-        }
-
-        pitchShiftBy.subscribe((val) => {
-            notes = getReferenceNotes();
-            localStorage.setItem("pitchShiftBy", val.toString());
-        });
-    });
-
-    onDestroy(() => {
-        stop();
-    });
 
     let Frequency = 0;
     let detectedClarity = 0;
@@ -371,8 +377,6 @@
     }
 </script>
 
-
-
 <div class="tuner">
     <div class="noteContainer">
         {#if Note}
@@ -510,11 +514,11 @@
         {/if}
         <div class="buttons on-off">
             {#if isListening}
-                <button in:fade class="listenActionButton stop" on:click={stop}
+                <button in:fade class="startButton stop" on:click={stop}
                     ><i class="fa-solid fa-guitar"></i></button
                 >
             {:else}
-                <button in:fade class="listenActionButton start" on:click={start}
+                <button in:fade class="startButton start" on:click={start}
                     ><i class="fa-solid fa-guitar"></i></button
                 >
             {/if}
@@ -623,7 +627,7 @@
         width: 35px;
         height: 35px;
         border-radius: 10px;
-        background: #2c3e50;
+        background: var(--secondary);
         font-weight: bold;
         font-size: 1rem;
         cursor: pointer;
@@ -650,7 +654,7 @@
         position: relative;
         width: 100%;
         font-size: 0.7rem;
-        color: #2c3e50;
+        color: var(--secondary);
 
         .settings{
             display: flex;
@@ -671,7 +675,6 @@
     .meter {
         position: relative;
         border-radius: 5px;
-        background: #2c3e5000;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -806,68 +809,6 @@
         }
     }
 
-    .listenActionButton {
-        border: none;
-        outline: none;
-        padding: 10px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: #266dfa;
-        cursor: pointer;
-        transition: 100ms;
-    }
-
-    @keyframes pulse {
-        0% {
-            transform: scale(1);
-            opacity: 0;
-        }
-        50% {
-            opacity: 0.9;
-        }
-        100% {
-            transform: scale(1.6);
-            opacity: 0;
-        }
-    }
-
-    .stop {
-        background: #ff0000;
-    }
-
-    .on-off{
-        position: relative;
-        height: 50px;
-        width: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        i{
-            font-size: 1.5rem;
-        }
-    }
-
-    .on-off:has(.stop){
-        &::after {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            border-radius: 50%;
-            background: #ffffff30;
-            opacity: 0;
-            z-index: -1;
-            transform: scale(1);
-            animation: pulse 800ms infinite;
-        }
-    }
-
-    .listenActionButton:hover {
-        filter: brightness(0.97);
-    }
 
     //for larger screens increase font size
     @media (min-width: 768px) {

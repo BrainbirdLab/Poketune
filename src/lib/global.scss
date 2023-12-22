@@ -30,9 +30,37 @@ Remove scrollbars
 
 :root{
 	--primary: #0b1d37;
+	--secondary: #2c3e50;
 }
 
 body{
 	background-color: var(--primary);
 	overflow: hidden;
+}
+
+.startButton {
+	border: none;
+	outline: none;
+	padding: 10px;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background: #266dfa;
+	cursor: pointer;
+	transition: 100ms;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	i{
+		font-size: 1.5rem;
+	}
+
+	&.stop {
+        background: #ff0000;
+    }
+}
+
+.startButton:hover {
+	filter: brightness(0.97);
 }
