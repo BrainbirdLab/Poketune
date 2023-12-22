@@ -462,7 +462,7 @@
                 <div class="label">Change pitch</div>
                 <div class="settings">
                     <button
-                    class="pitchChanger"
+                    class="updateButton"
                     on:click={() => {
                         incrementPitchBy(-1);
                     }}
@@ -475,7 +475,7 @@
                     </div>
                 {/key}
                 <button
-                    class="pitchChanger"
+                    class="updateButton"
                     on:click={() => {
                         incrementPitchBy(1);
                     }}
@@ -617,27 +617,6 @@
         width: 100%;
         gap: 10px;
         overflow: scroll;
-    }
-
-    .pitchChanger,
-    .button {
-        border: none;
-        outline: none;
-        padding: 10px;
-        width: 35px;
-        height: 35px;
-        border-radius: 10px;
-        background: var(--secondary);
-        font-weight: bold;
-        font-size: 1rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &:hover {
-            filter: brightness(0.9);
-        }
     }
 
     .button {

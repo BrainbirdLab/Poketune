@@ -34,7 +34,7 @@
 
 <div class="range {fieldName}">
   {#if showButtons}
-  <button class="rangeUpdate" 
+  <button class="updateButton" 
           on:mousedown={() => startUpdating(-step)} 
           on:mouseup={stopUpdating} 
           on:mouseleave={stopUpdating}>
@@ -48,7 +48,7 @@
       {/if}
   </div>
   {#if showButtons}
-  <button class="rangeUpdate" 
+  <button class="updateButton" 
           on:mousedown={() => startUpdating(step)} 
           on:mouseup={stopUpdating} 
           on:mouseleave={stopUpdating}>
@@ -67,25 +67,6 @@
       gap: 10px;
       min-width: 130px;
       position: relative;
-
-      .rangeUpdate {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          width: 35px;
-          height: 35px;
-          border-radius: 10px;
-          background: #607d8b28;
-          border: none;
-          color: #fff;
-          font-size: 1rem;
-          transition: all 0.2s ease-in-out;
-
-          &:hover {
-              background: #607d8b;
-          }
-      }
   }
 
   //snap to the nearest division on scroll

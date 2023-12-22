@@ -206,6 +206,8 @@
             cursor: pointer;
             border: 2px solid transparent;
             font-size: 0.8rem;
+            transition: 100ms ease-in-out;
+            font-weight: 700;
 
             &.playing{
                 border: 2px solid #b291ff;
@@ -266,6 +268,7 @@
         .input{
             .label{
                 font-size: 0.7rem;
+                font-weight: 700;
                 i{
                     color: #b291ff;
                 }
