@@ -3,14 +3,14 @@
     import { onDestroy, onMount } from "svelte";
     import Range from "./Range.svelte";
     import {writable, type Unsubscriber, type Writable} from "svelte/store";
-    import { fly, slide } from "svelte/transition";
+    import { fly } from "svelte/transition";
 
     const bpm = writable(120);
     const pattern = writable(4);
 
     let tickDirection = 1;
     
-    let index = -1;
+    let index = -1; 
     
     let playing = false;
     
@@ -24,7 +24,6 @@
     let allPatternsUnsub: Unsubscriber;
 
     function patternSaver(val: number){
-        console.log('pattern changed to ', val);
         patterns.set({});
         for (let i = 0; i < val; i++) {
             patterns.update((val) => {
@@ -36,12 +35,10 @@
     }
 
     function bpmSaver(val: number){
-        console.log('bpm changed to ', val);
         localStorage.setItem('bpm', val.toString());
     }
 
     function allPatternsSaver(val: {[key: string]: boolean}){
-        console.log('active pattern changed to', val);
         localStorage.setItem('activePattern', JSON.stringify(val));
     }
 
@@ -54,26 +51,20 @@
         bpmUnsub = bpm.subscribe(bpmSaver);
         if (b) {
             bpm.set(Number(b));
-            console.log('set bpm');
         } else {
             bpm.set(120);
-            console.log('set default bpm');
         }
         patternUnsub = pattern.subscribe(patternSaver);
         if (p) {
             pattern.set(Number(p));
-            console.log('set pattern');
         } else {
             pattern.set(4);
-            console.log('set default pattern');
         }
         allPatternsUnsub = patterns.subscribe(allPatternsSaver);
         if (a) {
             patterns.set(JSON.parse(a));
-            console.log('set active pattern');
         } else {
             patterns.set({});
-            console.log('set default active pattern');
         }
 
     });
@@ -125,7 +116,6 @@
             }
             scheduleNextBeat();
         } else {
-            console.log('stopped');
             clearTimeout(timeoutId);
         }
     }
@@ -175,7 +165,7 @@
     <div class="inputs">
         <div class="input">
             <div class="label">BPM <i class="fa-solid fa-drum"></i></div>
-            <Range fieldName="bpm" bind:value={$bpm} min={40} max={208} step={2}/>
+            <Range fieldName="bpm" bind:value={$bpm} min={40} max={400} step={20}/>
         </div>
         <div class="input">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
