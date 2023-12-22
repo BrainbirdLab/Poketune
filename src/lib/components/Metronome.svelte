@@ -165,7 +165,7 @@
     <div class="inputs">
         <div class="input">
             <div class="label">BPM <i class="fa-solid fa-drum"></i></div>
-            <Range fieldName="bpm" bind:value={$bpm} min={40} max={400} step={20}/>
+            <Range fieldName="bpm" bind:value={$bpm} min={40} max={400} step={10}/>
         </div>
         <div class="input">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
