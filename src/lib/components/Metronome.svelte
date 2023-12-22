@@ -314,6 +314,11 @@
         .inputs{
             gap: 50px;
         }
+
+        .beats .beat{
+            font-size: 1rem;
+            padding: 10px 15px;
+        }
     }
 
 </style>
