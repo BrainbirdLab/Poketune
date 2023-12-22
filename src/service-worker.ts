@@ -9,7 +9,7 @@ const CACHE = `cache-${version}`;
 
 const routes = [
 	'/',
-	'/Guiter',
+	'/Guitar',
 	'/Bass',
 	'/Ukulele',
 	'/Chromatic',
