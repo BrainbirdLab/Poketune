@@ -121,13 +121,13 @@
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          width: 40px;
-          height: 40px;
+          width: 35px;
+          height: 35px;
           border-radius: 10px;
           background: #607d8b28;
           border: none;
           color: #fff;
-          font-size: 1.2rem;
+          font-size: 1rem;
           transition: all 0.2s ease-in-out;
 
           &:hover {

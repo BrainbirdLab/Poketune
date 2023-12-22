@@ -209,12 +209,13 @@
         .beat{
             background: #182c44;
             border-radius: 10px;
-            padding: 10px 15px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             border: 2px solid transparent;
+            font-size: 0.8rem;
 
             &.playing{
                 border: 2px solid #b291ff;
@@ -228,12 +229,12 @@
 
     .metronome{
         position: relative;
-        width: 250px;
-        height: 200px;
+        width: 150px;
+        height: 120px;
         overflow: hidden;
         img{
             width: 100%;
-            height: 250px;
+            height: 150px;
             aspect-ratio: 1/1;
             display: block;
             position: absolute;
@@ -250,7 +251,7 @@
             width: 100%;
             height: 10%;
             background: #00000040;
-            bottom: 25px;
+            bottom: 12%;
             left: 0;
             border-radius: 50%;
             z-index: 0;
@@ -267,14 +268,17 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        gap: 10%;
+        gap: 10px;
         width: 100%;
         flex-wrap: wrap;
         padding: 10px;
 
         .input{
-            .label i{
-                color: #b291ff;
+            .label{
+                font-size: 0.7rem;
+                i{
+                    color: #b291ff;
+                }
             }
             padding-bottom: 20px;
             display: flex;
@@ -297,4 +301,19 @@
         border-radius: 10px;
         margin: 10px 0;
     }
+
+    @media (min-width: 768px){
+        .metronome{
+            width: 250px;
+            height: 200px;
+            img{
+                height: 250px;
+            }
+        }
+
+        .inputs{
+            gap: 50px;
+        }
+    }
+
 </style>
