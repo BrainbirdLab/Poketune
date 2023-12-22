@@ -169,7 +169,7 @@
         </div>
         <div class="input">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
-            <Range fieldName="pattern" bind:value={$pattern} min={1} max={16} step={1} reference={4}/>
+            <Range fieldName="pattern" bind:value={$pattern} min={3} max={16} step={1} reference={4}/>
         </div>
     </div>
     <div class="play pause">
