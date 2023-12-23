@@ -8,7 +8,6 @@
 
 <svelte:head>
     <title>{sentenceCase(data.name)}</title>
-    <!-- Update icon -->
     <link rel="icon" type="image/png" href="/images/{data.name.toLowerCase()}(custom).png" />
 </svelte:head>
 
