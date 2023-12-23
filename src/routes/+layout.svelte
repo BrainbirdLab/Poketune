@@ -13,7 +13,7 @@
                 if (newWorker.state === "installed") {
                     newWorker.postMessage({ type: "SKIP_WAITING" });
                     console.log("New update available");
-                    showPopupMessage("App service updated");
+                    showPopupMessage("App updated");
                 }
             });
         });
@@ -25,8 +25,8 @@
         //get update from service worker
         navigator.serviceWorker.addEventListener("message", (event) => {
             if (event.data.type === "CACHE_UPDATED") {
-                console.log("App updated");
-                showPopupMessage("App updated");
+                console.log("App data updated");
+                showPopupMessage("App data updated");
             }
         });
     })
