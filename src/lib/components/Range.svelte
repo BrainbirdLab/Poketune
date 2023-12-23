@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { afterUpdate, onMount } from "svelte";
+    import { writable } from "svelte/store";
 
     export let min: number;
     export let max: number;
@@ -8,14 +9,13 @@
     export let fastStep: number = 5;
     export let showButtons: boolean = true;
     export let reference: number = 0;
-    let intervalId: number;
 
     onMount(() => {
     
         const v = localStorage.getItem(fieldName);
-    
+
         if (v && !isNaN(parseInt(v))) {
-        value = parseInt(v);
+            value = parseInt(v);
         } else {
             value = min;
         }
@@ -27,16 +27,24 @@
             //console.log('reset max');
             value = max;
         }
+
+    });
+    
+    afterUpdate(() => {
+        if (localStorage){
+            //console.log('saving', fieldName, value);
+            localStorage.setItem(fieldName, value.toString());
+        }
     });
 
     function rangeUpdate(val: number) {
         if (value + val >= min && value + val <= max) {
             value += val;
         }
-        localStorage.setItem(fieldName, value.toString());
     }
 
     let timeoutId: number;
+    let intervalId: number;
 
     function startUpdating(step: number) {
         // Update the value once immediately

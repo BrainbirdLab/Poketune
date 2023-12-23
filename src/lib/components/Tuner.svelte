@@ -279,6 +279,24 @@
         }
     }
 
+    let timeoutId: number;
+    let intervalId: number;
+
+    function startUpdating(step: number) {
+        // Update the value once immediately
+        incrementPitchBy(step);
+
+        // Wait for 1 second before starting to update the value continuously
+        timeoutId = setTimeout(() => {
+            intervalId = setInterval(() => incrementPitchBy(5 * step), 100);
+        }, 500);
+    }
+
+    function stopUpdating() {
+        clearTimeout(timeoutId);
+        clearInterval(intervalId);
+    }
+
     let audioBuffer: AudioBuffer | null = null;
 
     async function playNote(frequency: number){
@@ -457,9 +475,9 @@
                 <div class="settings">
                     <button
                     class="updateButton"
-                    on:click={() => {
-                        incrementPitchBy(-1);
-                    }}
+                    on:mousedown={() => startUpdating(-1)} 
+                    on:mouseup={stopUpdating} 
+                    on:mouseleave={stopUpdating}
                 >
                 <i class="fa-solid fa-minus"></i>
                 </button>
@@ -470,9 +488,9 @@
                 {/key}
                 <button
                     class="updateButton"
-                    on:click={() => {
-                        incrementPitchBy(1);
-                    }}
+                    on:mousedown={() => startUpdating(1)} 
+                    on:mouseup={stopUpdating} 
+                    on:mouseleave={stopUpdating}
                 >
                 <i class="fa-solid fa-plus"></i>
                 </button>

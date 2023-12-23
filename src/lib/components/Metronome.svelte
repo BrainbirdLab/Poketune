@@ -104,6 +104,45 @@
         };
     }
 
+    let clickTimes: number[] = [];
+
+    let tapBpm = false;
+
+    function calculateBpm() {
+
+        playSound(false);
+
+        let currentTime = Date.now();
+        tapBpm = true;
+        // Store the time of the click
+        clickTimes.push(currentTime);
+
+        // If there are at least 4 clicks
+        if (clickTimes.length >= 4) {
+            let totalBpm = 0;
+
+            // Calculate the BPM for each pair of clicks and add it to the total
+            for (let i = 1; i < clickTimes.length; i++) {
+                let timeDifference = clickTimes[i] - clickTimes[i - 1]; // Time difference in milliseconds
+                let beatsPerMillisecond = 1 / timeDifference;
+                totalBpm += beatsPerMillisecond * 60000; // Convert to beats per minute
+            }
+
+            const _bpm = Math.round(totalBpm / (clickTimes.length - 1));
+
+            if (_bpm < 40){
+                bpm = 40;
+            } else if (_bpm > 400) {
+                bpm = 400;
+            } else {
+                bpm = _bpm;
+            }
+
+            // Remove the oldest click time
+            clickTimes.shift();
+        }
+    }
+
     onDestroy(() => {
         clearTimeout(timeoutId);
         unsubPattern();
@@ -134,19 +173,89 @@
             <Range fieldName="pattern" bind:value={$pattern} min={3} max={16} fastStep={2} reference={4}/>
         </div>
     </div>
-    <div class="play pause">
-        <button class="startButton" class:stop={playing} on:click={play}>
-            {#if playing}
-            <i class="fa-solid fa-pause"></i>
-            {:else}
-            <i class="fa-solid fa-play"></i>
-            {/if}
+
+    <div class="group">
+        <button class="beatButton"
+        class:pressed={tapBpm}
+        on:mousedown={calculateBpm}
+        on:mouseup={() => tapBpm = false}
+        >
+            <i class="fa-solid fa-drum"></i>
+            <div class="label">
+                Tap to change BPM
+            </div>
         </button>
+    
+        <div class="play pause">
+            <button class="beatButton" class:stop={playing} on:click={play}>
+                {#if playing}
+                <i class="fa-solid fa-pause"></i>
+                <div class="label">Stop</div>
+                {:else}
+                <i class="fa-solid fa-play"></i>
+                <div class="label">Start</div>
+                {/if}
+            </button>
+        </div>
     </div>
+
 </div>
 
 
 <style lang="scss">
+
+    .group{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        flex-wrap: wrap;
+        padding: 10px;
+    }
+
+    
+    .beatButton{
+        border-radius: 10px;
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        gap: 10px;
+        border: 2px solid #b291ff3d;
+        transition: 100ms ease-in-out;
+        background: transparent;
+        min-width: 70px;
+
+        
+        .label{
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        
+        .fa-play{
+            color: #e08d48;
+        }
+        
+        .fa-pause{
+            color: #ff3d3d;
+        }
+        
+        .fa-drum{
+            color: #a0a7ff;
+        }
+        
+        &.pressed{
+            border: 2px solid #b291ff;
+        }
+        
+        i{
+            font-size: 2rem;
+        }
+    }
 
     .beats{
         display: flex;
