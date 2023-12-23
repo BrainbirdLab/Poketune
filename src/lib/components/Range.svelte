@@ -40,14 +40,31 @@
         localStorage.setItem(fieldName, value.toString());
   }
 
-  function startUpdating(step: number) {
-      rangeUpdate(step);
-      intervalId = setInterval(() => rangeUpdate(step), 100);
-  }
+    let timeoutId: number;
+    let isHolding: boolean = false;
 
-  function stopUpdating() {
-      clearInterval(intervalId);
-  }
+    function startUpdating(step: number) {
+        // Update the value once immediately
+        rangeUpdate(step);
+
+        // Set the flag to true
+        isHolding = true;
+
+        // Wait for 1 second before starting to update the value continuously
+        timeoutId = setTimeout(() => {
+            if (isHolding) {
+                intervalId = setInterval(() => rangeUpdate(step), 100);
+            }
+        }, 1000);
+    }
+
+    function stopUpdating() {
+        // Set the flag to false
+        isHolding = false;
+
+        clearTimeout(timeoutId);
+        clearInterval(intervalId);
+    }
 
 </script>
 
