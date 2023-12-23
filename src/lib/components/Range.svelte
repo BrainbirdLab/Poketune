@@ -11,15 +11,21 @@
   let intervalId: number;
 
   onMount(() => {
-      if (value % step !== 0) {
-          value = Math.round(value / step) * step;
-      }
+        if (value % step !== 0) {
+            value = Math.round(value / step) * step;
+        }
+        if (value < min) {
+            value = min;
+        }
+        if (value > max) {
+            value = max;
+        }
   });
 
   function rangeUpdate(val: number) {
-      if (value + val >= min && value + val <= max) {
-          value += val;
-      }
+        if (value + val >= min && value + val <= max) {
+            value += val;
+        }
   }
 
   function startUpdating(step: number) {
@@ -30,7 +36,7 @@
   function stopUpdating() {
       clearInterval(intervalId);
   }
-  
+
 </script>
 
 <div class="range {fieldName}">
