@@ -377,7 +377,7 @@
     }
 </script>
 
-<div class="tuner">
+<div class="tuner" in:fly|global={{y: -10}}>
     <div class="noteContainer">
         {#if Note}
             <div class="noteName" in:fly|global={{ y: 5 }}>

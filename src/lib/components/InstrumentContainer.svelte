@@ -4,6 +4,7 @@
     import Tuner from "$lib/components/Tuner.svelte";
     import { fly } from "svelte/transition";
     import { onMount } from "svelte";
+    import SelectInstrument from "./SelectInstrument.svelte";
 
     let ready = false;
 
@@ -13,38 +14,58 @@
 </script>
 
 {#if ready}
-<div class="container" transition:fly={{y: 10}}>
+
+<div class="container">
     {#if $selectedInstrument != "none"}
-    <a href="/" in:fly|global={{x: -10}} class="goback" on:click={()=>{selectedInstrument.set("none")}}>
-        <i class="fa-solid fa-caret-left fa-fw"></i>
-    </a>
-    <div class="current">
-        <img src="/images/{$selectedInstrument}(custom).png" alt="{$selectedInstrument}" width="60px" />
-        <div class="name">{sentenceCase($selectedInstrument)}</div>
-    </div>
-    {/if}
-    {#if $selectedInstrument != "metronome"}
-        <Tuner/>
+        <div class="topbar" in:fly|global={{x: -10}}>
+            <a href="/" class="goback" on:click={()=>{selectedInstrument.set("none")}}>
+                <i class="fa-solid fa-caret-left fa-fw"></i>
+            </a>
+            <div class="current">
+                <img src="/images/{$selectedInstrument}(custom).png" alt="{$selectedInstrument}" width="60px" />
+                <div class="name">{sentenceCase($selectedInstrument)}</div>
+            </div>
+        </div>
+        {#if $selectedInstrument != "metronome"}
+            <Tuner/>
+        {:else}
+            <Metronome/>
+        {/if}
     {:else}
-        <Metronome/>
+        <SelectInstrument />
     {/if}
 </div>
 {/if}
 
 <style lang="scss">
+
+    .topbar{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+        width: 100%;
+        background: var(--primary);
+        padding: 0 10px;
+    }
+
     .goback {
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        position: absolute;
         top: 2px;
         gap: 5px;
         left: 0;
         width: 45px;
         height: 45px;
-        margin: 2px;
         text-decoration: none;
         font-size: 2rem;
         //background: #607d8b28;
@@ -65,9 +86,6 @@
         align-items: center;
         justify-content: center;
         gap: 3px;
-        position: absolute;
-        top: 5px;
-        right: 5px;
 
         img{
             width: 35px;
@@ -84,6 +102,7 @@
             transform: translate(-50%, -50%);
         }
     }
+
     .container {
         display: flex;
         flex-direction: column;

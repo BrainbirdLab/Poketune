@@ -1,46 +1,81 @@
 /// <reference types="@sveltejs/kit" />
 /// <reference lib="webworker" />
 
-import { build, files, version} from '$service-worker';
-import { precacheAndRoute, precache } from 'workbox-precaching';
-import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
+import { files, build } from "$service-worker";
+import { version } from "$service-worker";
 
-declare let self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope;
 
+const CACHENAME = `cache-poketune-${version}`;
 
-precacheAndRoute([
-	...build.map((file) => ({ url: file, revision: null })),
-	...files.map((file) => ({ url: file, revision: version })),
-]);
-
-const routes = [
-	'/',
-	'guitar',
-	'bass',
-	'ukulele',
-	'chromatic',
-	'metronome',
+const ASSETS = [
+	...build, // the app files (from the build directory)
+	...files, // all from 'static' dir
 ];
 
-precache([
-	...routes.map((route) => ({ url: route, revision: version })),
-]);
-
-
-
-self.addEventListener('message', (e) => {
-	//console.log(e.data);
-	if (e.data && e.data.type === 'SKIP_WAITING') {
-		console.log('Service Worker: Updated');
+self.addEventListener("message", (event) => {
+	if (event.data && event.data.type === "SKIP_WAITING") {
 		self.skipWaiting();
+		console.log("Service worker Updated");
 	}
 });
 
+self.addEventListener("install", (event) => {
+	console.log("installed");
+	async function addFilesToCache() {
+		const cache = await caches.open(CACHENAME);
+		await cache.addAll(ASSETS);
+	}
+	event.waitUntil(addFilesToCache());
+});
 
-const matchCb = ({ url, request }) => {
-	//console.log(url, request);
-	return routes.some(path => url.pathname === path);
-};
+self.addEventListener("activate", (event) => {
+	console.log("activated");
+	async function removeOldCache() {
+		for (const key of await caches.keys()) {
+			if (key !== CACHENAME) await caches.delete(key);
+		}
+	}
 
-registerRoute(matchCb, new StaleWhileRevalidate());
+	event.waitUntil(removeOldCache());
+});
+
+self.addEventListener("fetch", (event) => {
+	if (event.request.method !== "GET") return;
+
+	async function respond() {
+		const cache = await caches.open(CACHENAME);
+		// for everything else, try the network first, but
+		// fall back to the cache if we're offline
+		try {
+			const response = await fetch(event.request);
+
+			// if we're offline, fetch can return a value that is not a Response
+			// instead of throwing - and we can't pass this non-Response to respondWith
+			if (!(response instanceof Response)) {
+				throw new Error('invalid response from fetch');
+			}
+
+			if (response.status === 200) {
+				cache.put(event.request, response.clone());
+			}
+
+			//console.log(`Serving ${event.request.url} from network`);
+			return response;
+		} catch (err) {
+			const response = await cache.match(event.request);
+
+			if (response) {
+				//console.log(`Serving ${event.request.url} from cache`);
+				return response;
+			}
+
+			// if there's no cache, then just error out
+			// as there is nothing we can do to respond to this request
+			throw err;
+		}
+	}
+
+	event.respondWith(respond());
+});
+

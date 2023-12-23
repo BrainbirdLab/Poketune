@@ -150,7 +150,7 @@
 
 </script>
 
-<div class="wrapper">
+<div class="wrapper" in:fly|global={{y: -10}}>
 
     <div class="metronome">
         <img src="/images/metronome-body.png" alt="body">

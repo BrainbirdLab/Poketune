@@ -8,7 +8,7 @@
 
 </script>
 
-<div class="title" in:fly={{x: 10}}>
+<div class="title" in:fly|global={{x: 10, delay: 100}}>
     <div class="t">
         PokeTune
     </div>
