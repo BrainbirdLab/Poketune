@@ -116,6 +116,7 @@
             }
             scheduleNextBeat();
         } else {
+            index = -1;
             clearTimeout(timeoutId);
         }
     }
