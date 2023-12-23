@@ -5,7 +5,7 @@
     export let max: number;
     export let fieldName: string;
     export let value: number;
-    export let step: number = 1;
+    export let fastStep: number = 5;
     export let showButtons: boolean = true;
     export let reference: number = 0;
     let intervalId: number;
@@ -18,10 +18,6 @@
         value = parseInt(v);
         } else {
             value = min;
-        }
-        
-        if (value % step !== 0) {
-            value = Math.round(value / step) * step;
         }
         if (value < min) {
             //console.log('reset min');
@@ -48,7 +44,7 @@
 
         // Wait for 1 second before starting to update the value continuously
         timeoutId = setTimeout(() => {
-            intervalId = setInterval(() => rangeUpdate(step), 100);
+            intervalId = setInterval(() => rangeUpdate(fastStep * step), 100);
         }, 500);
     }
 
@@ -63,7 +59,7 @@
 <div class="range {fieldName}">
   {#if showButtons}
   <button class="updateButton" 
-            on:mousedown={() => startUpdating(-step)} 
+            on:mousedown={() => startUpdating(-1)} 
             on:mouseup={stopUpdating} 
             on:mouseleave={stopUpdating}
           >
@@ -78,7 +74,7 @@
   </div>
   {#if showButtons}
   <button class="updateButton" 
-            on:mousedown={() => startUpdating(step)} 
+            on:mousedown={() => startUpdating(1)} 
             on:mouseup={stopUpdating} 
             on:mouseleave={stopUpdating}
           >

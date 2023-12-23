@@ -127,11 +127,11 @@
     <div class="inputs">
         <div class="input">
             <div class="label">BPM <i class="fa-solid fa-drum"></i></div>
-            <Range fieldName="bpm" bind:value={bpm} min={40} max={400} step={5}/>
+            <Range fieldName="bpm" bind:value={bpm} min={40} max={400} fastStep={10}/>
         </div>
         <div class="input">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
-            <Range fieldName="pattern" bind:value={$pattern} min={3} max={16} step={1} reference={4}/>
+            <Range fieldName="pattern" bind:value={$pattern} min={3} max={16} fastStep={2} reference={4}/>
         </div>
     </div>
     <div class="play pause">
