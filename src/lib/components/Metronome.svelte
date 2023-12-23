@@ -114,8 +114,8 @@
 
         let currentTime = Date.now();
 
-        //if last click was more than 2 seconds ago, clear the array
-        if (clickTimes.length > 0 && currentTime - clickTimes[clickTimes.length - 1] > 2000) {
+        //if last click was more than 3 seconds ago, clear the array
+        if (clickTimes.length > 0 && currentTime - clickTimes[clickTimes.length - 1] > 3000) {
             clickTimes = [];
         }
 
