@@ -113,6 +113,12 @@
         playSound(false);
 
         let currentTime = Date.now();
+
+        //if last click was more than 2 seconds ago, clear the array
+        if (clickTimes.length > 0 && currentTime - clickTimes[clickTimes.length - 1] > 2000) {
+            clickTimes = [];
+        }
+
         tapBpm = true;
         // Store the time of the click
         clickTimes.push(currentTime);
