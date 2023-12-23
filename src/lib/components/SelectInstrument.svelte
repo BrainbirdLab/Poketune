@@ -3,6 +3,8 @@
     import { fade, fly } from 'svelte/transition';;
     import {instrumentNames} from '$lib/tuner';
     import { sentenceCase } from '$lib/store';
+    //import version of the app
+    import { version } from '$app/environment';
 
 </script>
 
@@ -24,7 +26,8 @@
 </div>
 <div class="footer" in:fade>
     <a href="https://github.com/itsfuad/Poketune" target="_blank" rel="noopener noreferrer">
-        View on GitHub <i class="fa-solid fa-code"></i>
+        <span class="v">Build v{version}</span>
+        <i class="fa-solid fa-code"></i>
     </a>
 </div>
 
@@ -34,12 +37,13 @@
         color: #fff;
         font-weight: 700;
         display: flex;
+        flex-direction: row;
         padding: 0 10px;
-        gap: 10px;
         width: min(100vw, 500px);
         align-items: center;
         justify-content: flex-start;
         position: fixed;
+        gap: 10px;
         top: 0;
         left: 0;
         right: 0;
@@ -60,9 +64,12 @@
         right: 0;
         padding: 10px;
         text-align: center;
-        font-size: 12px;
+        font-size: 0.6rem;
         color: #fff;
         background: var(--primary);
+        .v{
+            position: relative;
+        }
         a {
             color: #fff;
             text-decoration: underline;
