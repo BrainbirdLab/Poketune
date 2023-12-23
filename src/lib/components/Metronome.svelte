@@ -2,71 +2,35 @@
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
     import Range from "./Range.svelte";
-    import {writable, type Unsubscriber, type Writable} from "svelte/store";
     import { fly } from "svelte/transition";
+    import {writable} from "svelte/store";
 
-    const bpm = writable(120);
+    let bpm = 120;
     const pattern = writable(4);
+
+    let snareIndexes: number[] = [];
+
+    //$: snareIndexes = Array.from({length: pattern}, (_, i) => snareIndexes[i] || 0) as number[];
 
     let tickDirection = 1;
     
-    let index = -1; 
+    let index = -1;
     
     let playing = false;
-    
-    const patterns: Writable<{[key: string]: boolean}> = writable({});
-    
 
-    let bpmUnsub: Unsubscriber;
-        
-    let patternUnsub: Unsubscriber;
-
-    let allPatternsUnsub: Unsubscriber;
-
-    function patternSaver(val: number){
-        patterns.set({});
-        for (let i = 0; i < val; i++) {
-            patterns.update((val) => {
-                val[i] = false;
-                return val;
-            });
-        }
-        localStorage.setItem('pattern', val.toString());
-    }
-
-    function bpmSaver(val: number){
-        localStorage.setItem('bpm', val.toString());
-    }
-
-    function allPatternsSaver(val: {[key: string]: boolean}){
-        localStorage.setItem('activePattern', JSON.stringify(val));
-    }
+    const unsubPattern = pattern.subscribe((v) => {
+        snareIndexes = Array.from({length: v}, (_, i) => 0);
+    });
 
     onMount(() => {
 
-        const b = localStorage.getItem('bpm');
-        const p = localStorage.getItem('pattern');
-        const a = localStorage.getItem('activePattern');
-        
-        bpmUnsub = bpm.subscribe(bpmSaver);
-        if (b) {
-            bpm.set(Number(b));
-        } else {
-            bpm.set(120);
-        }
-        patternUnsub = pattern.subscribe(patternSaver);
-        if (p) {
-            pattern.set(Number(p));
-        } else {
-            pattern.set(4);
-        }
-        allPatternsUnsub = patterns.subscribe(allPatternsSaver);
-        if (a) {
-            patterns.set(JSON.parse(a));
-        } else {
-            patterns.set({});
-        }
+        let s = localStorage.getItem('snareIndexes'); // [0, 1, 0, 1, 0, 1, 0, 1]
 
+        if (s) {
+            snareIndexes = JSON.parse(s);
+        } else {
+            snareIndexes = Array.from({length: $pattern}, (_, i) => snareIndexes[i] || 0);
+        }
     });
     
 
@@ -91,21 +55,22 @@
     function scheduleNextBeat() {
         timeoutId = setTimeout(() => {
             index++;
+            //reset the index if it's out of bounds
+            if (index >= snareIndexes.length) {
+                index = 0;
+            }
+
             tickDirection *= -1;
-            const bt = $patterns[index % $pattern];
+            const bt = snareIndexes[index] == 1;
+            //console.log(bt, index, snareIndexes[index], snareIndexes);
             if (bt) {
                 playSound(true);
             } else {
                 playSound();
             }
-
-            //reset the index
-            if (index >= $pattern) {
-                index = 0;
-            }
-
+            
             scheduleNextBeat();
-        }, (60 / $bpm) * 1000);
+        }, (60 / bpm) * 1000);
     }
 
     async function play() {
@@ -126,11 +91,9 @@
         node.onclick = (e) => {
             const target = e.target as HTMLElement;
             if (target.classList.contains('beat')) {
-                const index = target.dataset.beat as string;
-                patterns.update((val) => {
-                    val[index] = !val[index];
-                    return val;
-                });
+                const index = Number(target.dataset.beat) as number;
+                snareIndexes[index] = snareIndexes[index] == 1 ? 0 : 1;
+                localStorage.setItem('snareIndexes', JSON.stringify(snareIndexes));
             }
         };
 
@@ -143,9 +106,7 @@
 
     onDestroy(() => {
         clearTimeout(timeoutId);
-        bpmUnsub();
-        patternUnsub();
-        allPatternsUnsub();
+        unsubPattern();
     });
 
 </script>
@@ -154,19 +115,19 @@
 
     <div class="metronome">
         <img src="/images/metronome-body.png" alt="body">
-        <img id="hand" src="/images/metronome-hand.png" alt="needle" class="needle" style="transform: rotate({playing ? 20*tickDirection : 0}deg); transition: {(60 / $bpm) * 1000}ms ease-in-out;">
+        <img id="hand" src="/images/metronome-hand.png" alt="needle" class="needle" style="transform: rotate({playing ? 20*tickDirection : 0}deg); transition: {(60 / bpm) * 1000}ms ease-in-out;">
     </div>
 
     <div class="beats" use:selectSnare>
-        {#each Object.entries($patterns) as pattern, i}
-            <div in:fly={{y: 10}} out:fly={{y: 10, duration: 50}} class="beat" class:playing={i == index} data-beat={i} class:snare={pattern[1]}>{i+1}</div>
+        {#each Array.from({length: $pattern}) as _, i}
+            <div class="beat {snareIndexes[i] === 1 ? 'snare' : ''} {playing && index == i ? 'playing' : ''}" data-beat={i}>{i+1}</div>
         {/each}
     </div>
 
     <div class="inputs">
         <div class="input">
             <div class="label">BPM <i class="fa-solid fa-drum"></i></div>
-            <Range fieldName="bpm" bind:value={$bpm} min={40} max={400} step={5}/>
+            <Range fieldName="bpm" bind:value={bpm} min={40} max={400} step={5}/>
         </div>
         <div class="input">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>

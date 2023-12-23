@@ -77,7 +77,7 @@
             //draw  a straight line
             canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
             canvasContext.lineWidth = 2;
-            canvasContext.strokeStyle = "var(--secondary)";
+            canvasContext.strokeStyle = "#2c3e50";
             canvasContext.beginPath();
             canvasContext.moveTo(0, HEIGHT / 2);
             canvasContext.lineTo(canvas.width, canvas.height / 2);
@@ -85,7 +85,7 @@
         } else {
             canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
             canvasContext.lineWidth = 2;
-            canvasContext.strokeStyle = "var(--secondary)";
+            canvasContext.strokeStyle = "#2c3e50";
 
             canvasContext.beginPath();
 
@@ -158,7 +158,6 @@
         }
 
         audioContext.close().then(() => {
-            console.log("closed");
             isListening = false;
             Cent = 0;
             Frequency = 0;
@@ -174,7 +173,7 @@
     }
 
     async function start() {
-        console.log("start");
+        //console.log("start");
 
         //if closed
         if (audioContext?.state != "running") {
@@ -197,11 +196,6 @@
                     }, 100);
                 }
             }
-        }
-
-        //if running
-        if (audioContext.state === "running") {
-            console.log("running");
         }
     }
 

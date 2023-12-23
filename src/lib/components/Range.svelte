@@ -11,13 +11,24 @@
   let intervalId: number;
 
   onMount(() => {
+      
+        const v = localStorage.getItem(fieldName);
+      
+        if (v && !isNaN(parseInt(v))) {
+          value = parseInt(v);
+        } else {
+            value = min;
+        }
+        
         if (value % step !== 0) {
             value = Math.round(value / step) * step;
         }
         if (value < min) {
+            //console.log('reset min');
             value = min;
         }
         if (value > max) {
+            //console.log('reset max');
             value = max;
         }
   });
@@ -26,6 +37,7 @@
         if (value + val >= min && value + val <= max) {
             value += val;
         }
+        localStorage.setItem(fieldName, value.toString());
   }
 
   function startUpdating(step: number) {

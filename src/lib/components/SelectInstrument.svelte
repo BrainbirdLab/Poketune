@@ -18,7 +18,9 @@
     <div class="instruments">
         {#each instrumentNames as instrument, i}
             <a class="instrument" in:fly|global={{y: 100*(i+1)}} href="/{instrument}">
-                <img src="/images/{instrument}(custom).png" alt="{instrument}">
+                <!--img src="/images/{instrument}.png" alt="{instrument}"-->
+                <!-- use srcset -->
+                <img srcset="/images/{instrument}.png 1x, /images/{instrument}(custom).png 2x" alt="{instrument}" />
                 <span>{sentenceCase(instrument)}</span>
             </a>
         {/each}

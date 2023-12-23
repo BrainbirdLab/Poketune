@@ -51,7 +51,6 @@
         right: 0;
         z-index: 1;
         width: 100%;
-        background: var(--primary);
         padding: 0 10px;
     }
 
