@@ -35,6 +35,8 @@ self.addEventListener("activate", (event) => {
 		for (const key of await caches.keys()) {
 			if (key !== CACHENAME) await caches.delete(key);
 		}
+		console.log("removed old cache");
+		parent.postMessage({ type: "CACHE_UPDATED" }, "*");
 	}
 
 	event.waitUntil(removeOldCache());

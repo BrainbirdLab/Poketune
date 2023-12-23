@@ -1,21 +1,21 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+    import { onMount } from "svelte";
 
-  export let min: number;
-  export let max: number;
-  export let fieldName: string;
-  export let value: number;
-  export let step: number = 1;
-  export let showButtons: boolean = true;
-  export let reference: number = 0;
-  let intervalId: number;
+    export let min: number;
+    export let max: number;
+    export let fieldName: string;
+    export let value: number;
+    export let step: number = 1;
+    export let showButtons: boolean = true;
+    export let reference: number = 0;
+    let intervalId: number;
 
-  onMount(() => {
-      
+    onMount(() => {
+    
         const v = localStorage.getItem(fieldName);
-      
+    
         if (v && !isNaN(parseInt(v))) {
-          value = parseInt(v);
+        value = parseInt(v);
         } else {
             value = min;
         }
@@ -31,40 +31,32 @@
             //console.log('reset max');
             value = max;
         }
-  });
+    });
 
-  function rangeUpdate(val: number) {
+    function rangeUpdate(val: number) {
         if (value + val >= min && value + val <= max) {
             value += val;
         }
         localStorage.setItem(fieldName, value.toString());
-  }
+    }
 
     let timeoutId: number;
-    let isHolding: boolean = false;
 
     function startUpdating(step: number) {
         // Update the value once immediately
         rangeUpdate(step);
 
-        // Set the flag to true
-        isHolding = true;
-
         // Wait for 1 second before starting to update the value continuously
         timeoutId = setTimeout(() => {
-            if (isHolding) {
-                intervalId = setInterval(() => rangeUpdate(step), 100);
-            }
-        }, 1000);
+            intervalId = setInterval(() => rangeUpdate(step), 100);
+        }, 500);
     }
 
     function stopUpdating() {
-        // Set the flag to false
-        isHolding = false;
-
         clearTimeout(timeoutId);
         clearInterval(intervalId);
     }
+
 
 </script>
 
@@ -74,8 +66,6 @@
             on:mousedown={() => startUpdating(-step)} 
             on:mouseup={stopUpdating} 
             on:mouseleave={stopUpdating}
-            on:touchstart={() => startUpdating(-step)}
-            on:touchend={stopUpdating}
           >
       <i class="fa-solid fa-minus"></i>
   </button>
@@ -91,8 +81,6 @@
             on:mousedown={() => startUpdating(step)} 
             on:mouseup={stopUpdating} 
             on:mouseleave={stopUpdating}
-            on:touchstart={() => startUpdating(step)}
-            on:touchend={stopUpdating}
           >
       <i class="fa-solid fa-plus"></i>
   </button>

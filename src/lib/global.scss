@@ -84,3 +84,28 @@ body{
 		filter: brightness(0.9);
 	}
 }
+
+.popup-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    background: #000000bb;
+    padding: 10px;
+    border-radius: 15px;
+    font-size: 0.6rem;
+    transform: translateX(-50%);
+    backdrop-filter: blur(2px);
+    z-index: 9999999;
+    visibility: hidden;
+    opacity: 0;
+    transition: 100ms ease-in-out;
+}
+
+.popup-message.active {
+	visibility: visible;
+	opacity: 1;
+}
