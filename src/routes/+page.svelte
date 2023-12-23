@@ -7,7 +7,7 @@
 
 <svelte:head>
     <title>PokeTune</title>
-    <!-- Update  -->
+    <!-- Update -->
     <link rel="icon" type="image/png" href="/images/icon(custom).png" />
 </svelte:head>
 
