@@ -1,5 +1,8 @@
 <script>
     import InstrumentContainer from "$lib/components/InstrumentContainer.svelte";
+    import { selectedInstrument } from "$lib/store";
+    
+    selectedInstrument.set("none");
 </script>
 
 <svelte:head>
