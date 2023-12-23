@@ -10,7 +10,7 @@
     } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
     import { onDestroy, onMount } from "svelte";
-    import { fade, fly, slide } from "svelte/transition";
+    import { fade, fly } from "svelte/transition";
 
     //load audio
     let correctNoteSound: HTMLAudioElement;
@@ -232,7 +232,7 @@
         Cent = tune.cent;
         Frequency = Math.round(pitch * 100) / 100;
         
-        if (($selectedInstrument != "Chromatic" && $selectedInstrument != "None") && Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
+        if (($selectedInstrument != "chromatic" && $selectedInstrument != "none") && Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
             tunedNotes.add(Note + Octave);
             tunedNotes = new Set<string>(tunedNotes);
             console.log(tunedNotes, notes);
@@ -292,13 +292,13 @@
         let dividerFrequency: number = 0;
         //load audio
         let url = '';
-        if ($selectedInstrument == "Guitar"){
+        if ($selectedInstrument == "guitar"){
             url = "/sounds/guitar.mp3";
             dividerFrequency = getFrequency("E", 2);
-        } else if ($selectedInstrument == "Ukulele"){
+        } else if ($selectedInstrument == "ukulele"){
             url = "/sounds/ukulele.mp3";
             dividerFrequency = getFrequency("G", 4);
-        } else if ($selectedInstrument == "Bass"){
+        } else if ($selectedInstrument == "bass"){
             url = "/sounds/bass.mp3";
             dividerFrequency = getFrequency("E", 1);
         }
@@ -437,7 +437,7 @@
         </div>
         <div class="cent">{Cent} C {Math.abs(Cent) < 10 ? "😁" : "😢"}</div>
     </div>
-    {#if $selectedInstrument != "Chromatic"}
+    {#if $selectedInstrument != "chromatic"}
         {#if tunedNotes.size == Object.values(notes).length}
             <div class="conf" use:confetti></div>
         {/if}
@@ -482,17 +482,6 @@
                 >
                 <i class="fa-solid fa-plus"></i>
                 </button>
-                {#if Math.abs($pitchShiftBy) > 10}
-                    <button
-                        transition:slide={{ axis: "x" }}
-                        class="button"
-                        on:click={() => {
-                            pitchShiftBy.set(0);
-                            tunedNotes.clear();
-                            tunedNotes = new Set(tunedNotes);
-                        }}><i class="fa-solid fa-rotate-left"></i></button
-                    >
-                {/if}
                 </div>
             </div>
             <div class="notes right">
@@ -617,12 +606,6 @@
         width: 100%;
         gap: 10px;
         overflow: scroll;
-    }
-
-    .button {
-        width: max-content;
-        height: 35px;
-        margin: 10px;
     }
 
     .pitch {

@@ -1,6 +1,5 @@
 <script>
-    import Range from "$lib/components/Range.svelte";
-import SelectInstrument from "$lib/components/SelectInstrument.svelte";
+    import SelectInstrument from "$lib/components/SelectInstrument.svelte";
     import { onMount } from 'svelte';
 
     let ready = false;

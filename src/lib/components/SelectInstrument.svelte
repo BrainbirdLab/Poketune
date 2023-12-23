@@ -2,6 +2,7 @@
     //import animation libs to fly in the instrument buttons
     import { fade, fly } from 'svelte/transition';;
     import {instrumentNames} from '$lib/tuner';
+    import { sentenceCase } from '$lib/store';
 
 </script>
 
@@ -9,14 +10,14 @@
     <div class="t">
         PokeTune
     </div>
-    <img src="/images/icon(Custom).png" alt="Logo" class="logo" width="50px" />
+    <img src="/images/icon(custom).png" alt="Logo" class="logo" width="50px" />
 </div>
 <div class="wrapper">
     <div class="instruments">
         {#each instrumentNames as instrument, i}
             <a class="instrument" in:fly|global={{y: 100*(i+1)}} href="/{instrument}">
-                <img src="/images/{instrument}(Custom).png" alt="{instrument}">
-                <span>{instrument}</span>
+                <img src="/images/{instrument}(custom).png" alt="{instrument}">
+                <span>{sentenceCase(instrument)}</span>
             </a>
         {/each}
     </div>

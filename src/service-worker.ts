@@ -1,34 +1,29 @@
 /// <reference types="@sveltejs/kit" />
 /// <reference lib="webworker" />
 
-import { build, files, version } from '$service-worker';
+import { build, files, version, prerendered } from '$service-worker';
 
 declare let self: ServiceWorkerGlobalScope;
 
 const CACHE = `cache-${version}`;
 
-const routes = [
-	'/',
-	'/Guitar',
-	'/Bass',
-	'/Ukulele',
-	'/Chromatic',
-	'/Metronome',
-];
-
 const ASSETS = [
 	...build,
 	...files,
-	...routes,
-]
-
+	...prerendered,
+];
 
 //Call Install Event
 self.addEventListener('install', (e) => {
 	console.log('Service Worker: Installed');
 	async function addFilesToCache() {
-		const cache = await caches.open(CACHE);
-		await cache.addAll(ASSETS);
+		try{
+			const cache = await caches.open(CACHE);
+			await cache.addAll(ASSETS);
+		} catch (err) {
+			console.log('Service Worker: Error');
+			console.log(err);
+		}
 	}
 
 	e.waitUntil(addFilesToCache());

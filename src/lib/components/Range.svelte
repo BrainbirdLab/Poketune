@@ -30,14 +30,18 @@
   function stopUpdating() {
       clearInterval(intervalId);
   }
+  
 </script>
 
 <div class="range {fieldName}">
   {#if showButtons}
   <button class="updateButton" 
-          on:mousedown={() => startUpdating(-step)} 
-          on:mouseup={stopUpdating} 
-          on:mouseleave={stopUpdating}>
+            on:mousedown={() => startUpdating(-step)} 
+            on:mouseup={stopUpdating} 
+            on:mouseleave={stopUpdating}
+            on:touchstart={() => startUpdating(-step)}
+            on:touchend={stopUpdating}
+          >
       <i class="fa-solid fa-minus"></i>
   </button>
   {/if}
@@ -49,9 +53,12 @@
   </div>
   {#if showButtons}
   <button class="updateButton" 
-          on:mousedown={() => startUpdating(step)} 
-          on:mouseup={stopUpdating} 
-          on:mouseleave={stopUpdating}>
+            on:mousedown={() => startUpdating(step)} 
+            on:mouseup={stopUpdating} 
+            on:mouseleave={stopUpdating}
+            on:touchstart={() => startUpdating(step)}
+            on:touchend={stopUpdating}
+          >
       <i class="fa-solid fa-plus"></i>
   </button>
   {/if}

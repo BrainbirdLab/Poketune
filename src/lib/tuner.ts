@@ -5,11 +5,11 @@ const chromaticNotes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A
 
 //list of instruments
 export const instrumentNames = [
-    'Guitar',
-    'Bass',
-    'Ukulele',
-    'Chromatic',
-    'Metronome',
+    'guitar',
+    'bass',
+    'ukulele',
+    'chromatic',
+    'metronome',
 ];
 
 export type Tuning = {
@@ -22,7 +22,7 @@ export type Tuning = {
 
 export function getReferenceNotes(): {[key: string]: Tuning}{
 
-    if (get(selectedInstrument) == "Chromatic") {
+    if (get(selectedInstrument) == "chromatic") {
         return {}
     }
 
@@ -31,15 +31,15 @@ export function getReferenceNotes(): {[key: string]: Tuning}{
     let instrumentOctaves: number[] = [];
 
     switch (get(selectedInstrument)) {
-        case "Guitar":
+        case "guitar":
             instrumentNotes = ["E", "A", "D", "G", "B", "E"];
             instrumentOctaves = [2, 2, 3, 3, 3, 4];
             break;
-        case "Bass":
+        case "bass":
             instrumentNotes = ["E", "A", "D", "G"];
             instrumentOctaves = [1, 1, 2, 2];
             break;
-        case "Ukulele":
+        case "ukulele":
             instrumentNotes = ["G", "C", "E", "A"];
             instrumentOctaves = [4, 4, 4, 4];
             break;
@@ -101,7 +101,7 @@ export function getFrequency(note: string, octave: number): number {
 
 export function tuneInstrument(pitch: number): Tuning {
 
-    if (get(selectedInstrument) == "Chromatic") {
+    if (get(selectedInstrument) == "chromatic") {
 
         const frequency = Math.round(pitch);
 

@@ -1,14 +1,9 @@
-
 <script lang="ts">
-    import { selectedInstrument, type InstrumentTypes } from "$lib/store";
+    import { selectedInstrument, type InstrumentTypes, sentenceCase } from "$lib/store";
     import Metronome from "$lib/components/Metronome.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
     import { fly } from "svelte/transition";
     import { onMount } from "svelte";
-
-    export let data;
-
-    selectedInstrument.set(data.instrument as InstrumentTypes);
 
     let ready = false;
 
@@ -17,20 +12,18 @@
     });
 </script>
 
-
 {#if ready}
-
 <div class="container" transition:fly={{y: 10}}>
-    {#if $selectedInstrument != "None"}
-    <a href="/" in:fly|global={{x: -10}} class="goback" on:click={()=>{selectedInstrument.set("None")}}>
+    {#if $selectedInstrument != "none"}
+    <a href="/" in:fly|global={{x: -10}} class="goback" on:click={()=>{selectedInstrument.set("none")}}>
         <i class="fa-solid fa-caret-left fa-fw"></i>
     </a>
     <div class="current">
-        <img src="/images/{$selectedInstrument}(Custom).png" alt="{$selectedInstrument}" width="60px" />
-        <div class="name">{$selectedInstrument}</div>
+        <img src="/images/{$selectedInstrument}(custom).png" alt="{$selectedInstrument}" width="60px" />
+        <div class="name">{sentenceCase($selectedInstrument)}</div>
     </div>
     {/if}
-    {#if $selectedInstrument != "Metronome"}
+    {#if $selectedInstrument != "metronome"}
         <Tuner/>
     {:else}
         <Metronome/>
