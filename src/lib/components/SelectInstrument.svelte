@@ -133,7 +133,7 @@
 
         &:hover img{
             filter:
-            drop-shadow(3px 3px 5px #ffca0a);
+            drop-shadow(3px 3px 5px #000000);
             //drop-shadow(3px 3px 5px #000000)
         }
     }
