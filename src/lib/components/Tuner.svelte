@@ -55,8 +55,11 @@
     let complete = false;
 
     const unsubPitchShiftBy = pitchShiftBy.subscribe((val) => {
-        //notes = getReferenceNotes($selectedInstrument, val);
-        //localStorage.setItem("pitchShiftBy", val.toString());
+
+        if ($selectedInstrument == "chromatic" || $selectedInstrument == "none") {
+            return;
+        }
+
         notes = getReferenceNotes($selectedInstrument, val);
         const obj = Object.values(notes);
         const firstNoteFrequency = obj[0].frequency;
