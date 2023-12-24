@@ -67,12 +67,10 @@
 <div class="range {fieldName}">
   {#if showButtons}
   <button class="updateButton" 
-            on:mousedown={() => startUpdating(-1)} 
-            on:mouseup={stopUpdating} 
-            on:mouseleave={stopUpdating}
-            on:touchstart={() => startUpdating(-1)}
-            on:touchend={stopUpdating}
-            on:touchcancel={stopUpdating}
+            on:mousedown|preventDefault={() => startUpdating(-1)} 
+            on:mouseup|preventDefault={stopUpdating} 
+            on:touchstart|preventDefault={(e) => startUpdating(-1)}
+            on:touchend|preventDefault={stopUpdating}
           >
       <i class="fa-solid fa-minus"></i>
   </button>
@@ -85,12 +83,10 @@
   </div>
   {#if showButtons}
   <button class="updateButton" 
-            on:mousedown={() => startUpdating(1)} 
-            on:mouseup={stopUpdating} 
-            on:mouseleave={stopUpdating}
-            on:touchstart={() => startUpdating(1)}
-            on:touchend={stopUpdating}
-            on:touchcancel={stopUpdating}
+            on:mousedown|preventDefault={() => startUpdating(1)} 
+            on:mouseup|preventDefault={stopUpdating} 
+            on:touchstart|preventDefault={(e) => startUpdating(1)}
+            on:touchend|preventDefault={stopUpdating}
           >
       <i class="fa-solid fa-plus"></i>
   </button>

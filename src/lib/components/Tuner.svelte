@@ -201,6 +201,7 @@
 
     let lastNote = "";
     let complete = false;
+    let notePlayedTimeout: number;
 
     function updatePitch(analyserNode: AnalyserNode, sampleRate: number) {
         //console.log("updatePitch ", count++);
@@ -251,7 +252,8 @@
 
             if (elem) {
                 elem.classList.add("played");
-                setTimeout(() => {
+                clearTimeout(notePlayedTimeout);
+                notePlayedTimeout = setTimeout(() => {
                     elem.classList.remove("played");
                 }, 1000);
             }
@@ -298,6 +300,7 @@
     }
 
     let audioBuffer: AudioBuffer | null = null;
+    let streamMuteTimeout: number;
 
     async function playNote(frequency: number){
        
@@ -348,8 +351,30 @@
         );
 
         source.playbackRate.value = frequency / dividerFrequency;
+        
+        
+        //we have to mute the microphone so that the sound is not picked up by the microphone
+        if (stream) {
+            stream.getAudioTracks().forEach((track) => {
+                track.enabled = false;
+            });
+        }
+
+        clearTimeout(streamMuteTimeout);
+
         source.start();
+
+        streamMuteTimeout = setTimeout(() => {
+            //unmute the microphone
+            if (stream) {
+                stream.getAudioTracks().forEach((track) => {
+                    track.enabled = true;
+                });
+            }
+        }, 300);
     }
+
+    const playNoteTimeouts: { [key: string]: number } = {};
 
     function handleClickOnNote(node: HTMLElement) {
 
@@ -360,18 +385,33 @@
                 return;
             }
 
+            
             const frequencyStr = target.dataset.frequency;
             if (!frequencyStr) {
                 return;
             }
-
+            
+            
             const frequency = Number(frequencyStr);
-
+            
             if (!frequency) {
                 return;
             }
+            
+            if (playNoteTimeouts[frequencyStr]) {
+                clearTimeout(playNoteTimeouts[frequencyStr]);
+            }
+
+            target.setAttribute("data-playing", "");
 
             await playNote(frequency);
+
+            playNoteTimeouts[frequencyStr] = setTimeout(() => {
+                //delete from object
+                delete playNoteTimeouts[frequencyStr];
+                target.removeAttribute("data-playing");
+            }, 300);
+            
         };
 
         return {
@@ -387,6 +427,8 @@
         lastNote = "";
         complete = false;
     }
+
+
 </script>
 
 <div class="tuner" in:fly|global={{y: -10}}>
@@ -475,9 +517,10 @@
                 <div class="settings">
                     <button
                     class="updateButton"
-                    on:mousedown={() => startUpdating(-1)} 
-                    on:mouseup={stopUpdating} 
-                    on:mouseleave={stopUpdating}
+                    on:mousedown|preventDefault={() => startUpdating(-1)} 
+                    on:mouseup|preventDefault={stopUpdating}
+                    on:touchstart|preventDefault={() => startUpdating(-1)}
+                    on:touchend|preventDefault={stopUpdating}
                 >
                 <i class="fa-solid fa-minus"></i>
                 </button>
@@ -488,9 +531,10 @@
                 {/key}
                 <button
                     class="updateButton"
-                    on:mousedown={() => startUpdating(1)} 
-                    on:mouseup={stopUpdating} 
-                    on:mouseleave={stopUpdating}
+                    on:mousedown|preventDefault={() => startUpdating(1)} 
+                    on:mouseup|preventDefault={stopUpdating} 
+                    on:touchstart|preventDefault={() => startUpdating(1)}
+                    on:touchend|preventDefault={stopUpdating}
                 >
                 <i class="fa-solid fa-plus"></i>
                 </button>
@@ -584,7 +628,8 @@
             padding: 5px;
             border: 2px solid #ffffff30;
             width: 100%;
-            max-width: 65px;
+            max-width: 75px;
+            aspect-ratio: 2/1.6;
             transition: 100ms;
             cursor: pointer;
 
@@ -607,6 +652,10 @@
         background: #2ecc7074;
     }
 
+    :global(.note[data-playing]) {
+        border: 2px solid #b291ff !important;
+    }
+
     .tuner {
         display: flex;
         flex-direction: column;
@@ -627,6 +676,7 @@
         align-items: center;
         position: relative;
         width: 100%;
+        min-width: 150px;
         font-size: 0.7rem;
         color: var(--secondary);
 

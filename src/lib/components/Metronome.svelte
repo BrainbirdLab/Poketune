@@ -183,12 +183,10 @@
     <div class="group">
         <button class="beatButton"
         class:pressed={tapBpm}
-        on:mousedown={calculateBpm}
-        on:mouseleave={() => tapBpm = false}
-        on:mouseup={() => tapBpm = false}
-        on:touchstart={calculateBpm}
-        on:touchend={() => tapBpm = false}
-        on:touchcancel={() => tapBpm = false}
+            on:mousedown|preventDefault={calculateBpm}
+            on:mouseup|preventDefault={() => tapBpm = false}
+            on:touchstart|preventDefault={calculateBpm}
+            on:touchend|preventDefault={() => tapBpm = false}
         >
             <i class="fa-solid fa-drum"></i>
             <div class="label">
