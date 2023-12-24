@@ -387,7 +387,7 @@
                 <div
                     class="pointer"
                     style="width: max(calc((100% / 12)*{Math.abs(Cent) /
-                        10}), 2%);"
+                        10}), 5px);"
                     class:left={Cent < -2}
                     class:right={Cent > 2}
                     class:strong={Math.abs(Cent) < 10}
@@ -546,7 +546,7 @@
         background: rgba(0, 128, 128, 0);
         border-radius: 10px;
         height: max-content;
-        width: 100%;
+        width: min(100%, 500px);
         gap: 10px;
         overflow: scroll;
     }
@@ -603,14 +603,16 @@
             height: 18px;
             left: 50%;
             border-radius: 2px;
-            //transition: 100ms;
             transform: translateX(-50%);
+            transition: none;
             &.left {
+                transition: width 300ms;
                 transform: translateX(-100%);
                 border-top-left-radius: 5px;
                 border-bottom-left-radius: 5px;
             }
             &.right {
+                transition: width 300ms;
                 transform: translateX(0%);
                 border-top-right-radius: 5px;
                 border-bottom-right-radius: 5px;

@@ -113,7 +113,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        width: min(100vw, 850px);
+        width: min(100vw, 750px);
         height: 100%;
         overflow: hidden;
         position: absolute;
