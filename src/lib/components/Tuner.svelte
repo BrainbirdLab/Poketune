@@ -8,6 +8,7 @@
     import { fade, fly } from "svelte/transition";
     import Range from "./Range.svelte";
     import { writable } from "svelte/store";
+    import WaveCanvas from "./waveCanvas.svelte";
 
     //load audio
     let correctNoteSound: HTMLAudioElement;
@@ -80,7 +81,6 @@
         ukuleleSound = new Audio("/sounds/ukulele.mp3");
         bassSound = new Audio("/sounds/bass.mp3");
 
-        drawCanvas();
         const pitchShift = localStorage.getItem("pitchShiftBy") || "0";
         if (pitchShift) {
             //if pitch shift is <= 10 or >= -10 then only set, else set to 0
@@ -93,72 +93,10 @@
 
     });
 
-    
-
     onDestroy(() => {
         stop();
         unsubPitchShiftBy();
     });
-
-    function drawCanvas() {
-        if (!canvas) {
-            return;
-        }
-
-        const canvasContext = canvas.getContext(
-            "2d",
-        ) as CanvasRenderingContext2D;
-        const WIDTH = canvas.width;
-        const HEIGHT = canvas.height;
-
-        if (!isListening) {
-            //draw  a straight line
-            canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
-            canvasContext.lineWidth = 2;
-            canvasContext.strokeStyle = "#2c3e50";
-            canvasContext.beginPath();
-            canvasContext.moveTo(0, HEIGHT / 2);
-            canvasContext.lineTo(canvas.width, canvas.height / 2);
-            canvasContext.stroke();
-        } else {
-            canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
-            canvasContext.lineWidth = 2;
-            canvasContext.strokeStyle = "#2c3e50";
-
-            canvasContext.beginPath();
-
-            const bufferLength = analyserNode?.frequencyBinCount;
-
-            const dataArray = new Uint8Array(bufferLength);
-
-            if (bufferLength && analyserNode) {
-                analyserNode.getByteTimeDomainData(dataArray);
-
-                //console.log(bufferLength, dataArray);
-                let sliceWidth = (WIDTH * 1.0) / bufferLength;
-                let x = 0;
-
-                for (let i = 0; i < bufferLength; i++) {
-                    let v = dataArray[i] / 128.0;
-
-                    let y = (v * HEIGHT) / 2;
-
-                    if (i === 0) {
-                        canvasContext.moveTo(x, y);
-                    } else {
-                        canvasContext.lineTo(x, y);
-                    }
-
-                    x += sliceWidth;
-                }
-
-                canvasContext.lineTo(canvas.width, canvas.height / 2);
-                canvasContext.stroke();
-            }
-        }
-
-        requestAnimationFrame(drawCanvas);
-    }
 
     function stop() {
         //console.log("stop");
@@ -411,7 +349,6 @@
         complete = false;
     }
 
-
 </script>
 
 <div class="tuner" in:fly|global={{y: -10}}>
@@ -424,11 +361,7 @@
         {:else}
             <div class="noteName" in:fly|global={{ y: 5 }}>-.-</div>
         {/if}
-        <canvas
-            class:hidden={!isListening && !Note}
-            in:fly={{ x: 40, delay: 500 }}
-            bind:this={canvas}
-        />
+        <WaveCanvas Note={Note} analyserNode={analyserNode} isListening={isListening} />
     </div>
     <div class="meter">
         <div class="range">
@@ -495,8 +428,8 @@
                     </div>
                 {/each}
             </div>
-            <div class="pitch">
-                <div class="label">Change pitch</div>
+            <div class="input pitch">
+                <div class="label">Change pitch <i class="fa-solid fa-wave-square"></i></div>
                 <Range showSign={true} fieldName="pitchShiftBy" fastStep={10} bind:value={$pitchShiftBy} min={-100} max={100}/>
             </div>
             <div class="notes right">
@@ -537,19 +470,6 @@
         left: 50%;
         transform: translate(-50%, -50%);
         pointer-events: none;
-    }
-
-    canvas {
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        opacity: 1;
-        transition: 100ms;
-        z-index: -1;
-        &.hidden {
-            opacity: 0;
-        }
     }
 
     .noteVisual {

@@ -1,4 +1,4 @@
-@import url('fontawesome/css/all.min.css');
+@import url('fontawesome/css/all.css');
 
 @font-face {
 	font-family: Now;
@@ -65,6 +65,21 @@ body{
 	filter: brightness(0.97);
 }
 
+.input{
+	.label{
+		font-size: 0.7rem;
+		font-weight: 700;
+		i{
+			color: #b291ff;
+		}
+	}
+	padding-bottom: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+}
 
 .popup-message {
     display: flex;

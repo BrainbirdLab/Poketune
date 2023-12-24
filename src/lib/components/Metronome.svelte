@@ -343,22 +343,6 @@
         width: 100%;
         flex-wrap: wrap;
         padding: 10px;
-
-        .input{
-            .label{
-                font-size: 0.7rem;
-                font-weight: 700;
-                i{
-                    color: #b291ff;
-                }
-            }
-            padding-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
     }
 
     .wrapper {

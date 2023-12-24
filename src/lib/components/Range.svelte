@@ -1,5 +1,7 @@
 <script lang="ts">
     import { afterUpdate, onMount } from "svelte";
+    import { flip } from "svelte/animate";
+    import { fly } from "svelte/transition";
 
     export let min: number;
     export let max: number;
@@ -26,7 +28,6 @@
             //console.log('reset max');
             value = max;
         }
-
     });
     
     afterUpdate(() => {
@@ -72,28 +73,34 @@
 <div class="range {fieldName}">
   <button class="updateButton" 
             on:mousedown|preventDefault={() => startUpdating(-1)} 
-            on:mouseup|preventDefault={stopUpdating} 
+            on:mouseup|preventDefault={stopUpdating}
+            on:mouseleave|preventDefault={stopUpdating}
             on:touchstart|preventDefault={(e) => startUpdating(-1)}
             on:touchend|preventDefault={stopUpdating}
+            on:touchcancel|preventDefault={stopUpdating}
           >
       <i class="fa-solid fa-minus"></i>
   </button>
   <div class="value">
-      <div class="main">
+    {#key value}
+    <div class="main">
             {#if showSign}
             {value > 0 ? '+' : ''}
             {/if}
             {value}
-      </div>
+    </div>
+    {/key}
       {#if reference}
       <div class="reference">/{reference}</div>
       {/if}
   </div>
   <button class="updateButton" 
             on:mousedown|preventDefault={() => startUpdating(1)} 
-            on:mouseup|preventDefault={stopUpdating} 
+            on:mouseup|preventDefault={stopUpdating}
+            on:mouseleave|preventDefault={stopUpdating} 
             on:touchstart|preventDefault={(e) => startUpdating(1)}
             on:touchend|preventDefault={stopUpdating}
+            on:touchcancel|preventDefault={stopUpdating}
           >
       <i class="fa-solid fa-plus"></i>
   </button>
