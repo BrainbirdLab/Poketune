@@ -1,16 +1,13 @@
 <script lang="ts">
     
     import { confetti } from "@neoconfetti/svelte";
-    import { pitchShiftBy, selectedInstrument } from "$lib/store";
-    import {
-        getFrequency,
-        getReferenceNotes,
-        tuneInstrument,
-        type Tuning,
-    } from "$lib/tuner";
+    import { selectedInstrument } from "$lib/store";
+    import { type Tuning, getReferenceNotes, tuneInstrument, getFrequency } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
     import { onDestroy, onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
+    import Range from "./Range.svelte";
+    import { writable } from "svelte/store";
 
     //load audio
     let correctNoteSound: HTMLAudioElement;
@@ -32,6 +29,48 @@
 
     let tunedNotes = new Set<string>();
 
+    let Frequency = 0;
+    let detectedClarity = 0;
+
+    let analyserNode: AnalyserNode;
+
+    let stream: MediaStream;
+
+    let interval: number;
+
+    const pitchShiftBy = writable(0);
+
+    let notes: { [key: string]: Tuning } = getReferenceNotes($selectedInstrument, $pitchShiftBy);
+
+    $: leftNotes = Object.values(notes).slice(
+        0,
+        Object.values(notes).length / 2,
+    );
+
+    $: rightNotes = Object.values(notes).slice(Object.values(notes).length / 2);
+
+
+    let lastNote = "";
+    let complete = false;
+
+    const unsubPitchShiftBy = pitchShiftBy.subscribe((val) => {
+        //notes = getReferenceNotes($selectedInstrument, val);
+        //localStorage.setItem("pitchShiftBy", val.toString());
+        notes = getReferenceNotes($selectedInstrument, val);
+        const obj = Object.values(notes);
+        const firstNoteFrequency = obj[0].frequency;
+        const lastNoteFrequency = obj[obj.length - 1].frequency;
+
+        if (firstNoteFrequency < 16.35 || lastNoteFrequency > 7902.13) {
+            if (firstNoteFrequency < 16.35) {
+                pitchShiftBy.set(val + 1);
+            } else if (lastNoteFrequency > 7902.13) {
+                pitchShiftBy.set(val - 1);
+            }
+        }
+    });
+
+
     onMount(() => {
 
         correctNoteSound = new Audio("/sounds/correct.mp3");
@@ -52,14 +91,13 @@
             }
         }
 
-        pitchShiftBy.subscribe((val) => {
-            notes = getReferenceNotes();
-            localStorage.setItem("pitchShiftBy", val.toString());
-        });
-        });
+    });
 
-        onDestroy(() => {
+    
+
+    onDestroy(() => {
         stop();
+        unsubPitchShiftBy();
     });
 
     function drawCanvas() {
@@ -122,24 +160,6 @@
         requestAnimationFrame(drawCanvas);
     }
 
-
-    let Frequency = 0;
-    let detectedClarity = 0;
-
-    let analyserNode: AnalyserNode;
-
-    let stream: MediaStream;
-
-    let interval: number;
-
-    let notes: { [key: string]: Tuning } = getReferenceNotes();
-
-    $: leftNotes = Object.values(notes).slice(
-        0,
-        Object.values(notes).length / 2,
-    );
-    $: rightNotes = Object.values(notes).slice(Object.values(notes).length / 2);
-
     function stop() {
         //console.log("stop");
 
@@ -199,9 +219,7 @@
         }
     }
 
-    let lastNote = "";
-    let complete = false;
-    let notePlayedTimeout: number;
+    const correctNotePlayedTimeout: {[key: string]: number} = {};
 
     function updatePitch(analyserNode: AnalyserNode, sampleRate: number) {
         //console.log("updatePitch ", count++);
@@ -220,15 +238,17 @@
             return;
         }
 
-        const tune = tuneInstrument(pitch);
+        const tune = tuneInstrument($selectedInstrument, pitch, $pitchShiftBy);
 
         Note = tune.note;
         Octave = tune.octave;
         Cent = tune.cent;
         Frequency = Math.round(pitch * 100) / 100;
+
+        const noteId = Note + Octave;
         
         if (($selectedInstrument != "chromatic" && $selectedInstrument != "none") && Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
-            tunedNotes.add(Note + Octave);
+            tunedNotes.add(noteId);
             tunedNotes = new Set<string>(tunedNotes);
             //if correct note is played and all notes are not tuned
             if (
@@ -250,52 +270,16 @@
             const elem = document.getElementById(Note + Octave);
 
             if (elem) {
+                clearTimeout(correctNotePlayedTimeout[noteId]);
                 elem.classList.add("played");
-                clearTimeout(notePlayedTimeout);
-                notePlayedTimeout = setTimeout(() => {
+                correctNotePlayedTimeout[noteId] = setTimeout(() => {
                     elem.classList.remove("played");
+                    delete correctNotePlayedTimeout[noteId];
                 }, 1000);
             }
 
             lastNote = Note + Octave;
         }
-    }
-
-    function incrementPitchBy(num: number) {
-        pitchShiftBy.update((val) => {
-            //if first note frequency is more than 16.35 Hz or last note frequency is less than 7902.13 Hz then only increment
-            return val + num;
-        });
-        const tempNotes = getReferenceNotes();
-        const obj = Object.values(tempNotes);
-        const firstNote = obj[0].frequency;
-        const lastNote = obj[obj.length - 1].frequency;
-
-        if (firstNote < 16.35 || lastNote > 7902.13) {
-            pitchShiftBy.update((val) => {
-                return val - num;
-            });
-        } else {
-            reset();
-        }
-    }
-
-    let timeoutId: number;
-    let intervalId: number;
-
-    function startUpdating(step: number) {
-        // Update the value once immediately
-        incrementPitchBy(step);
-
-        // Wait for 1 second before starting to update the value continuously
-        timeoutId = setTimeout(() => {
-            intervalId = setInterval(() => incrementPitchBy(5 * step), 100);
-        }, 500);
-    }
-
-    function stopUpdating() {
-        clearTimeout(timeoutId);
-        clearInterval(intervalId);
     }
 
     let audioBuffer: AudioBuffer | null = null;
@@ -513,31 +497,7 @@
             </div>
             <div class="pitch">
                 <div class="label">Change pitch</div>
-                <div class="settings">
-                    <button
-                    class="updateButton"
-                    on:mousedown|preventDefault={() => startUpdating(-1)} 
-                    on:mouseup|preventDefault={stopUpdating}
-                    on:touchstart|preventDefault={() => startUpdating(-1)}
-                    on:touchend|preventDefault={stopUpdating}
-                >
-                <i class="fa-solid fa-minus"></i>
-                </button>
-                {#key $pitchShiftBy}
-                    <div class="pitchShift" in:fly={{ y: 10, duration: 500 }}>
-                        {$pitchShiftBy > 0 ? "+" : ""}{$pitchShiftBy}
-                    </div>
-                {/key}
-                <button
-                    class="updateButton"
-                    on:mousedown|preventDefault={() => startUpdating(1)} 
-                    on:mouseup|preventDefault={stopUpdating} 
-                    on:touchstart|preventDefault={() => startUpdating(1)}
-                    on:touchend|preventDefault={stopUpdating}
-                >
-                <i class="fa-solid fa-plus"></i>
-                </button>
-                </div>
+                <Range showSign={true} fieldName="pitchShiftBy" fastStep={10} bind:value={$pitchShiftBy} min={-100} max={100}/>
             </div>
             <div class="notes right">
                 <!-- Display G B E -->
@@ -666,33 +626,6 @@
         width: 100%;
         gap: 10px;
         overflow: scroll;
-    }
-
-    .pitch {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        width: 100%;
-        min-width: 150px;
-        font-size: 0.7rem;
-        color: var(--secondary);
-
-        .settings{
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            width: 100%;
-        }
-    }
-
-    .pitchShift {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin: 10px;
     }
 
     .meter {

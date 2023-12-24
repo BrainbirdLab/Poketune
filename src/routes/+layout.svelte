@@ -21,14 +21,6 @@
 
     onMount(() => {
         detectSWUpdate();
-
-        //get update from service worker
-        navigator.serviceWorker.addEventListener("message", (event) => {
-            if (event.data.type === "CACHE_UPDATED") {
-                console.log("App data updated");
-                showPopupMessage("App data updated");
-            }
-        });
     })
 </script>
 

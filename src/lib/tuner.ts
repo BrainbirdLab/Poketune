@@ -1,16 +1,4 @@
-import { get } from "svelte/store";
-import { selectedInstrument, pitchShiftBy } from "./store";
-
-const chromaticNotes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-//list of instruments
-export const instrumentNames = [
-    'guitar',
-    'bass',
-    'ukulele',
-    'chromatic',
-    'metronome',
-];
+import type { InstrumentTypes } from "./store";
 
 export type Tuning = {
     note: string;
@@ -20,9 +8,11 @@ export type Tuning = {
     cent: number;
 };
 
-export function getReferenceNotes(): {[key: string]: Tuning}{
+const chromaticNotes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
-    if (get(selectedInstrument) == "chromatic") {
+export function getReferenceNotes(instrument: InstrumentTypes, pitchShift: number): {[key: string]: Tuning}{
+
+    if (instrument == "chromatic") {
         return {}
     }
 
@@ -30,7 +20,7 @@ export function getReferenceNotes(): {[key: string]: Tuning}{
     let instrumentNotes: string[] = [];
     let instrumentOctaves: number[] = [];
 
-    switch (get(selectedInstrument)) {
+    switch (instrument) {
         case "guitar":
             instrumentNotes = ["E", "A", "D", "G", "B", "E"];
             instrumentOctaves = [2, 2, 3, 3, 3, 4];
@@ -46,12 +36,12 @@ export function getReferenceNotes(): {[key: string]: Tuning}{
     }
 
     //if get(pitchShiftBy) is not 0, then we need to shift the notes and octaves
-    if (get(pitchShiftBy) != 0) {
+    if (pitchShift != 0) {
         for (let i = 0; i < instrumentNotes.length; i++) {
             const noteIndex = chromaticNotes.indexOf(instrumentNotes[i]);
-            const shiftedNoteIndex = (noteIndex + get(pitchShiftBy) + (chromaticNotes.length) * 10) % chromaticNotes.length;
+            const shiftedNoteIndex = (noteIndex + pitchShift + (chromaticNotes.length) * 10) % chromaticNotes.length;
             instrumentNotes[i] = chromaticNotes[shiftedNoteIndex];
-            instrumentOctaves[i] += Math.floor((noteIndex + get(pitchShiftBy)) / chromaticNotes.length);
+            instrumentOctaves[i] += Math.floor((noteIndex + pitchShift) / chromaticNotes.length);
         }
     }
 
@@ -99,9 +89,9 @@ export function getFrequency(note: string, octave: number): number {
     return frequency;
 }
 
-export function tuneInstrument(pitch: number): Tuning {
+export function tuneInstrument(instrument: InstrumentTypes, pitch: number, pitchShift: number): Tuning {
 
-    if (get(selectedInstrument) == "chromatic") {
+    if (instrument == "chromatic") {
 
         const frequency = Math.round(pitch);
 
@@ -130,7 +120,7 @@ export function tuneInstrument(pitch: number): Tuning {
         };
 
     } else {
-        const standardTuning = getReferenceNotes();
+        const standardTuning = getReferenceNotes(instrument, pitchShift);
         const closestNote = getClosestNote(standardTuning, pitch);
         return closestNote;
     }

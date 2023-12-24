@@ -1,4 +1,4 @@
-import { instrumentNames } from '$lib/tuner.js';
+import { instrumentNames } from '$lib/store';
 import { redirect } from '@sveltejs/kit';
 
 export function load({params}){

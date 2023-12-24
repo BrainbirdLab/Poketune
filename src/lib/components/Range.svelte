@@ -1,14 +1,13 @@
 <script lang="ts">
     import { afterUpdate, onMount } from "svelte";
-    import { writable } from "svelte/store";
 
     export let min: number;
     export let max: number;
     export let fieldName: string;
     export let value: number;
     export let fastStep: number = 5;
-    export let showButtons: boolean = true;
     export let reference: number = 0;
+    export let showSign: boolean = false;
 
     onMount(() => {
     
@@ -32,7 +31,6 @@
     
     afterUpdate(() => {
         if (localStorage){
-            //console.log('saving', fieldName, value);
             localStorage.setItem(fieldName, value.toString());
         }
     });
@@ -49,10 +47,17 @@
     function startUpdating(step: number) {
         // Update the value once immediately
         rangeUpdate(step);
-
+        clearTimeout(timeoutId);
         // Wait for 1 second before starting to update the value continuously
         timeoutId = setTimeout(() => {
-            intervalId = setInterval(() => rangeUpdate(fastStep * step), 100);
+            clearInterval(intervalId);
+            intervalId = setInterval(() => {
+                rangeUpdate(fastStep * step);
+                //if value is not multiple of fastStep, round it to the nearest multiple
+                if (value > min && value < max && value % fastStep !== 0) {
+                    value = Math.round(value / fastStep) * fastStep;
+                }
+            }, 100);
         }, 500);
     }
 
@@ -65,7 +70,6 @@
 </script>
 
 <div class="range {fieldName}">
-  {#if showButtons}
   <button class="updateButton" 
             on:mousedown|preventDefault={() => startUpdating(-1)} 
             on:mouseup|preventDefault={stopUpdating} 
@@ -74,14 +78,17 @@
           >
       <i class="fa-solid fa-minus"></i>
   </button>
-  {/if}
   <div class="value">
-      <div class="main">{value}</div>
+      <div class="main">
+            {#if showSign}
+            {value > 0 ? '+' : ''}
+            {/if}
+            {value}
+      </div>
       {#if reference}
       <div class="reference">/{reference}</div>
       {/if}
   </div>
-  {#if showButtons}
   <button class="updateButton" 
             on:mousedown|preventDefault={() => startUpdating(1)} 
             on:mouseup|preventDefault={stopUpdating} 
@@ -90,7 +97,6 @@
           >
       <i class="fa-solid fa-plus"></i>
   </button>
-  {/if}
 </div>
 
 <style lang="scss">
@@ -120,10 +126,32 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 1rem;
       font-weight: 700;
       color: #fff;
       position: relative;
       z-index: 1;
   }
+
+
+  .updateButton{
+        border: none;
+        outline: none;
+        padding: 10px;
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+        background: var(--secondary);
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            filter: brightness(0.9);
+        }
+    }
 
 </style>

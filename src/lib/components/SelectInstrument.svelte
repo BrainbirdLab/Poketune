@@ -1,8 +1,7 @@
 <script lang="ts">
     //import animation libs to fly in the instrument buttons
     import { fade, fly } from 'svelte/transition';;
-    import {instrumentNames} from '$lib/tuner';
-    import { sentenceCase } from '$lib/store';
+    import { sentenceCase, instrumentNames } from '$lib/store';
     //import version of the app
     import { version } from '$app/environment';
 
