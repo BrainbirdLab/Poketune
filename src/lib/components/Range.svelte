@@ -70,6 +70,9 @@
             on:mousedown={() => startUpdating(-1)} 
             on:mouseup={stopUpdating} 
             on:mouseleave={stopUpdating}
+            on:touchstart={() => startUpdating(-1)}
+            on:touchend={stopUpdating}
+            on:touchcancel={stopUpdating}
           >
       <i class="fa-solid fa-minus"></i>
   </button>
@@ -85,6 +88,9 @@
             on:mousedown={() => startUpdating(1)} 
             on:mouseup={stopUpdating} 
             on:mouseleave={stopUpdating}
+            on:touchstart={() => startUpdating(1)}
+            on:touchend={stopUpdating}
+            on:touchcancel={stopUpdating}
           >
       <i class="fa-solid fa-plus"></i>
   </button>
