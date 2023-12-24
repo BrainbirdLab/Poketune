@@ -69,8 +69,10 @@
         width: 45px;
         height: 45px;
         text-decoration: none;
+        border: none;
+        outline: none;
         font-size: 2rem;
-        //background: #607d8b28;
+        background: none;
         border-radius: 50%;
 
         &:hover{
