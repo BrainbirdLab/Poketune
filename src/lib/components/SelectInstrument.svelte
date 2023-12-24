@@ -50,6 +50,7 @@
         right: 0;
         z-index: 1;
         width: 100%;
+        height: 60px;
         background: var(--primary);
 
         .t{

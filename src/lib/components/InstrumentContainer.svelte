@@ -55,6 +55,7 @@
         z-index: 1;
         width: 100%;
         padding: 0 10px;
+        height: 60px;
     }
 
     .goback {
