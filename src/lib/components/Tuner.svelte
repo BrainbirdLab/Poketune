@@ -230,7 +230,6 @@
         if (($selectedInstrument != "chromatic" && $selectedInstrument != "none") && Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
             tunedNotes.add(Note + Octave);
             tunedNotes = new Set<string>(tunedNotes);
-            console.log(tunedNotes, notes);
             //if correct note is played and all notes are not tuned
             if (
                 lastNote != Note + Octave
