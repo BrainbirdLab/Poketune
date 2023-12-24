@@ -6,5 +6,5 @@
 
 <svelte:head>
     <title>{sentenceCase(data.name)}</title>
-    <link rel="icon" type="image/png" href="/images/{data.name.toLowerCase()}(custom).png" />
+    <link rel="icon" type="image/png" href="/images/{data.name.toLowerCase()} (Mini).png" />
 </svelte:head>

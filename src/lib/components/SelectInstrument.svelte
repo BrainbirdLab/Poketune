@@ -11,7 +11,7 @@
     <div class="t">
         PokeTune
     </div>
-    <img src="/images/icon(custom).png" alt="Logo" class="logo" width="50px" />
+    <img src="/images/icon (Icon).png" alt="Logo" class="logo" width="50px" />
 </div>
 <div class="wrapper">
     <div class="instruments">
@@ -19,7 +19,7 @@
             <a class="instrument" in:fly|global={{y: 100*(i+1)}} href="/{instrument}">
                 <!--img src="/images/{instrument}.png" alt="{instrument}"-->
                 <!-- use srcset -->
-                <img srcset="/images/{instrument}.png 1x, /images/{instrument}(custom).png 2x" alt="{instrument}" />
+                <img srcset="/images/{instrument}.png 1x, /images/{instrument} (Icon).png 2x" alt="{instrument}" />
                 <span>{sentenceCase(instrument)}</span>
             </a>
         {/each}

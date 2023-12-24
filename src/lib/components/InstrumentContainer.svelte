@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { selectedInstrument, type InstrumentTypes, sentenceCase } from "$lib/store";
+    import { selectedInstrument, sentenceCase } from "$lib/store";
     import Metronome from "$lib/components/Metronome.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
     import { fly } from "svelte/transition";
@@ -25,7 +25,7 @@
                 <i class="fa-solid fa-caret-left fa-fw"></i>
             </button>
             <div class="current">
-                <img src="/images/{$selectedInstrument}(custom).png" alt="{$selectedInstrument}" width="60px" />
+                <img src="/images/{$selectedInstrument} (Mini).png" alt="{$selectedInstrument}" width="60px" />
                 <div class="name">{sentenceCase($selectedInstrument)}</div>
             </div>
         </div>
