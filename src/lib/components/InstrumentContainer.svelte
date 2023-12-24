@@ -18,9 +18,12 @@
 <div class="container">
     {#if $selectedInstrument != "none"}
         <div class="topbar" in:fly|global={{x: -10}}>
-            <a href="/" class="goback" on:click={()=>{selectedInstrument.set("none")}}>
+            <button class="goback" on:click={()=>{
+                selectedInstrument.set("none");
+                history.back();
+            }}>
                 <i class="fa-solid fa-caret-left fa-fw"></i>
-            </a>
+            </button>
             <div class="current">
                 <img src="/images/{$selectedInstrument}(custom).png" alt="{$selectedInstrument}" width="60px" />
                 <div class="name">{sentenceCase($selectedInstrument)}</div>
