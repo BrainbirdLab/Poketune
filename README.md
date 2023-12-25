@@ -2,6 +2,8 @@
 
 PokeTune is a Progressive Web App (PWA) designed to help you tune your musical instruments with ease. Built using SvelteJS, this app provides a convenient way to achieve accurate tuning right from your web browser on any device.
 
+![Cover](./cover.png)
+
 ## Features
 
 - **User-Friendly Interface**: PokeTune boasts an intuitive and user-friendly interface, making it accessible to both beginners and experienced musicians.
