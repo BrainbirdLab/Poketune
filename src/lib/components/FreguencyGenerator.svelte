@@ -62,7 +62,7 @@
             max={20_000}
             bind:value={frequency}
             unit="Hz"
-            fastStep={200}>
+            fastStep={20}>
         </Range>
     </div>
     <div class="input">

@@ -162,6 +162,27 @@
         thumb.style.left = `${offsetLeft}px`;
         progressBar.style.width = `${offsetLeft}px`;
     }
+
+    function handleEvents(node: HTMLElement){
+        //on:touchstart={onDragStart}
+        //on:mousedown={onDragStart}
+        //on:mouseover={() => (thumbHover = true)}
+        //on:mouseout={() => (thumbHover = false)}
+
+        node.ontouchstart = onDragStart;
+        node.onmousedown = onDragStart;
+        node.onmouseover = () => (thumbHover = true);
+        node.onmouseout = () => (thumbHover = false);
+
+        return {
+            destroy(){
+                node.ontouchstart = null;
+                node.onmousedown = null;
+                node.onmouseover = null;
+                node.onmouseout = null;
+            }
+        }
+    }
 </script>
 
 <svelte:window
@@ -189,13 +210,11 @@
         <div class="range__track" bind:this={container}>
             <div class="range__track--highlighted" bind:this={progressBar} />
             <div
+                tabindex="-1"
                 class="range__thumb"
                 class:range__thumb--holding={holding}
                 bind:this={thumb}
-                on:touchstart={onDragStart}
-                on:mousedown={onDragStart}
-                on:mouseover={() => (thumbHover = true)}
-                on:mouseout={() => (thumbHover = false)}
+
             >
                 {#if holding || thumbHover}
                     <div
