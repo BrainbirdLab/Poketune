@@ -159,8 +159,8 @@
 <div class="wrapper" in:fly|global={{y: -10}}>
 
     <div class="metronome">
-        <img src="/images/metronome-body.png" alt="body">
-        <img id="hand" src="/images/metronome-hand.png" alt="needle" class="needle" style="transform: rotate({playing ? 20*tickDirection : 0}deg); transition: {(60 / bpm) * 1000}ms ease-in-out;">
+        <img src="/images/Metronome-body.png" alt="body">
+        <img id="hand" src="/images/Metronome-hand.png" alt="needle" class="needle" style="transform: rotate({playing ? 20*tickDirection : 0}deg); transition: {(60 / bpm) * 1000}ms ease-in-out;">
     </div>
 
     <div class="beats" use:selectSnare>

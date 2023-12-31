@@ -12,7 +12,7 @@ const chromaticNotes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A
 
 export function getReferenceNotes(instrument: InstrumentTypes, pitchShift: number): {[key: string]: Tuning}{
 
-    if (instrument == "chromatic") {
+    if (instrument == "Chromatic") {
         return {}
     }
 
@@ -21,15 +21,15 @@ export function getReferenceNotes(instrument: InstrumentTypes, pitchShift: numbe
     let instrumentOctaves: number[] = [];
 
     switch (instrument) {
-        case "guitar":
+        case "Guitar":
             instrumentNotes = ["E", "A", "D", "G", "B", "E"];
             instrumentOctaves = [2, 2, 3, 3, 3, 4];
             break;
-        case "bass":
+        case "Bass":
             instrumentNotes = ["E", "A", "D", "G"];
             instrumentOctaves = [1, 1, 2, 2];
             break;
-        case "ukulele":
+        case "Ukulele":
             instrumentNotes = ["G", "C", "E", "A"];
             instrumentOctaves = [4, 4, 4, 4];
             break;
@@ -91,7 +91,7 @@ export function getFrequency(note: string, octave: number): number {
 
 export function tuneInstrument(instrument: InstrumentTypes, pitch: number, pitchShift: number): Tuning {
 
-    if (instrument == "chromatic") {
+    if (instrument == "Chromatic") {
 
         const frequency = Math.round(pitch);
 

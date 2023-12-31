@@ -1,9 +1,7 @@
 <script lang="ts">
     //import animation libs to fly in the instrument buttons
-    import { fade, fly } from 'svelte/transition';;
-    import { sentenceCase, instrumentNames } from '$lib/store';
-    //import version of the app
-    import { version } from '$app/environment';
+    import { fly } from 'svelte/transition';;
+    import { instrumentNames } from '$lib/store';
 
 </script>
 
@@ -20,7 +18,7 @@
                 <!--img src="/images/{instrument}.png" alt="{instrument}"-->
                 <!-- use srcset -->
                 <img srcset="/images/{instrument}.png 1x, /images/{instrument} (Icon).png 2x" alt="{instrument}" />
-                <span>{sentenceCase(instrument)}</span>
+                <span>{instrument}</span>
             </a>
         {/each}
     </div>

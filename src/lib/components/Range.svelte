@@ -1,7 +1,5 @@
 <script lang="ts">
     import { afterUpdate, onMount } from "svelte";
-    import { flip } from "svelte/animate";
-    import { fly } from "svelte/transition";
 
     export let min: number;
     export let max: number;
@@ -9,6 +7,7 @@
     export let value: number;
     export let fastStep: number = 5;
     export let reference: number = 0;
+    export let unit: string = '';
     export let showSign: boolean = false;
 
     onMount(() => {
@@ -70,41 +69,41 @@
 
 </script>
 
-<div class="range {fieldName}">
-  <button class="updateButton" 
-            on:mousedown|preventDefault={() => startUpdating(-1)} 
-            on:mouseup|preventDefault={stopUpdating}
-            on:mouseleave|preventDefault={stopUpdating}
-            on:touchstart|preventDefault={(e) => startUpdating(-1)}
-            on:touchend|preventDefault={stopUpdating}
-            on:touchcancel|preventDefault={stopUpdating}
-          >
-      <i class="fa-solid fa-minus"></i>
-  </button>
-  <div class="value">
-    {#key value}
-    <div class="main">
-            {#if showSign}
-            {value > 0 ? '+' : ''}
-            {/if}
-            {value}
+    <div class="range {fieldName}">
+      <button class="updateButton"
+                on:mousedown|preventDefault={() => startUpdating(-1)} 
+                on:mouseup|preventDefault={stopUpdating}
+                on:mouseleave|preventDefault={stopUpdating}
+                on:touchstart|preventDefault={(e) => startUpdating(-1)}
+                on:touchend|preventDefault={stopUpdating}
+                on:touchcancel|preventDefault={stopUpdating}
+              >
+          <i class="fa-solid fa-minus"></i>
+      </button>
+      <div class="value">
+        {#key value}
+        <div class="main" style="width: {max.toString().length + 2}ch;">
+                {#if showSign}
+                {value > 0 ? '+' : ''}
+                {/if}
+                {value}{unit}
+        </div>
+        {/key}
+          {#if reference}
+          <div class="reference">/{reference}</div>
+          {/if}
+      </div>
+      <button class="updateButton" 
+                on:mousedown|preventDefault={() => startUpdating(1)} 
+                on:mouseup|preventDefault={stopUpdating}
+                on:mouseleave|preventDefault={stopUpdating} 
+                on:touchstart|preventDefault={(e) => startUpdating(1)}
+                on:touchend|preventDefault={stopUpdating}
+                on:touchcancel|preventDefault={stopUpdating}
+              >
+          <i class="fa-solid fa-plus"></i>
+      </button>
     </div>
-    {/key}
-      {#if reference}
-      <div class="reference">/{reference}</div>
-      {/if}
-  </div>
-  <button class="updateButton" 
-            on:mousedown|preventDefault={() => startUpdating(1)} 
-            on:mouseup|preventDefault={stopUpdating}
-            on:mouseleave|preventDefault={stopUpdating} 
-            on:touchstart|preventDefault={(e) => startUpdating(1)}
-            on:touchend|preventDefault={stopUpdating}
-            on:touchcancel|preventDefault={stopUpdating}
-          >
-      <i class="fa-solid fa-plus"></i>
-  </button>
-</div>
 
 <style lang="scss">
 
@@ -140,25 +139,14 @@
       z-index: 1;
   }
 
-
-  .updateButton{
-        border: none;
-        outline: none;
-        padding: 10px;
-        width: 35px;
-        height: 35px;
-        border-radius: 10px;
-        background: var(--secondary);
-        font-weight: bold;
-        font-size: 1rem;
-        cursor: pointer;
+  .main{
         display: flex;
         align-items: center;
         justify-content: center;
-
-        &:hover {
-            filter: brightness(0.9);
-        }
-    }
-
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+        position: relative;
+        z-index: 1;
+  }
 </style>

@@ -1,10 +1,11 @@
 <script lang="ts">
-    import { selectedInstrument, sentenceCase } from "$lib/store";
+    import { selectedInstrument } from "$lib/store";
     import Metronome from "$lib/components/Metronome.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
     import { fly } from "svelte/transition";
     import { onMount } from "svelte";
     import SelectInstrument from "./SelectInstrument.svelte";
+    import FreguencyGenerator from "./FreguencyGenerator.svelte";
 
     let ready = false;
 
@@ -26,13 +27,15 @@
             </button>
             <div class="current">
                 <img src="/images/{$selectedInstrument} (Mini).png" alt="{$selectedInstrument}" width="60px" />
-                <div class="name">{sentenceCase($selectedInstrument)}</div>
+                <div class="name">{$selectedInstrument}</div>
             </div>
         </div>
-        {#if $selectedInstrument != "metronome"}
-            <Tuner/>
+        {#if $selectedInstrument == "Metronome"}
+        <Metronome/>
+        {:else if $selectedInstrument == "Frequency"}
+        <FreguencyGenerator/>
         {:else}
-            <Metronome/>
+        <Tuner/>
         {/if}
     {:else}
         <SelectInstrument />

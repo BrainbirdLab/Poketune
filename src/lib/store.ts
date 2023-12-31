@@ -1,18 +1,26 @@
 import { writable, type Writable } from "svelte/store";
 
-export type InstrumentTypes = "guitar" | "bass" | "ukulele" | "chromatic" | "metronome" | "none";
+export type InstrumentTypes = "Guitar" | "Bass" | "Ukulele" | "Chromatic" | "Metronome" | "Frequency" | "none";
 
 export const selectedInstrument: Writable<InstrumentTypes> = writable("none");
 
 export function sentenceCase(str: string) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+    //lower case everything
+    str = str.toLowerCase();
+    //uppercase first letter of each word
+    str = str.replace(/\b[a-z]/g, function (letter) {
+        return letter.toUpperCase();
+    });
+
+    return str;
 }
 
 //list of instruments
 export const instrumentNames = [
-    'guitar',
-    'bass',
-    'ukulele',
-    'chromatic',
-    'metronome',
+    'Guitar',
+    'Bass',
+    'Ukulele',
+    'Chromatic',
+    'Metronome',
+    'Frequency',
 ];

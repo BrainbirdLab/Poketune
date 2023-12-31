@@ -1,10 +1,10 @@
 <script lang="ts">
     import { selectedInstrument, type InstrumentTypes, sentenceCase } from "$lib/store";
     export let data;
-    selectedInstrument.set(data.name.toLowerCase() as InstrumentTypes);
+    selectedInstrument.set(data.name as InstrumentTypes);
 </script>
 
 <svelte:head>
-    <title>{sentenceCase(data.name)}</title>
-    <link rel="icon" type="image/png" href="/images/{data.name.toLowerCase()} (Mini).png" />
+    <title>{data.name}</title>
+    <link rel="icon" type="image/png" href="/images/{data.name} (Mini).png" />
 </svelte:head>

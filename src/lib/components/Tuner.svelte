@@ -14,10 +14,6 @@
     let correctNoteSound: HTMLAudioElement;
     let allDoneSound: HTMLAudioElement;
 
-    let guitarSound: HTMLAudioElement;
-    let ukuleleSound: HTMLAudioElement;
-    let bassSound: HTMLAudioElement;
-
     let Octave: number;
     let Note: string;
     let Cent = 0;
@@ -56,7 +52,7 @@
 
     const unsubPitchShiftBy = pitchShiftBy.subscribe((val) => {
 
-        if ($selectedInstrument == "chromatic" || $selectedInstrument == "none") {
+        if ($selectedInstrument == "Chromatic" || $selectedInstrument == "none") {
             return;
         }
 
@@ -79,10 +75,6 @@
 
         correctNoteSound = new Audio("/sounds/correct.mp3");
         allDoneSound = new Audio("/sounds/allDone.mp3");
-
-        guitarSound = new Audio("/sounds/guitar.mp3");
-        ukuleleSound = new Audio("/sounds/ukulele.mp3");
-        bassSound = new Audio("/sounds/bass.mp3");
 
         const pitchShift = localStorage.getItem("pitchShiftBy") || "0";
         if (pitchShift) {
@@ -188,7 +180,7 @@
 
         const noteId = Note + Octave;
         
-        if (($selectedInstrument != "chromatic" && $selectedInstrument != "none") && Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
+        if (($selectedInstrument != "Chromatic" && $selectedInstrument != "none") && Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
             tunedNotes.add(noteId);
             tunedNotes = new Set<string>(tunedNotes);
             //if correct note is played and all notes are not tuned
@@ -410,7 +402,7 @@
         </div>
         <div class="cent">{Cent} C {Math.abs(Cent) < 10 ? "😁" : "😢"}</div>
     </div>
-    {#if $selectedInstrument != "chromatic"}
+    {#if $selectedInstrument != "Chromatic"}
         {#if tunedNotes.size == Object.values(notes).length}
             <div class="conf" use:confetti></div>
         {/if}
