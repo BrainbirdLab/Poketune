@@ -1,7 +1,6 @@
 <script lang="ts">
     import "$lib/global.scss";
     import { onMount } from "svelte";
-    import InstrumentContainer from "$lib/components/InstrumentContainer.svelte";
     import { showPopupMessage } from "$lib/popup";
 
     async function detectSWUpdate(){
@@ -25,5 +24,4 @@
 </script>
 
 <svelte:body on:contextmenu|preventDefault></svelte:body>
-<InstrumentContainer/>
 <slot></slot>

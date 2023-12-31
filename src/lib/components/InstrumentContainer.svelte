@@ -6,6 +6,7 @@
     import { onMount } from "svelte";
     import SelectInstrument from "./SelectInstrument.svelte";
     import FreguencyGenerator from "./FreguencyGenerator.svelte";
+    import InstrumentPage from "./../../routes/[id]/+page.svelte";
 
     let ready = false;
 
@@ -18,25 +19,7 @@
 
 <div class="container">
     {#if $selectedInstrument != "none"}
-        <div class="topbar" in:fly|global={{x: -10}}>
-            <button class="goback" on:click={()=>{
-                selectedInstrument.set("none");
-                history.back();
-            }}>
-                <i class="fa-solid fa-caret-left fa-fw"></i>
-            </button>
-            <div class="current">
-                <img src="/images/{$selectedInstrument} (Mini).png" alt="{$selectedInstrument}" width="60px" />
-                <div class="name">{$selectedInstrument}</div>
-            </div>
-        </div>
-        {#if $selectedInstrument == "Metronome"}
-        <Metronome/>
-        {:else if $selectedInstrument == "Frequency"}
-        <FreguencyGenerator/>
-        {:else}
-        <Tuner/>
-        {/if}
+        <InstrumentPage data={{name: $selectedInstrument}}/>
     {:else}
         <SelectInstrument />
     {/if}

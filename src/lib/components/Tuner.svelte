@@ -403,7 +403,7 @@
         <div class="cent">{Cent} C {Math.abs(Cent) < 10 ? "😁" : "😢"}</div>
     </div>
     {#if $selectedInstrument != "Chromatic"}
-        {#if tunedNotes.size == Object.values(notes).length}
+        {#if tunedNotes.size != 0 && tunedNotes.size == Object.values(notes).length}
             <div class="conf" use:confetti></div>
         {/if}
 

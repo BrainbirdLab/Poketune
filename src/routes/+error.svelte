@@ -1,3 +1,5 @@
+
+
 <svelte:head>
     <title>Oops..!!</title>
 </svelte:head>
@@ -18,6 +20,7 @@
         align-items: center;
         justify-content: center;
         height: 100vh;
+        background: #111d2a;
         gap: 50px;
     }
     
