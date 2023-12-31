@@ -1,5 +1,4 @@
 <script>
-    import InstrumentContainer from "$lib/components/InstrumentContainer.svelte";
     import SelectInstrument from "$lib/components/SelectInstrument.svelte";
     import { selectedInstrument } from "$lib/store";
     

@@ -22,6 +22,7 @@
         snareIndexes = Array.from({length: v}, (_, i) => 0);
     });
 
+    let mounted = false;
     onMount(() => {
 
         let s = localStorage.getItem('snareIndexes'); // [0, 1, 0, 1, 0, 1, 0, 1]
@@ -31,6 +32,8 @@
         } else {
             snareIndexes = Array.from({length: $pattern}, (_, i) => snareIndexes[i] || 0);
         }
+
+        mounted = true;
     });
     
 
@@ -156,6 +159,7 @@
 
 </script>
 
+{#if mounted}
 <div class="wrapper" in:fly|global={{y: -10}}>
 
     <div class="metronome">
@@ -208,7 +212,7 @@
     </div>
 
 </div>
-
+{/if}
 
 <style lang="scss">
 

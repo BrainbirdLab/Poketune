@@ -2,9 +2,17 @@
     //import animation libs to fly in the instrument buttons
     import { fly } from 'svelte/transition';;
     import { instrumentNames } from '$lib/store';
+    import { onMount } from 'svelte';
+
+    let mounted = false;
+
+    onMount(() => {
+        mounted = true;
+    });
 
 </script>
 
+{#if mounted}
 <div class="title" in:fly|global={{x: 10, delay: 100}}>
     <div class="t">
         PokeTune
@@ -29,6 +37,7 @@
     ・
     <a href="https://www.flaticon.com/free-icons/course" title="course icons">Icon by Freepik - Flaticon</a>
 </footer>
+{/if}
 
 <style lang="scss">
 

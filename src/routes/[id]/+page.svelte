@@ -9,8 +9,9 @@
     export let data;
     selectedInstrument.set(data.name as InstrumentTypes);
 
+    let mounted = false;
     onMount(() => {
-
+        mounted = true;
     });
 </script>
 
@@ -19,6 +20,7 @@
     <link rel="icon" type="image/png" href="/images/{data.name} (Mini).png" />
 </svelte:head>
 
+{#if mounted}
 <div class="container">
     <div class="topbar" in:fly|global={{x: -10}}>
         <button class="goback" on:click={()=>{
@@ -40,6 +42,7 @@
         <Tuner/>
     {/if}
 </div>
+{/if}
 
 <style lang="scss">
 

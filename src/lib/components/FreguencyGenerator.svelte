@@ -21,6 +21,7 @@
         }
     }
 
+    let mounted = false;
     onMount(() => {
         const v = localStorage.getItem("selectedWave");
         if (v && !isNaN(parseInt(v)) && parseInt(v) < waveType.length && parseInt(v) >= 0) {
@@ -28,6 +29,7 @@
         } else {
             selectedWaveType = 0;
         }
+        mounted = true;
     });
 
     function handleStart() {
@@ -50,6 +52,7 @@
     });
 </script>
 
+{#if mounted}
 <div class="container">
     <div class="input slider" in:fly|global={{y: -10}}>
         <div class="label">
@@ -95,6 +98,7 @@
         {/if}
     </button>
 </div>
+{/if}
 
 <style lang="scss">
     .container {

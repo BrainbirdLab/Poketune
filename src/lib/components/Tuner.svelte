@@ -70,6 +70,8 @@
         }
     });
 
+    let mounted = false;
+
 
     onMount(() => {
 
@@ -86,6 +88,7 @@
             }
         }
 
+        mounted = true;
     });
 
     onDestroy(() => {
@@ -346,6 +349,7 @@
 
 </script>
 
+{#if mounted}
 <div class="tuner" in:fly|global={{y: -10}}>
     <div class="noteContainer">
         {#if Note}
@@ -456,6 +460,7 @@
             {/if}
         </div>
 </div>
+{/if}
 
 <style lang="scss">
 
