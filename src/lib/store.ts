@@ -15,6 +15,8 @@ export function sentenceCase(str: string) {
     return str;
 }
 
+export const lastPage: Writable<string> = writable("");
+
 //list of instruments
 export const instrumentNames = [
     'Guitar',

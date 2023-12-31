@@ -3,9 +3,9 @@
     import FreguencyGenerator from "$lib/components/FreguencyGenerator.svelte";
     import Metronome from "$lib/components/Metronome.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
-    import { selectedInstrument, type InstrumentTypes } from "$lib/store";
+    import { selectedInstrument, type InstrumentTypes, lastPage } from "$lib/store";
     import { onMount } from "svelte";
-    import { fly } from "svelte/transition";
+    import { fade, fly } from "svelte/transition";
     export let data;
     selectedInstrument.set(data.name as InstrumentTypes);
 
@@ -22,17 +22,24 @@
 
 {#if mounted}
 <div class="container">
-    <div class="topbar" in:fly|global={{x: -10}}>
-        <button class="goback" on:click={()=>{
+    <div class="topbar">
+        <button in:fly|global={{x: -10}} class="goback" on:click={()=>{
             selectedInstrument.set("none");
-            goto("/");
+            if ($lastPage != "/"){
+                lastPage.set("/");
+                goto("/", { replaceState: true });
+            } else {
+                history.back();
+            }
         }}>
             <i class="fa-solid fa-caret-left fa-fw"></i>
         </button>
-        <div class="current">
+        {#if $selectedInstrument != "none"}
+        <div class="current" in:fly|global={{x: 10}}>
             <img src="/images/{$selectedInstrument} (Mini).png" alt="{$selectedInstrument}" width="60px" />
             <div class="name">{$selectedInstrument}</div>
         </div>
+        {/if}
     </div>
     {#if $selectedInstrument == "Metronome"}
         <Metronome/>

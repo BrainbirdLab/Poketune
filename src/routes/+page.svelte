@@ -1,8 +1,9 @@
 <script>
     import SelectInstrument from "$lib/components/SelectInstrument.svelte";
-    import { selectedInstrument } from "$lib/store";
+    import { lastPage, selectedInstrument } from "$lib/store";
     
     selectedInstrument.set("none");
+    lastPage.set("/");
 </script>
 
 <svelte:head>
