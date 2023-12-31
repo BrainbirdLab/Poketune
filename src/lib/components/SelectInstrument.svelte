@@ -14,7 +14,7 @@
 <div class="wrapper">
     <div class="instruments">
         {#each instrumentNames as instrument, i}
-            <a class="instrument" in:fly|global={{y: 100*(i+1)}} href="/{instrument}">
+            <a class="instrument" in:fly|global={{y: 100*(i+1)}} href="/{instrument.toLocaleLowerCase()}">
                 <!--img src="/images/{instrument}.png" alt="{instrument}"-->
                 <!-- use srcset -->
                 <img srcset="/images/{instrument}.png 1x, /images/{instrument} (Icon).png 2x" alt="{instrument}" />

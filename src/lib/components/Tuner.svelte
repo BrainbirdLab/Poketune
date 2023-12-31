@@ -223,13 +223,13 @@
         let dividerFrequency: number = 0;
         //load audio
         let url = '';
-        if ($selectedInstrument == "guitar"){
+        if ($selectedInstrument == "Guitar"){
             url = "/sounds/guitar.mp3";
             dividerFrequency = getFrequency("E", 2);
-        } else if ($selectedInstrument == "ukulele"){
+        } else if ($selectedInstrument == "Ukulele"){
             url = "/sounds/ukulele.mp3";
             dividerFrequency = getFrequency("G", 4);
-        } else if ($selectedInstrument == "bass"){
+        } else if ($selectedInstrument == "Bass"){
             url = "/sounds/bass.mp3";
             dividerFrequency = getFrequency("E", 1);
         }
@@ -423,7 +423,7 @@
                     </div>
                 {/each}
             </div>
-            <div class="input pitch">
+            <div class="input pitch" in:fly|global={{y: 20}}>
                 <div class="label">Change pitch <i class="fa-solid fa-wave-square"></i></div>
                 <Range showSign={true} fieldName="pitchShiftBy" fastStep={10} bind:value={$pitchShiftBy} min={-100} max={100}/>
             </div>

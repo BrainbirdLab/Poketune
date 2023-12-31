@@ -79,6 +79,10 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
+
+	&:hover {
+		filter: brightness(0.97);
+	}
 }
 
 .input{

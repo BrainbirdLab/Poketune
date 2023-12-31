@@ -23,7 +23,7 @@
 
     onMount(() => {
         const v = localStorage.getItem("selectedWave");
-        if (v && !isNaN(parseInt(v))) {
+        if (v && !isNaN(parseInt(v)) && parseInt(v) < waveType.length && parseInt(v) >= 0) {
             selectedWaveType = parseInt(v);
         } else {
             selectedWaveType = 0;
@@ -154,15 +154,15 @@
             width: 120px;
             height: 60px;
             border-radius: 10px;
-            background: var(--secondary);
             font-size: 0.7rem;
+            background: transparent;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             gap: 10px;
             align-items: center;
             justify-content: center;
-            border: 2px solid transparent;
+            border: 2px solid var(--secondary);
 
             img {
                 width: 20px;
@@ -171,10 +171,6 @@
 
             &.selected {
                 border: 2px solid #b291ff;
-            }
-
-            &:hover {
-                filter: brightness(0.9);
             }
         }
     }
