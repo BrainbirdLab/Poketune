@@ -21,34 +21,32 @@
 </svelte:head>
 
 {#if mounted}
-<div class="container">
-    <div class="topbar">
-        <button in:fly|global={{x: -10}} class="goback" on:click={()=>{
-            selectedInstrument.set("none");
-            if ($lastPage != "/"){
-                lastPage.set("/");
-                goto("/", { replaceState: true });
-            } else {
-                history.back();
-            }
-        }}>
-            <i class="fa-solid fa-caret-left fa-fw"></i>
-        </button>
-        {#if $selectedInstrument != "none"}
-        <div class="current" in:fly|global={{x: 10}}>
-            <img src="/images/{$selectedInstrument} (Mini).png" alt="{$selectedInstrument}" width="60px" />
-            <div class="name">{$selectedInstrument}</div>
-        </div>
-        {/if}
+<div class="topbar">
+    <button in:fly|global={{x: -10}} class="goback" on:click={()=>{
+        selectedInstrument.set("none");
+        if ($lastPage != "/"){
+            lastPage.set("/");
+            goto("/", { replaceState: true });
+        } else {
+            history.back();
+        }
+    }}>
+        <i class="fa-solid fa-caret-left fa-fw"></i>
+    </button>
+    {#if $selectedInstrument != "none"}
+    <div class="current" in:fly|global={{x: 10}}>
+        <img src="/images/{$selectedInstrument} (Mini).png" alt="{$selectedInstrument}" width="60px" />
+        <div class="name">{$selectedInstrument}</div>
     </div>
-    {#if $selectedInstrument == "Metronome"}
-        <Metronome/>
-    {:else if $selectedInstrument == "Frequency"}
-        <FreguencyGenerator/>
-    {:else}
-        <Tuner/>
     {/if}
 </div>
+{#if $selectedInstrument == "Metronome"}
+    <Metronome/>
+{:else if $selectedInstrument == "Frequency"}
+    <FreguencyGenerator/>
+{:else}
+    <Tuner/>
+{/if}
 {/if}
 
 <style lang="scss">
@@ -117,20 +115,5 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-    }
-
-    .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: min(100vw, 750px);
-        height: 100%;
-        overflow: hidden;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: -1;
     }
 </style>

@@ -107,7 +107,7 @@
         flex-direction: row;
         justify-content: center;
         align-items: flex-start;
-        gap: 25px;
+        gap: 10px 50px;
         padding: 30px 10px;
         overflow: scroll;
         align-content: flex-start;
