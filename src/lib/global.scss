@@ -38,6 +38,10 @@ body{
 	overflow: hidden;
 }
 
+body, html{
+	overscroll-behavior-y: none;
+}
+
 .startButton {
 	border: none;
 	outline: none;
