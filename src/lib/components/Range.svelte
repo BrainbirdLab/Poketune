@@ -7,11 +7,10 @@
     export let value: number;
     export let fastStep: number = 5;
     export let reference: number = 0;
-    export let unit: string = '';
+    export let unit: string = "";
     export let showSign: boolean = false;
 
     onMount(() => {
-    
         const v = localStorage.getItem(fieldName);
 
         if (v && !isNaN(parseInt(v))) {
@@ -28,9 +27,9 @@
             value = max;
         }
     });
-    
+
     afterUpdate(() => {
-        if (localStorage){
+        if (localStorage) {
             localStorage.setItem(fieldName, value.toString());
         }
     });
@@ -65,81 +64,73 @@
         clearTimeout(timeoutId);
         clearInterval(intervalId);
     }
-
-
 </script>
 
-    <div class="range {fieldName}">
-      <button class="updateButton"
-                on:mousedown|preventDefault={() => startUpdating(-1)} 
-                on:mouseup|preventDefault={stopUpdating}
-                on:mouseleave|preventDefault={stopUpdating}
-                on:touchstart|preventDefault={(e) => startUpdating(-1)}
-                on:touchend|preventDefault={stopUpdating}
-                on:touchcancel|preventDefault={stopUpdating}
-              >
-          <i class="fa-solid fa-minus"></i>
-      </button>
-      <div class="value">
+<div class="range {fieldName}">
+    <button
+        class="updateButton"
+        on:mousedown|preventDefault={() => startUpdating(-1)}
+        on:mouseup|preventDefault={stopUpdating}
+        on:mouseleave|preventDefault={stopUpdating}
+        on:touchstart|preventDefault={(e) => startUpdating(-1)}
+        on:touchend|preventDefault={stopUpdating}
+        on:touchcancel|preventDefault={stopUpdating}
+    >
+        <i class="fa-solid fa-minus"></i>
+    </button>
+    <div class="value">
         {#key value}
-        <div class="main" style="width: {max.toString().length + 2}ch;">
+            <div class="main" style="width: {max.toString().length + 2}ch;">
                 {#if showSign}
-                {value > 0 ? '+' : ''}
+                    {value > 0 ? "+" : ""}
                 {/if}
                 {value}{unit}
-        </div>
+            </div>
         {/key}
-          {#if reference}
-          <div class="reference">/{reference}</div>
-          {/if}
-      </div>
-      <button class="updateButton" 
-                on:mousedown|preventDefault={() => startUpdating(1)} 
-                on:mouseup|preventDefault={stopUpdating}
-                on:mouseleave|preventDefault={stopUpdating} 
-                on:touchstart|preventDefault={(e) => startUpdating(1)}
-                on:touchend|preventDefault={stopUpdating}
-                on:touchcancel|preventDefault={stopUpdating}
-              >
-          <i class="fa-solid fa-plus"></i>
-      </button>
+        {#if reference}
+            <div class="reference">/{reference}</div>
+        {/if}
     </div>
+    <button
+        class="updateButton"
+        on:mousedown|preventDefault={() => startUpdating(1)}
+        on:mouseup|preventDefault={stopUpdating}
+        on:mouseleave|preventDefault={stopUpdating}
+        on:touchstart|preventDefault={(e) => startUpdating(1)}
+        on:touchend|preventDefault={stopUpdating}
+        on:touchcancel|preventDefault={stopUpdating}
+    >
+        <i class="fa-solid fa-plus"></i>
+    </button>
+</div>
 
 <style lang="scss">
+    .reference {
+        margin-left: -15px;
+    }
 
-  .range {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      min-width: 130px;
-      position: relative;
-  }
+    .range {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 130px;
+        position: relative;
+    }
 
-  //snap to the nearest division on scroll
-  .divContainer{
-      height: 60px;
-      width: 50px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-  }
+    //snap to the nearest division on scroll
+    .divContainer {
+        height: 60px;
+        width: 50px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
 
-  .value{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      font-weight: 700;
-      color: #fff;
-      position: relative;
-      z-index: 1;
-  }
-
-  .main{
+    .value {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -148,5 +139,16 @@
         color: #fff;
         position: relative;
         z-index: 1;
-  }
+    }
+
+    .main {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+        position: relative;
+        z-index: 1;
+    }
 </style>
