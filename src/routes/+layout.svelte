@@ -26,7 +26,7 @@
 <svelte:body on:contextmenu|preventDefault></svelte:body>
 
 <div class="container">
-    <slot></slot>
+    <slot/>
 </div>
 
 <style>

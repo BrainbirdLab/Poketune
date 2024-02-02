@@ -1,5 +1,3 @@
-
-
 <svelte:head>
     <title>Oops..!!</title>
 </svelte:head>
@@ -20,7 +18,6 @@
         align-items: center;
         justify-content: center;
         height: 100vh;
-        background: #111d2a;
         gap: 50px;
     }
     
@@ -33,13 +30,14 @@
     }
 
     h1 {
-        font-size: 5rem;
-        font-weight: 700;
+        font-size: 9rem;
         opacity: 0.15;
+        font-family: Comf;
     }
 
     p {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
         position: absolute;
     }
 

@@ -1,8 +1,13 @@
-@import url('fontawesome/css/all.css');
+@import url('$lib/fontawesome/css/all.css');
 
 @font-face {
 	font-family: Now;
-	src: url('/fonts/now-web.woff2');
+	src: url('$lib/fonts/now-web.woff2');
+}
+
+@font-face {
+    font-family: Comf;
+    src: url('$lib/fonts/comf.woff2') format('woff2');
 }
 
 *{
