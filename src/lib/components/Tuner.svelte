@@ -57,11 +57,13 @@
         }
 
         notes = getReferenceNotes($selectedInstrument, val);
+
         const obj = Object.values(notes);
         const firstNoteFrequency = obj[0].frequency;
         const lastNoteFrequency = obj[obj.length - 1].frequency;
 
         if (firstNoteFrequency < 16.35 || lastNoteFrequency > 7902.13) {
+            console.log(firstNoteFrequency, val, lastNoteFrequency);
             if (firstNoteFrequency < 16.35) {
                 pitchShiftBy.set(val + 1);
             } else if (lastNoteFrequency > 7902.13) {
@@ -78,7 +80,8 @@
         correctNoteSound = new Audio("/sounds/correct.mp3");
         allDoneSound = new Audio("/sounds/allDone.mp3");
 
-        const pitchShift = localStorage.getItem("pitchShiftBy") || "0";
+        const pitchShift = localStorage.getItem("pitchShiftBy") || 0;
+        console.log(pitchShift);
         if (pitchShift) {
             //if pitch shift is <= 10 or >= -10 then only set, else set to 0
             if (Math.abs(Number(pitchShift)) <= 10) {

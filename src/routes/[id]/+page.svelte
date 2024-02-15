@@ -5,7 +5,7 @@
     import Tuner from "$lib/components/Tuner.svelte";
     import { selectedInstrument, type InstrumentTypes, lastPage } from "$lib/store";
     import { onMount } from "svelte";
-    import { fade, fly } from "svelte/transition";
+    import { fly } from "svelte/transition";
     export let data;
     selectedInstrument.set(data.name as InstrumentTypes);
 

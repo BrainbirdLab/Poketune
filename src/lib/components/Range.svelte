@@ -12,19 +12,14 @@
 
     onMount(() => {
         const v = localStorage.getItem(fieldName);
-
         if (v && !isNaN(parseInt(v))) {
             value = parseInt(v);
         } else {
-            value = min;
+            value = 0;
         }
-        if (value < min) {
-            //console.log('reset min');
-            value = min;
-        }
-        if (value > max) {
-            //console.log('reset max');
-            value = max;
+
+        if (value < min || value > max) {
+            value = 0;
         }
     });
 
