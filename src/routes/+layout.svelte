@@ -1,7 +1,7 @@
 <script lang="ts">
     import "$lib/global.scss";
     import { onMount } from "svelte";
-    import { showPopupMessage } from "$lib/popup";
+    import { showToastMessage } from "domtoastmessage";
 
     async function detectSWUpdate(){
         const registration = await navigator.serviceWorker.ready;
@@ -12,7 +12,7 @@
                 if (newWorker.state === "installed") {
                     newWorker.postMessage({ type: "SKIP_WAITING" });
                     console.log("New update available");
-                    showPopupMessage("App updated");
+                    showToastMessage("App updated");
                 }
             });
         });
@@ -20,6 +20,7 @@
 
     onMount(() => {
         detectSWUpdate();
+        //showToastMessage("App loaded");
     })
 </script>
 
