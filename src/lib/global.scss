@@ -17,7 +17,6 @@
 	font-family: 'Now';
 	color: white;
 	user-select: none;
-	overscroll-behavior: none;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 	-webkit-tap-highlight-color: transparent;
 	-webkit-user-select: none;
@@ -42,6 +41,7 @@ Remove scrollbars
 body{
 	background-color: var(--primary);
 	overflow: hidden;
+	overscroll-behavior-y: none;
 }
 
 body, html{
