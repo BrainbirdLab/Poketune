@@ -169,16 +169,16 @@
         display: flex;
         flex-direction: row;
         padding: 0 10px;
-        width: min(100vw, 500px);
         align-items: center;
         justify-content: space-between;
         position: fixed;
         gap: 10px;
         top: 0;
-        left: 0;
+        left: 50%;
+        transform: translateX(-50%);
         right: 0;
         z-index: 1;
-        width: 100%;
+        width: min(100vw, 850px);
         height: 50px;
         background: var(--primary);
 
@@ -210,6 +210,7 @@
         justify-content: center;
         align-content: center;
         height: 100vh;
+        width: min(100vw, 850px);
         overflow: hidden;
     }
 

@@ -36,8 +36,8 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        width: min(100vw, 850px);
         height: 100%;
+        width: 100%;
         overflow: hidden;
         position: absolute;
         top: 50%;

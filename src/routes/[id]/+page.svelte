@@ -60,10 +60,11 @@
         gap: 10px;
         position: fixed;
         top: 0;
-        left: 0;
+        left: 50%;
+        transform: translateX(-50%);
         right: 0;
         z-index: 1;
-        width: 100%;
+        width: min(100vw, 850px);
         padding: 0 10px;
         height: 60px;
     }
