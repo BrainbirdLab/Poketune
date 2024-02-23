@@ -17,10 +17,10 @@
     async function keepAwake(evt: CustomEvent<boolean>){
         if (evt.detail){
             awakeLock = await navigator.wakeLock.request("screen");
-            showToastMessage("Screen Wake locked");
+            //showToastMessage("Screen Wake locked");
         } else {
             awakeLock?.release();
-            showToastMessage("Screen Wake released");
+            //showToastMessage("Screen Wake released");
         }
     }
 
