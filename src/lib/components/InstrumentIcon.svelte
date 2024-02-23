@@ -1,11 +1,11 @@
 <script lang="ts">
-    import type { InstrumentTypes } from "$lib/store";
-    import BassImage from "./BassImage.svelte";
-    import ChromaticImage from "./ChromaticImage.svelte";
-    import FrequencyImage from "./FrequencyImage.svelte";
-    import GuitarImage from "./GuitarImage.svelte";
-    import MetronomeImage from "./MetronomeImage.svelte";
-    import UkuleleImage from "./UkuleleImage.svelte";
+
+    import BassImage from "./Icons/BassImage.svelte";
+    import ChromaticImage from "./Icons/ChromaticImage.svelte";
+    import FrequencyImage from "./Icons/FrequencyImage.svelte";
+    import GuitarImage from "./Icons/GuitarImage.svelte";
+    import MetronomeImage from "./Icons/MetronomeImage.svelte";
+    import UkuleleImage from "./Icons/UkuleleImage.svelte";
 
     export let name: string;
     export let size: number = 100;

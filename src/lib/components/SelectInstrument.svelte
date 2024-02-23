@@ -5,7 +5,7 @@
     import { onMount } from "svelte";
     import Logo from "./logo.svelte";
     import GuitarImage from "./GuitarImage.svelte";
-    import BassImage from "./BassImage.svelte";
+    import BassImage from "./Icons/BassImage.svelte";
     import UkuleleImage from "./UkuleleImage.svelte";
     import ChromaticImage from "./ChromaticImage.svelte";
     import MetronomeImage from "./MetronomeImage.svelte";
