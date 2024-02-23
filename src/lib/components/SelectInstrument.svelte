@@ -1,70 +1,175 @@
 <script lang="ts">
     //import animation libs to fly in the instrument buttons
-    import { fly } from 'svelte/transition';;
-    import { instrumentNames } from '$lib/store';
-    import { onMount } from 'svelte';
+    import { fly } from "svelte/transition";
+    import { instrumentNames } from "$lib/store";
+    import { onMount } from "svelte";
 
     let mounted = false;
+
+    const version = __VERSION__;
 
     onMount(() => {
         mounted = true;
     });
 
+    let showcredits = false;
+
+    function handler(node: HTMLElement) {
+        node.onclick = (e) => {
+            if (e.target === node) {
+                showcredits = false;
+            }
+        };
+
+        return {
+            destroy() {
+                node.onclick = null;
+            },
+        };
+    }
+
 </script>
 
 {#if mounted}
-<div class="title" in:fly|global={{x: 10, delay: 100}}>
-    <div class="t">
-        PokeTune
+    <div class="wrapper">
+        <div class="topbar">
+            <div class="title">
+                PokeTune
+                <img src="/images/icon (Mini).png" alt="icon" width="35px" />
+            </div>
+            <button on:click={() => {showcredits = true}}><i class="fa-solid fa-circle-info"></i></button>
+        </div>
+        <div class="instruments">
+            {#each instrumentNames as instrument, i}
+                <a
+                    class="instrument"
+                    in:fly|global={{ y: 100 * (i + 1) }}
+                    href="/{instrument.toLocaleLowerCase()}"
+                >
+                    <!--img src="/images/{instrument}.png" alt="{instrument}"-->
+                    <!-- use srcset -->
+                    <img
+                        srcset="/images/{instrument}.png 1x, /images/{instrument} (Icon).png 2x"
+                        alt={instrument}
+                    />
+                    <span>{instrument}</span>
+                </a>
+            {/each}
+        </div>
     </div>
-    <img src="/images/icon (Icon).png" alt="Logo" class="logo" width="50px" />
-</div>
-<div class="wrapper">
-    <div class="instruments">
-        {#each instrumentNames as instrument, i}
-            <a class="instrument" in:fly|global={{y: 100*(i+1)}} href="/{instrument.toLocaleLowerCase()}">
-                <!--img src="/images/{instrument}.png" alt="{instrument}"-->
-                <!-- use srcset -->
-                <img srcset="/images/{instrument}.png 1x, /images/{instrument} (Icon).png 2x" alt="{instrument}" />
-                <span>{instrument}</span>
-            </a>
-        {/each}
+{/if}
+{#if showcredits}    
+<div class="creditsWrapper" transition:fly={{y: 10, duration: 200}} use:handler>
+    <div class="credits">
+        <div class="info">
+            <div class="title">
+                PokeTune
+                <img
+                    height="30px"
+                    src="/images/icon (Mini).png"
+                    alt="icon"
+                />
+            </div>
+            <div class="more">Musical instrument tuner. v{version}</div>
+        </div>
+        <div class="dev">Developed by Fuad Hasan</div>
+        <div class="src">
+            <a href="https://github.com/itsfuad/Poketune" target="_blank"
+                >Source Code <i class="fa-solid fa-up-right-from-square"></i></a
+            >
+        </div>
+        <div class="images">
+            <a href="https://www.flaticon.com" target="_blank"
+                >Icons & Images <i class="fa-solid fa-up-right-from-square"
+                ></i></a
+            >
+        </div>
+        <button on:click={() => {
+            showcredits = false;
+        }}>Close</button>
     </div>
 </div>
-
-<footer class="footer">
-    <div class="source"><a href="https://github.com/itsfuad/Poketune">Source code <i class="fa-solid fa-code"></i></a></div>
-    ・
-    <a href="https://www.flaticon.com/free-icons/course" title="course icons">Icon by Freepik - Flaticon</a>
-</footer>
 {/if}
 
 <style lang="scss">
+    .creditsWrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(3px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
 
-    .footer{
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: center;
-		width: 100%;
-		padding: 10px;
-		gap: 5px;
-		font-size: 0.6rem;
-        position: relative;
-		*{
-			padding: 0;
-			color: ghostwhite;
-		}
+    .credits {
+        background-color: #0b1d37;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.688);
+        text-align: center;
+        max-width: 95vw;
+        width: max-content;
+        color: ghostwhite;
 
-		a{
-			text-decoration: underline;
-		}
-		i{
-			font-size: 0.7rem;
-		}
-	}
+        .info {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+
+            .more {
+                font-size: 0.7rem;
+                font-weight: normal;
+                color: #c9c9c9;
+            }
+        }
+
+        .dev,
+        .src,
+        .images {
+            margin-top: 10px;
+            font-size: 0.8rem;
+
+            a {
+                text-decoration: none;
+                color: #007bff;
+                i {
+                    color: currentColor;
+                }
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 8px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.1s;
+
+            &:hover {
+                background-color: #0056b3;
+            }
+        }
+    }
 
     .title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .topbar {
         font-size: 1.3rem;
         color: #fff;
         font-weight: 700;
@@ -73,7 +178,7 @@
         padding: 0 10px;
         width: min(100vw, 500px);
         align-items: center;
-        justify-content: flex-start;
+        justify-content: space-between;
         position: fixed;
         gap: 10px;
         top: 0;
@@ -81,13 +186,27 @@
         right: 0;
         z-index: 1;
         width: 100%;
-        height: 60px;
+        height: 50px;
         background: var(--primary);
 
-        .t{
+        button {
+            margin-right: -5px;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+            outline: none;
+            background: none;
+            height: 35px;
+            width: 35px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            font-size: 1.1rem;
+
+            &:hover {
+                background: #607d8b28;
+            }
         }
     }
 
@@ -132,11 +251,11 @@
         padding: 5px;
         text-decoration: none;
 
-        *{
+        * {
             pointer-events: none;
         }
 
-        img{
+        img {
             width: 100%;
             height: 100%;
             object-fit: contain;
@@ -144,17 +263,14 @@
             transition: 100ms;
         }
 
-        &:hover img{
-            filter:
-            drop-shadow(3px 3px 5px #000000);
+        &:hover img {
+            filter: drop-shadow(3px 3px 5px #000000);
             //drop-shadow(3px 3px 5px #000000)
         }
     }
 
-    .instrument:has(input[type=radio]:checked) {
-    
+    .instrument:has(input[type="radio"]:checked) {
         transform: scale(0.95);
         transition: 100ms ease-in-out;
     }
-
 </style>
