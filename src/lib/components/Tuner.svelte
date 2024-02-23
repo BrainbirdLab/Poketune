@@ -83,7 +83,7 @@
         allDoneSound = new Audio("/sounds/allDone.mp3");
 
         const pitchShift = localStorage.getItem("pitchShiftBy") || 0;
-        console.log(pitchShift);
+        //console.log(pitchShift);
         if (pitchShift) {
             //if pitch shift is <= 10 or >= -10 then only set, else set to 0
             if (Math.abs(Number(pitchShift)) <= 10) {
