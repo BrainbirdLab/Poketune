@@ -49,7 +49,7 @@
                     <!--img src="/images/{instrument}.png" alt="{instrument}"-->
                     <!-- use srcset -->
                     <img
-                        srcset="/images/{instrument}.png 1x, /images/{instrument} (Icon).png 2x"
+                        src="/images/{instrument} (Icon).png"
                         alt={instrument}
                     />
                     <span>{instrument}</span>
