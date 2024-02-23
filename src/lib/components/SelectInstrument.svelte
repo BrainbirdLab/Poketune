@@ -3,6 +3,14 @@
     import { fly } from "svelte/transition";
     import { instrumentNames } from "$lib/store";
     import { onMount } from "svelte";
+    import Logo from "./logo.svelte";
+    import GuitarImage from "./GuitarImage.svelte";
+    import BassImage from "./BassImage.svelte";
+    import UkuleleImage from "./UkuleleImage.svelte";
+    import ChromaticImage from "./ChromaticImage.svelte";
+    import MetronomeImage from "./MetronomeImage.svelte";
+    import FrequencyImage from "./FrequencyImage.svelte";
+    import InstrumentIcon from "./InstrumentIcon.svelte";
 
     let mounted = false;
 
@@ -35,7 +43,7 @@
         <div class="topbar">
             <div class="title">
                 PokeTune
-                <img src="/images/icon (Mini).png" alt="icon" width="35px" />
+                <Logo size={35} />
             </div>
             <button on:click={() => {showcredits = true}}><i class="fa-solid fa-circle-info"></i></button>
         </div>
@@ -46,12 +54,7 @@
                     in:fly|global={{ y: 100 * (i + 1) }}
                     href="/{instrument.toLocaleLowerCase()}"
                 >
-                    <!--img src="/images/{instrument}.png" alt="{instrument}"-->
-                    <!-- use srcset -->
-                    <img
-                        src="/images/{instrument} (Icon).png"
-                        alt={instrument}
-                    />
+                    <InstrumentIcon name={instrument} size={100} />
                     <span>{instrument}</span>
                 </a>
             {/each}
@@ -64,11 +67,7 @@
         <div class="info">
             <div class="title">
                 PokeTune
-                <img
-                    height="30px"
-                    src="/images/icon (Mini).png"
-                    alt="icon"
-                />
+                <Logo size={35} />
             </div>
             <div class="more">Musical instrument tuner. v{version}</div>
         </div>
@@ -253,19 +252,6 @@
 
         * {
             pointer-events: none;
-        }
-
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            transition: 100ms;
-        }
-
-        &:hover img {
-            filter: drop-shadow(3px 3px 5px #000000);
-            //drop-shadow(3px 3px 5px #000000)
         }
     }
 

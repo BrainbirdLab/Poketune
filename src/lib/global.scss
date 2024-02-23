@@ -48,6 +48,15 @@ body, html{
 	overscroll-behavior-y: none;
 }
 
+img{
+	-webkit-user-drag: none;
+	user-drag: none;
+	display: block;
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+}
+
 .startButton {
 	border: none;
 	outline: none;

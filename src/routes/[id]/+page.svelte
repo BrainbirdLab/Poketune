@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import FreguencyGenerator from "$lib/components/FreguencyGenerator.svelte";
+    import InstrumentIcon from "$lib/components/InstrumentIcon.svelte";
     import Metronome from "$lib/components/Metronome.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
     import { selectedInstrument, type InstrumentTypes, lastPage } from "$lib/store";
@@ -35,7 +36,7 @@
     </button>
     {#if $selectedInstrument != "none"}
     <div class="current" in:fly|global={{x: 10}}>
-        <img src="/images/{$selectedInstrument} (Mini).png" alt="{$selectedInstrument}" width="60px" />
+        <InstrumentIcon name={$selectedInstrument} size={35}/>
         <div class="name">{$selectedInstrument}</div>
     </div>
     {/if}
