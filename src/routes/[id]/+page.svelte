@@ -7,16 +7,20 @@
     import { selectedInstrument, type InstrumentTypes, lastPage } from "$lib/store";
     import { onMount } from "svelte";
     import { fly } from "svelte/transition";
+    import { showToastMessage } from "domtoastmessage";
+
     export let data;
     selectedInstrument.set(data.name as InstrumentTypes);
 
-    function keepAwake(evt: CustomEvent<boolean>){
+    let awakeLock: WakeLockSentinel | null = null;
+
+    async function keepAwake(evt: CustomEvent<boolean>){
         if (evt.detail){
-            navigator.wakeLock.request("screen");
+            awakeLock = await navigator.wakeLock.request("screen");
+            showToastMessage("Screen Wake locked");
         } else {
-            navigator.wakeLock.request("screen").then((wakeLock) => {
-                wakeLock.release();
-            });
+            awakeLock?.release();
+            showToastMessage("Screen Wake released");
         }
     }
 
@@ -52,9 +56,9 @@
     {/if}
 </div>
 {#if $selectedInstrument == "Metronome"}
-    <Metronome/>
+    <Metronome on:keepAwake={keepAwake}/>
 {:else if $selectedInstrument == "Frequency"}
-    <FreguencyGenerator/>
+    <FreguencyGenerator on:keepAwake={keepAwake}/>
 {:else}
     <Tuner on:keepAwake={keepAwake}/>
 {/if}

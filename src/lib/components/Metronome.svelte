@@ -5,6 +5,9 @@
     import { fly } from "svelte/transition";
     import {writable} from "svelte/store";
     import MetronomeAnimated from "./Icons/MetronomeAnimated.svelte";
+    import { createEventDispatcher } from 'svelte'
+
+    const dispatch = createEventDispatcher();
 
     let bpm = 120;
     const pattern = writable(4);
@@ -83,9 +86,11 @@
             if (context.state === 'suspended') {
                 await context.resume();
             }
+            dispatch('keepAwake', true);
             scheduleNextBeat();
         } else {
             index = -1;
+            dispatch('keepAwake', false);
             clearTimeout(timeoutId);
         }
     }

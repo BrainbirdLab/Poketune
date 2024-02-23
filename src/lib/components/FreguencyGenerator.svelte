@@ -4,6 +4,9 @@
     import Slider from "./Slider.svelte";
     import Range from "./Range.svelte";
     import { onDestroy, onMount } from "svelte";
+    import { createEventDispatcher } from 'svelte'
+
+    const dispatch = createEventDispatcher();
 
     let start = false;
     let frequency = 20;
@@ -35,12 +38,14 @@
     function handleStart() {
         if (start) {
             oscillator.stop();
+            dispatch("keepAwake", false);
         } else {
             oscillator = audioCtx.createOscillator();
             oscillator.type = waveType[selectedWaveType] as OscillatorType;
             oscillator.frequency.value = frequency;
             oscillator.connect(audioCtx.destination);
             oscillator.start();
+            dispatch("keepAwake", true);
         }
         start = !start;
     }
