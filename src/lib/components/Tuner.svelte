@@ -52,6 +52,8 @@
 
     const unsubPitchShiftBy = pitchShiftBy.subscribe((val) => {
 
+        reset();
+
         if ($selectedInstrument == "Chromatic" || $selectedInstrument == "none") {
             return;
         }
