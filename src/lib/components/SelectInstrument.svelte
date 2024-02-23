@@ -4,12 +4,6 @@
     import { instrumentNames } from "$lib/store";
     import { onMount } from "svelte";
     import Logo from "./logo.svelte";
-    import GuitarImage from "./GuitarImage.svelte";
-    import BassImage from "./Icons/BassImage.svelte";
-    import UkuleleImage from "./UkuleleImage.svelte";
-    import ChromaticImage from "./ChromaticImage.svelte";
-    import MetronomeImage from "./MetronomeImage.svelte";
-    import FrequencyImage from "./FrequencyImage.svelte";
     import InstrumentIcon from "./InstrumentIcon.svelte";
 
     let mounted = false;
