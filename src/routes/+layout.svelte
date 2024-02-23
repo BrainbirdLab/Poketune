@@ -1,6 +1,6 @@
 <script lang="ts">
     import "$lib/global.scss";
-    import { onDestroy, onMount } from "svelte";
+    import { onMount } from "svelte";
     import { showToastMessage } from "domtoastmessage";
 
     async function detectSWUpdate(){
@@ -18,21 +18,9 @@
         });
     }
 
-    let wakeLock: WakeLockSentinel | null = null;
-
     onMount(async () => {
         detectSWUpdate();
-        //showToastMessage("App loaded");
-        if (navigator.wakeLock){
-            wakeLock = await navigator.wakeLock.request("screen");
-        } else {
-            showToastMessage("Wake lock not supported");
-        }
-    })
-
-    onDestroy(() => {
-        wakeLock?.release();
-    })
+    });
 </script>
 
 <svelte:body on:contextmenu|preventDefault></svelte:body>

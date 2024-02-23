@@ -10,6 +10,16 @@
     export let data;
     selectedInstrument.set(data.name as InstrumentTypes);
 
+    function keepAwake(evt: CustomEvent<boolean>){
+        if (evt.detail){
+            navigator.wakeLock.request("screen");
+        } else {
+            navigator.wakeLock.request("screen").then((wakeLock) => {
+                wakeLock.release();
+            });
+        }
+    }
+
     let mounted = false;
     onMount(() => {
         mounted = true;
@@ -46,7 +56,7 @@
 {:else if $selectedInstrument == "Frequency"}
     <FreguencyGenerator/>
 {:else}
-    <Tuner/>
+    <Tuner on:keepAwake={keepAwake}/>
 {/if}
 {/if}
 

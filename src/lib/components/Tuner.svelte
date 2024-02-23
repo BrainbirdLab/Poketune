@@ -9,6 +9,9 @@
     import Range from "./Range.svelte";
     import { writable } from "svelte/store";
     import WaveCanvas from "./waveCanvas.svelte";
+    import { createEventDispatcher } from 'svelte'
+
+    const dispatch = createEventDispatcher();
 
     //load audio
     let correctNoteSound: HTMLAudioElement;
@@ -126,6 +129,8 @@
             detectedClarity = 0;
         });
 
+        dispatch('keepAwake', false);
+
         reset();
 
         stream.getTracks().forEach((track) => track.stop());
@@ -150,6 +155,8 @@
                     .connect(analyserNode);
 
                 isListening = true;
+
+                dispatch('keepAwake', true);
 
                 if (audioContext.state === "running") {
                     interval = setInterval(() => {
