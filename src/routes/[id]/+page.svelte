@@ -102,10 +102,6 @@
         justify-content: center;
         gap: 3px;
 
-        img{
-            width: 35px;
-            position: relative;
-        }
         .name{
             font-size: 0.8rem;
             position: relative;
