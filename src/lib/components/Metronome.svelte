@@ -4,6 +4,7 @@
     import Range from "./Range.svelte";
     import { fly } from "svelte/transition";
     import {writable} from "svelte/store";
+    import MetronomeAnimated from "./Icons/MetronomeAnimated.svelte";
 
     let bpm = 120;
     const pattern = writable(4);
@@ -162,10 +163,7 @@
 {#if mounted}
 <div class="wrapper" in:fly|global={{y: -10}}>
 
-    <div class="metronome">
-        <img src="/images/Metronome-body.png" alt="body">
-        <img id="hand" src="/images/Metronome-hand.png" alt="needle" class="needle" style="transform: rotate({playing ? 20*tickDirection : 0}deg); transition: {(60 / bpm) * 1000}ms ease-in-out;">
-    </div>
+    <MetronomeAnimated style="transform: rotate({playing ? 20*tickDirection : 0}deg); transition: {(60 / bpm) * 1000}ms ease-in-out;" />
 
     <div class="beats" use:selectSnare>
         {#each Array.from({length: $pattern}) as _, i}
@@ -176,11 +174,11 @@
     <div class="inputs">
         <div class="input">
             <div class="label">BPM <i class="fa-solid fa-drum"></i></div>
-            <Range fieldName="bpm" bind:value={bpm} min={40} max={400} fastStep={10}/>
+            <Range fieldName="bpm" bind:value={bpm} min={40} defaultVal={120} max={400} fastStep={10}/>
         </div>
         <div class="input">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
-            <Range fieldName="pattern" bind:value={$pattern} min={3} max={16} fastStep={2} reference={4}/>
+            <Range fieldName="pattern" bind:value={$pattern} min={3} defaultVal={4} max={16} fastStep={2} reference={4}/>
         </div>
     </div>
 
@@ -302,42 +300,6 @@
         }
     }
 
-    .metronome{
-        position: relative;
-        width: 150px;
-        height: 120px;
-        overflow: hidden;
-        img{
-            width: 100%;
-            height: 150px;
-            aspect-ratio: 1/1;
-            display: block;
-            position: absolute;
-            z-index: 1;
-            &#hand{
-                transform-origin: center;
-            }
-        }
-
-        //shadow of the body
-        &:before{
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 10%;
-            background: #00000040;
-            bottom: 12%;
-            left: 0;
-            border-radius: 50%;
-            z-index: 0;
-        }
-
-        //shadow of the needle
-        #hand{
-            filter: drop-shadow(-4px -2px 4px #000000e1);
-        }
-    }
-
     .inputs{
         display: flex;
         flex-direction: row;
@@ -363,13 +325,6 @@
     }
 
     @media (min-width: 768px){
-        .metronome{
-            width: 250px;
-            height: 200px;
-            img{
-                height: 250px;
-            }
-        }
 
         .inputs{
             gap: 50px;

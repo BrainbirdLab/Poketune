@@ -8,7 +8,7 @@
     import UkuleleImage from "./Icons/UkuleleImage.svelte";
 
     export let name: string;
-    export let size: number = 100;
+    export let size: number | undefined = undefined;
 </script>
 
 {#if name === "Guitar"}

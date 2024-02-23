@@ -62,6 +62,7 @@
         <Range
             fieldName="frequency"
             min={20}
+            defaultVal={300}
             max={20_000}
             bind:value={frequency}
             unit="Hz"

@@ -3,6 +3,7 @@
 
     export let min: number;
     export let max: number;
+    export let defaultVal: number;
     export let fieldName: string;
     export let value: number;
     export let fastStep: number = 5;
@@ -15,11 +16,14 @@
         if (v && !isNaN(parseInt(v))) {
             value = parseInt(v);
         } else {
-            value = 0;
+            value = defaultVal;
         }
 
-        if (value < min || value > max) {
-            value = 0;
+        if (value < min) {
+            value = min;
+        }
+        if (value > max) {
+            value = max;
         }
     });
 

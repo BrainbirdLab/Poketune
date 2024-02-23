@@ -432,7 +432,7 @@
             </div>
             <div class="input pitch" in:fly|global={{y: 20}}>
                 <div class="label">Change pitch <i class="fa-solid fa-wave-square"></i></div>
-                <Range showSign={true} fieldName="pitchShiftBy" fastStep={10} bind:value={$pitchShiftBy} min={-100} max={100}/>
+                <Range showSign={true} fieldName="pitchShiftBy" fastStep={10} bind:value={$pitchShiftBy} min={-100} defaultVal={0} max={100}/>
             </div>
             <div class="notes right">
                 <!-- Display G B E -->

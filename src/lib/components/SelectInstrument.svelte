@@ -48,7 +48,7 @@
                     in:fly|global={{ y: 100 * (i + 1) }}
                     href="/{instrument.toLocaleLowerCase()}"
                 >
-                    <InstrumentIcon name={instrument} size={100} />
+                    <InstrumentIcon name={instrument} />
                     <span>{instrument}</span>
                 </a>
             {/each}
