@@ -58,7 +58,7 @@
     <Metronome on:keepAwake={keepAwake}/>
 {:else if $selectedInstrument == "Frequency"}
     <FreguencyGenerator on:keepAwake={keepAwake}/>
-{:else}
+{:else if $selectedInstrument != "none"}
     <Tuner on:keepAwake={keepAwake}/>
 {/if}
 {/if}
@@ -80,6 +80,7 @@
         width: min(100vw, 850px);
         padding: 0 10px;
         height: 50px;
+        background: #0b1d37;
     }
 
     .goback {

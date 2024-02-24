@@ -465,11 +465,11 @@
         <div class="buttons on-off">
             {#if isListening}
                 <button class:listening={isListening} in:fade class="startButton stop" on:click={stop}>
-                    <Logo />
+                    <Logo size={50}/>
                 </button>
             {:else}
                 <button class:listening={isListening} in:fade class="startButton start" on:click={start}>
-                    <Logo />
+                    <Logo size={50}/>
                 </button>
             {/if}
         </div>
@@ -729,7 +729,7 @@
         flex-direction: row;
         width: 100%;
         justify-content: center;
-        align-items: flex-end;
+        align-items: center;
         font-size: 6rem;
         height: 10rem;
         color: #607d8b;

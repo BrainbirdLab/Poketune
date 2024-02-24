@@ -72,9 +72,7 @@
 
 {#if mounted}
 <div class="container">
-    <div class="canvas">
-        <WaveCanvas color={"#b291ff7a"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
-    </div>
+    <WaveCanvas height={50} waveWidth={2} zIndex={0} absolute={false} color={"#ffffff3a"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
     <div class="input">
         <div class="label" in:fly|global={{x: 10}}>
             Wave type
@@ -115,11 +113,11 @@
             fastStep={20}>
         </Range>
     </div>
-    <button in:fly|global={{x: -10}} class="startButton" on:click={handleStart}>
+    <button in:fly|global={{x: -10}} on:click={handleStart} class="beatButton">
         {#if start}
-            <i class="fa-solid fa-pause"></i>
+            <i class="fa-solid fa-pause"></i> Stop
         {:else}
-            <i class="fa-solid fa-play"></i>
+            <i class="fa-solid fa-play"></i> Start
         {/if}
     </button>
 </div>
@@ -127,21 +125,17 @@
 
 <style lang="scss">
 
-    .canvas{
-        width: 100%;
-        height: 150px;
-        position: relative;
-    }
     .container {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        align-content: center;
-        gap: 40px;
+        gap: 25px;
         width: 100%;
         height: 100%;
-        padding: 10px;
+        justify-content: safe center;
+        overflow-y: scroll;
+        min-height: max-content;
+        padding: 25px 10px;
         box-sizing: border-box;
     }
 

@@ -230,48 +230,6 @@
         padding: 10px;
     }
 
-    
-    .beatButton{
-        border-radius: 10px;
-        padding: 8px 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        gap: 10px;
-        border: 2px solid #b291ff3d;
-        transition: 100ms ease-in-out;
-        background: transparent;
-        min-width: 70px;
-
-        
-        .label{
-            font-size: 0.7rem;
-            font-weight: 700;
-        }
-        
-        .fa-play{
-            color: #e08d48;
-        }
-        
-        .fa-pause{
-            color: #ff3d3d;
-        }
-        
-        .fa-drum{
-            color: #a0a7ff;
-        }
-        
-        &.pressed{
-            border: 2px solid #b291ff;
-        }
-        
-        i{
-            font-size: 2rem;
-        }
-    }
-
     .beats{
         display: flex;
         flex-direction: row;
@@ -320,13 +278,16 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        //justify-content: center;
         gap: 10px;
         width: 100%;
         padding: 10px;
         background: var(--primary);
         border-radius: 10px;
         margin: 10px 0;
+        justify-content: safe center;
+        overflow-y: scroll;
+        min-height: max-content;
     }
 
     @media (min-width: 768px){
