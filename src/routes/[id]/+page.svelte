@@ -50,7 +50,6 @@
     </button>
     {#if $selectedInstrument != "none"}
     <div class="current" in:fly|global={{x: 10}}>
-        <InstrumentIcon name={$selectedInstrument} size={35}/>
         <div class="name">{$selectedInstrument}</div>
     </div>
     {/if}
@@ -80,7 +79,7 @@
         z-index: 1;
         width: min(100vw, 850px);
         padding: 0 10px;
-        height: 60px;
+        height: 50px;
     }
 
     .goback {
@@ -116,16 +115,14 @@
         align-items: center;
         justify-content: center;
         gap: 3px;
+        height: 100%;
 
         .name{
-            font-size: 0.8rem;
+            font-size: 1rem;
             position: relative;
-            font-weight: 700;
+            //font-weight: 700;
             color: #ffffff;
             filter: drop-shadow(0px 0px 50px #000000);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
         }
     }
 </style>

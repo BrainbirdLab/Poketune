@@ -10,6 +10,8 @@
     import { writable } from "svelte/store";
     import WaveCanvas from "./waveCanvas.svelte";
     import { createEventDispatcher } from 'svelte'
+    import InstrumentIcon from "./InstrumentIcon.svelte";
+    import Logo from "./logo.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -462,19 +464,58 @@
         {/if}
         <div class="buttons on-off">
             {#if isListening}
-                <button in:fade class="startButton stop" on:click={stop}
-                    ><i class="fa-solid fa-guitar"></i></button
-                >
+                <button class:listening={isListening} in:fade class="startButton stop" on:click={stop}>
+                    <Logo />
+                </button>
             {:else}
-                <button in:fade class="startButton start" on:click={start}
-                    ><i class="fa-solid fa-guitar"></i></button
-                >
+                <button class:listening={isListening} in:fade class="startButton start" on:click={start}>
+                    <Logo />
+                </button>
             {/if}
         </div>
 </div>
 {/if}
 
 <style lang="scss">
+
+    .on-off{
+        min-height: 100px;
+    }
+    .on-off button{
+        position: relative;
+        background: transparent !important;
+        z-index: 2;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        //ripple effect
+        &.listening:after {
+            content: '';
+            position: absolute;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff30;
+            border-radius: 50%;
+            animation: ripple 1s infinite;
+            z-index: -1;
+        }
+    }
+
+    @keyframes ripple{
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(2);
+            opacity: 0;
+        }
+    }
 
     .conf {
         position: absolute;
@@ -551,11 +592,12 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: safe center;
         background: rgba(0, 128, 128, 0);
         border-radius: 10px;
         height: max-content;
         width: min(100%, 500px);
+        min-height: 100%;
         gap: 10px;
         overflow: scroll;
     }
