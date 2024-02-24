@@ -5,6 +5,7 @@
     import Range from "./Range.svelte";
     import { onDestroy, onMount } from "svelte";
     import { createEventDispatcher } from 'svelte'
+    import WaveCanvas from "./waveCanvas.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -17,6 +18,9 @@
 
     let audioCtx = new AudioContext();
     let oscillator: OscillatorNode;
+
+    let analyserNode = audioCtx.createAnalyser();
+
     $: {
         if (oscillator) {
             oscillator.frequency.value = frequency;
@@ -38,6 +42,8 @@
     function handleStart() {
         if (start) {
             oscillator.stop();
+            //remove frequency from analyser
+            oscillator.disconnect(analyserNode);
             dispatch("keepAwake", false);
         } else {
             oscillator = audioCtx.createOscillator();
@@ -45,6 +51,8 @@
             oscillator.frequency.value = frequency;
             oscillator.connect(audioCtx.destination);
             oscillator.start();
+            //add frequency to analyser
+            oscillator.connect(analyserNode);
             dispatch("keepAwake", true);
         }
         start = !start;
@@ -53,26 +61,15 @@
     onDestroy(() => {
         if (oscillator) {
             oscillator.stop();
+            oscillator.disconnect(analyserNode);
         }
     });
 </script>
 
 {#if mounted}
 <div class="container">
-    <div class="input slider" in:fly|global={{y: -10}}>
-        <div class="label">
-            Change frequency <i class="fas fa-wave-square"></i>
-        </div>
-        <Slider min={20} max={20_000} bind:value={frequency} />
-        <Range
-            fieldName="frequency"
-            min={20}
-            defaultVal={300}
-            max={20_000}
-            bind:value={frequency}
-            unit="Hz"
-            fastStep={20}>
-        </Range>
+    <div class="canvas">
+        <WaveCanvas color={"#b291ff"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
     </div>
     <div class="input">
         <div class="label" in:fly|global={{x: 10}}>
@@ -96,6 +93,24 @@
             {/each}
         </div>
     </div>
+    <div class="input slider" in:fly|global={{y: -10}}>
+        <div class="label">
+            Change frequency <i class="fas fa-wave-square"></i>
+        </div>
+        <div class="label warning">
+            Warning: High frequency can cause hearing damage <i class="fa-solid fa-ear-listen"></i> 
+        </div>
+        <Slider min={20} max={20_000} bind:value={frequency} />
+        <Range
+            fieldName="frequency"
+            min={20}
+            defaultVal={300}
+            max={20_000}
+            bind:value={frequency}
+            unit="Hz"
+            fastStep={20}>
+        </Range>
+    </div>
     <button in:fly|global={{x: -10}} class="startButton" on:click={handleStart}>
         {#if start}
             <i class="fa-solid fa-pause"></i>
@@ -107,6 +122,12 @@
 {/if}
 
 <style lang="scss">
+
+    .canvas{
+        width: 100%;
+        height: 150px;
+        position: relative;
+    }
     .container {
         display: flex;
         flex-direction: column;
@@ -139,6 +160,18 @@
         align-items: center;
         justify-content: center;
         gap: 5px;
+
+        &.warning{
+            color: #df2424;
+            font-size: 0.6rem;
+            font-weight: 400;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
         img {
             width: 15px;
             height: 15px;

@@ -6,6 +6,7 @@
     export let Note: string;
     export let isListening: boolean;
     export let analyserNode: AnalyserNode;
+    export let color: string = "#2c3e5030";
     
     let canvas: HTMLCanvasElement;
     let canvasContext: CanvasRenderingContext2D;
@@ -28,7 +29,7 @@
             //draw  a straight line
             canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
             canvasContext.lineWidth = 2;
-            canvasContext.strokeStyle = "#2c3e5030";
+            canvasContext.strokeStyle = color;
             canvasContext.beginPath();
             canvasContext.moveTo(0, HEIGHT / 2);
             canvasContext.lineTo(canvas.width, canvas.height / 2);
@@ -37,7 +38,7 @@
 
             canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
             canvasContext.lineWidth = 2;
-            canvasContext.strokeStyle = "#2c3e5030";
+            canvasContext.strokeStyle = color;
             canvasContext.beginPath();
 
             const bufferLength = analyserNode?.frequencyBinCount;
