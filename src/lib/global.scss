@@ -150,14 +150,15 @@ img{
 	}
 }
 
-.input{
-	.label{
-		font-size: 0.7rem;
-		font-weight: 700;
-		i{
-			color: #b291ff;
-		}
+.label{
+	font-size: 0.7rem;
+	font-weight: 700;
+	i{
+		color: #b291ff;
 	}
+}
+
+.input{
 	padding-bottom: 20px;
 	display: flex;
 	flex-direction: column;

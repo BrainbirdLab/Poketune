@@ -171,9 +171,12 @@
     <MetronomeAnimated style="transform: rotate({playing ? 20*tickDirection : 0}deg); transition: {(60 / bpm) * 1000}ms ease-in-out;" />
 
     <div class="beats" use:selectSnare>
-        {#each Array.from({length: $pattern}) as _, i}
-            <div class="beat {snareIndexes[i] === 1 ? 'snare' : ''} {playing && index == i ? 'playing' : ''}" data-beat={i}>{i+1}</div>
-        {/each}
+        <div class="label">Beats <i class="fa-solid fa-drum"></i></div>
+        <div class="beatsContainer">
+            {#each Array.from({length: $pattern}) as _, i}
+                <div class="beat {snareIndexes[i] === 1 ? 'snare' : ''} {playing && index == i ? 'playing' : ''}" data-beat={i}>{i+1}</div>
+            {/each}
+        </div>
     </div>
 
     <div class="inputs">
@@ -240,6 +243,17 @@
         width: 100%;
         max-width: 650px;
         padding: 10px;
+
+        .beatsContainer{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
         .beat{
             background: #182c44;
             border-radius: 10px;
