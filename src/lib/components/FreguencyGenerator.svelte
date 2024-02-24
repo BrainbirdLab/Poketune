@@ -43,16 +43,18 @@
         if (start) {
             oscillator.stop();
             //remove frequency from analyser
-            oscillator.disconnect(analyserNode);
+            if (analyserNode) {
+                analyserNode.disconnect();
+            }
             dispatch("keepAwake", false);
         } else {
             oscillator = audioCtx.createOscillator();
             oscillator.type = waveType[selectedWaveType] as OscillatorType;
             oscillator.frequency.value = frequency;
             oscillator.connect(audioCtx.destination);
+            oscillator.connect(analyserNode);
             oscillator.start();
             //add frequency to analyser
-            oscillator.connect(analyserNode);
             dispatch("keepAwake", true);
         }
         start = !start;
@@ -60,8 +62,10 @@
 
     onDestroy(() => {
         if (oscillator) {
+            if (analyserNode){
+                analyserNode.disconnect();
+            }
             oscillator.stop();
-            oscillator.disconnect(analyserNode);
         }
     });
 </script>
