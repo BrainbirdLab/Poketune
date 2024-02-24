@@ -72,7 +72,6 @@
 
 {#if mounted}
 <div class="container">
-    <WaveCanvas height={50} waveWidth={2} zIndex={0} absolute={false} color={"#ffffff3a"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
     <div class="input">
         <div class="label" in:fly|global={{x: 10}}>
             Wave type
@@ -115,6 +114,7 @@
     </div>
     <button in:fly|global={{x: -10}} on:click={handleStart} class="beatButton">
         {#if start}
+        <WaveCanvas height={50} waveWidth={2} zIndex={-1} absolute={true} color={"#b291ff3d"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
             <i class="fa-solid fa-pause"></i> Stop
         {:else}
             <i class="fa-solid fa-play"></i> Start
@@ -124,6 +124,10 @@
 {/if}
 
 <style lang="scss">
+
+    .beatButton{
+        width: 150px;
+    }
 
     .container {
         display: flex;
