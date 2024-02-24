@@ -69,7 +69,7 @@
 {#if mounted}
 <div class="container">
     <div class="canvas">
-        <WaveCanvas color={"#b291ff"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
+        <WaveCanvas color={"#b291ff7a"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
     </div>
     <div class="input">
         <div class="label" in:fly|global={{x: 10}}>

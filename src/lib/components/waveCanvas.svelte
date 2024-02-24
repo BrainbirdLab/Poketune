@@ -79,7 +79,7 @@
 
 <canvas
     class:hidden={!isListening && !Note}
-    in:fly={{ x: 40, delay: 500 }}
+    in:fly|global={{ x: 10, delay: 100 }}
     bind:this={canvas}
 />
 
