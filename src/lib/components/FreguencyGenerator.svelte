@@ -114,7 +114,7 @@
     </div>
     <button in:fly|global={{x: -10}} on:click={handleStart} class="beatButton">
         {#if start}
-        <WaveCanvas height={50} waveWidth={2} zIndex={-1} absolute={true} color={"#b291ff3d"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
+        <WaveCanvas height={50} waveWidth={3} zIndex={-1} absolute={true} color={"#b291ff3d"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
             <i class="fa-solid fa-pause"></i> Stop
         {:else}
             <i class="fa-solid fa-play"></i> Start
