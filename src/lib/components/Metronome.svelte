@@ -197,6 +197,7 @@
             on:mouseup|preventDefault={() => tapBpm = false}
             on:touchstart|preventDefault={calculateBpm}
             on:touchend|preventDefault={() => tapBpm = false}
+            on:mouseleave|preventDefault={() => tapBpm = false}
         >
             <i class="fa-solid fa-drum"></i>
             <div class="label">
