@@ -1,7 +1,7 @@
 
 <script lang="ts">
     import { onMount } from "svelte";
-    import { fly } from "svelte/transition";
+    import { fly, slide } from "svelte/transition";
 
     export let Note: string;
     export let isListening: boolean;
@@ -88,7 +88,7 @@
 <canvas
     style="position: {absolute ? "absolute" : "relative"}; height: {height}px; z-index: {zIndex};"
     class:hidden={!isListening && !Note}
-    in:fly|global={{ x: 10, delay: 100 }}
+    in:slide|global={{ axis: "x", delay: 100 }}
     bind:this={canvas}
 />
 
