@@ -433,6 +433,7 @@
                         class="note"
                         id="{note.note}{note.octave}"
                         data-frequency={note.frequency}
+                        class:inRange={Note + Octave == note.note + note.octave}
                         in:fly|global={{ y: 5, delay: 40 * (i + 1) }}
                         class:tuned={tunedNotes.has(note.note + note.octave)}
                     >
@@ -452,6 +453,7 @@
                         class="note"
                         id="{note.note}{note.octave}"
                         data-frequency={note.frequency}
+                        class:inRange={Note + Octave == note.note + note.octave}
                         in:fly|global={{ y: 5, delay: 40 * (i + 1) }}
                         class:tuned={tunedNotes.has(note.note + note.octave)}
                     >
@@ -567,6 +569,10 @@
 
             &.tuned {
                 border: 2px solid #2ecc71;
+            }
+
+            &.inRange {
+                border: 2px solid #87ffb5;
             }
 
             .freq {
