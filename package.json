@@ -2,6 +2,12 @@
 	"name": "tuner",
 	"version": "1.0.0",
 	"private": true,
+	"$schema": "https://schemastore.org/package",
+	"engines": {
+	  "node": ">=16.13.0",
+	  "pnpm": ">=3",
+	  "npm": ">=8"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
