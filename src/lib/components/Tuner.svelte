@@ -572,7 +572,7 @@
             }
 
             &.inRange {
-                border: 2px solid #87ffb5;
+                border: 2px solid rgb(16, 131, 246);
             }
 
             .freq {
@@ -587,7 +587,7 @@
     }
 
     :global(.note.played) {
-        background: #2ecc7074;
+        background: #ffffff1a;
     }
 
     :global(.note[data-playing]) {
