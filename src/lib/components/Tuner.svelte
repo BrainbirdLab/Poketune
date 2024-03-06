@@ -188,6 +188,7 @@
             return;
         }
 
+        // Get the note, octave and cent from the pitch
         const tune = tuneInstrument($selectedInstrument, pitch, $pitchShiftBy);
 
         Note = tune.note;
@@ -568,7 +569,7 @@
             cursor: pointer;
 
             &.tuned {
-                border: 2px solid #2ecc71;
+                background: #ffffff1a;
             }
 
             &.inRange {
@@ -587,7 +588,7 @@
     }
 
     :global(.note.played) {
-        background: #ffffff1a;
+        border: 2px solid #2ecc71 !important;
     }
 
     :global(.note[data-playing]) {
