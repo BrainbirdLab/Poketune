@@ -10,8 +10,8 @@
     import { writable } from "svelte/store";
     import WaveCanvas from "./waveCanvas.svelte";
     import { createEventDispatcher } from 'svelte'
-    import InstrumentIcon from "./InstrumentIcon.svelte";
     import Logo from "./logo.svelte";
+    import { showToastMessage } from "domtoastmessage";
 
     const dispatch = createEventDispatcher();
 
@@ -108,64 +108,72 @@
 
     function stop() {
         //console.log("stop");
-
-        if (!audioContext) {
-            //console.log("No audio context");
-            return;
+        try{
+            if (!audioContext) {
+                //console.log("No audio context");
+                return;
+            }
+    
+            if (audioContext.state === "closed") {
+                //console.log("Already closed");
+                return;
+            }
+    
+            if (interval) {
+                clearInterval(interval);
+            }
+    
+            audioContext.close().then(() => {
+                isListening = false;
+                Cent = 0;
+                Frequency = 0;
+                Note = "";
+                detectedClarity = 0;
+            });
+    
+            dispatch('keepAwake', false);
+    
+            reset();
+    
+            stream.getTracks().forEach((track) => track.stop());
+    
+            analyserNode.disconnect();
+        } catch (e){
+            console.error(e);
+            showToastMessage(e as string);
         }
-
-        if (audioContext.state === "closed") {
-            //console.log("Already closed");
-            return;
-        }
-
-        if (interval) {
-            clearInterval(interval);
-        }
-
-        audioContext.close().then(() => {
-            isListening = false;
-            Cent = 0;
-            Frequency = 0;
-            Note = "";
-            detectedClarity = 0;
-        });
-
-        dispatch('keepAwake', false);
-
-        reset();
-
-        stream.getTracks().forEach((track) => track.stop());
-
-        analyserNode.disconnect();
     }
 
     async function start() {
         //console.log("start");
-
-        //if closed
-        if (audioContext?.state != "running") {
-            //create new audio context
-
-            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-            if (stream) {
-                audioContext = new window.AudioContext();
-                analyserNode = audioContext.createAnalyser();
-                audioContext
-                    .createMediaStreamSource(stream)
-                    .connect(analyserNode);
-
-                isListening = true;
-
-                dispatch('keepAwake', true);
-
-                if (audioContext.state === "running") {
-                    interval = setInterval(() => {
-                        updatePitch(analyserNode, audioContext.sampleRate);
-                    }, 100);
+        try{
+            //if closed
+            if (audioContext?.state != "running") {
+                //create new audio context
+    
+                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    
+                if (stream) {
+                    audioContext = new window.AudioContext();
+                    analyserNode = audioContext.createAnalyser();
+                    audioContext
+                        .createMediaStreamSource(stream)
+                        .connect(analyserNode);
+    
+                    isListening = true;
+    
+                    dispatch('keepAwake', true);
+    
+                    if (audioContext.state === "running") {
+                        interval = setInterval(() => {
+                            updatePitch(analyserNode, audioContext.sampleRate);
+                        }, 100);
+                    }
                 }
             }
+        } catch (e){
+            console.error(e);
+            showToastMessage(e as string);
         }
     }
 
@@ -237,75 +245,80 @@
     let streamMuteTimeout: number;
 
     async function playNote(frequency: number){
-       
-        let dividerFrequency: number = 0;
-        //load audio
-        let url = '';
-        if ($selectedInstrument == "Guitar"){
-            url = "/sounds/guitar.mp3";
-            dividerFrequency = getFrequency("E", 2);
-        } else if ($selectedInstrument == "Ukulele"){
-            url = "/sounds/ukulele.mp3";
-            dividerFrequency = getFrequency("G", 4);
-        } else if ($selectedInstrument == "Bass"){
-            url = "/sounds/bass.mp3";
-            dividerFrequency = getFrequency("E", 1);
-        }
 
-        const noteAudioContext = new AudioContext();
-
-        const response = await fetch(url);
-        const arrayBuffer = await response.arrayBuffer();
-        audioBuffer = await noteAudioContext.decodeAudioData(arrayBuffer);
-
-        const source = noteAudioContext.createBufferSource();
-        source.buffer = audioBuffer;
-
-        const gainNode = noteAudioContext.createGain();
-        const distortion = noteAudioContext.createWaveShaper();
-        const phaser = noteAudioContext.createDelay();
-        phaser.delayTime.value = 0.1;
-
-        gainNode.connect(noteAudioContext.destination);
-        distortion.connect(gainNode);
-        phaser.connect(distortion);
-        source.connect(gainNode);
-
-
-        gainNode.gain.setValueAtTime(1, noteAudioContext.currentTime);
-
-        gainNode.gain.exponentialRampToValueAtTime(
-            0.1,
-            noteAudioContext.currentTime + 1,
-        );
-
-        gainNode.gain.exponentialRampToValueAtTime(
-            0.1,
-            noteAudioContext.currentTime + 1.01,
-        );
-
-        source.playbackRate.value = frequency / dividerFrequency;
-        
-        
-        //we have to mute the microphone so that the sound is not picked up by the microphone
-        if (stream) {
-            stream.getAudioTracks().forEach((track) => {
-                track.enabled = false;
-            });
-        }
-
-        clearTimeout(streamMuteTimeout);
-
-        source.start();
-
-        streamMuteTimeout = setTimeout(() => {
-            //unmute the microphone
+        try{
+            let dividerFrequency: number = 0;
+            //load audio
+            let url = '';
+            if ($selectedInstrument == "Guitar"){
+                url = "/sounds/guitar.mp3";
+                dividerFrequency = getFrequency("E", 2);
+            } else if ($selectedInstrument == "Ukulele"){
+                url = "/sounds/ukulele.mp3";
+                dividerFrequency = getFrequency("G", 4);
+            } else if ($selectedInstrument == "Bass"){
+                url = "/sounds/bass.mp3";
+                dividerFrequency = getFrequency("E", 1);
+            }
+    
+            const noteAudioContext = new AudioContext();
+    
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            audioBuffer = await noteAudioContext.decodeAudioData(arrayBuffer);
+    
+            const source = noteAudioContext.createBufferSource();
+            source.buffer = audioBuffer;
+    
+            const gainNode = noteAudioContext.createGain();
+            const distortion = noteAudioContext.createWaveShaper();
+            const phaser = noteAudioContext.createDelay();
+            phaser.delayTime.value = 0.1;
+    
+            gainNode.connect(noteAudioContext.destination);
+            distortion.connect(gainNode);
+            phaser.connect(distortion);
+            source.connect(gainNode);
+    
+    
+            gainNode.gain.setValueAtTime(1, noteAudioContext.currentTime);
+    
+            gainNode.gain.exponentialRampToValueAtTime(
+                0.1,
+                noteAudioContext.currentTime + 1,
+            );
+    
+            gainNode.gain.exponentialRampToValueAtTime(
+                0.1,
+                noteAudioContext.currentTime + 1.01,
+            );
+    
+            source.playbackRate.value = frequency / dividerFrequency;
+            
+            
+            //we have to mute the microphone so that the sound is not picked up by the microphone
             if (stream) {
                 stream.getAudioTracks().forEach((track) => {
-                    track.enabled = true;
+                    track.enabled = false;
                 });
             }
-        }, 300);
+    
+            clearTimeout(streamMuteTimeout);
+    
+            source.start();
+    
+            streamMuteTimeout = setTimeout(() => {
+                //unmute the microphone
+                if (stream) {
+                    stream.getAudioTracks().forEach((track) => {
+                        track.enabled = true;
+                    });
+                }
+            }, 300);
+        } catch (e){
+            console.error(e);
+            showToastMessage(e as string);
+        }
     }
 
     const playNoteTimeouts: { [key: string]: number } = {};

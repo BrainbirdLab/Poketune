@@ -1,7 +1,7 @@
 
 <script lang="ts">
     import { onMount } from "svelte";
-    import { fly, slide } from "svelte/transition";
+    import { slide } from "svelte/transition";
 
     export let Note: string;
     export let isListening: boolean;
