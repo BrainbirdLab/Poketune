@@ -107,9 +107,7 @@ export function tuneInstrument(instrument: InstrumentTypes, pitch: number, pitch
         const note = chromaticNotes[noteIndex % 12];
         const octave = Math.floor(noteIndex / 12);
         const expectedFrequency = 440 * Math.pow(2, (noteIndex - 57) / 12);
-        const cent = Math.round(
-            (1200 * Math.log(frequency / expectedFrequency)) / Math.log(2),
-        );
+        const cent = (1200 * Math.log(frequency / expectedFrequency)) / Math.log(2);
 
         return {
             note: note,

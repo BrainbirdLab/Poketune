@@ -10,6 +10,7 @@
     import { writable } from "svelte/store";
     import WaveCanvas from "./waveCanvas.svelte";
     import { createEventDispatcher } from 'svelte'
+    import { tweened } from "svelte/motion";
     import Logo from "./logo.svelte";
     import { showToastMessage } from "domtoastmessage";
 
@@ -21,18 +22,18 @@
 
     let Octave: number;
     let Note: string;
-    let Cent = 0;
-
+    
     let canvas: HTMLCanvasElement;
-
+    
     let isListening = false;
-
+    
     let audioContext: AudioContext;
-
+    
     let tunedNotes = new Set<string>();
-
-    let Frequency = 0;
-    let detectedClarity = 0;
+        
+    const Cent = tweened(0, { duration: 100 });
+    const Frequency = tweened(0, { duration: 100 });
+    const detectedClarity = tweened(0, { duration: 100 });
 
     let analyserNode: AnalyserNode;
 
@@ -125,10 +126,10 @@
     
             audioContext.close().then(() => {
                 isListening = false;
-                Cent = 0;
-                Frequency = 0;
+                Cent.set(0);
+                Frequency.set(0);
                 Note = "";
-                detectedClarity = 0;
+                detectedClarity.set(0);
             });
     
             dispatch('keepAwake', false);
@@ -187,12 +188,12 @@
         const [pitch, clarity] = detector.findPitch(dataArray, sampleRate);
 
         if (clarity !== null) {
-            detectedClarity = Math.round(clarity * 100);
+            detectedClarity.set(clarity * 100);
         }
 
         if (clarity < 0.8) {
-            Frequency = 0;
-            Cent = 0;
+            Frequency.set(0);
+            Cent.set(0);
             return;
         }
 
@@ -201,12 +202,14 @@
 
         Note = tune.note;
         Octave = tune.octave;
-        Cent = tune.cent;
-        Frequency = Math.round(pitch * 100) / 100;
+        Cent.set(tune.cent);
+        Frequency.set((pitch * 100) / 100);
+
+        console.log($Cent);
 
         const noteId = Note + Octave;
         
-        if (($selectedInstrument != "Chromatic" && $selectedInstrument != "none") && Math.abs(Cent) < 8 && Math.abs(Cent) > 0) {
+        if (($selectedInstrument != "Chromatic" && $selectedInstrument != "none") && Math.abs($Cent) < 8 && Math.abs($Cent) > 0) {
             tunedNotes.add(noteId);
             tunedNotes = new Set<string>(tunedNotes);
             //if correct note is played and all notes are not tuned
@@ -410,14 +413,14 @@
                 {/each}
                 <div
                     class="pointer"
-                    style="width: max(calc((100% / 12)*{Math.abs(Cent) /
+                    style="width: max(calc((100% / 12)*{Math.abs($Cent) /
                         10}), 5px);"
-                    class:left={Cent < -2}
-                    class:right={Cent > 2}
-                    class:strong={Math.abs(Cent) < 10}
-                    class:average={Math.abs(Cent) > 10 && Math.abs(Cent) < 20}
-                    class:weak={Math.abs(Cent) > 20 && Math.abs(Cent) < 30}
-                    class:poor={Math.abs(Cent) > 30}
+                    class:left={$Cent < -2}
+                    class:right={$Cent > 2}
+                    class:strong={Math.abs($Cent) < 10}
+                    class:average={Math.abs($Cent) > 10 && Math.abs($Cent) < 20}
+                    class:weak={Math.abs($Cent) > 20 && Math.abs($Cent) < 30}
+                    class:poor={Math.abs($Cent) > 30}
                 ></div>
             </div>
             <div class="labels">
@@ -428,11 +431,11 @@
         </div>
     </div>
     <div class="info">
-        <div class="freq">f: {Frequency} Hz</div>
+        <div class="freq">f: {Math.round($Frequency)} Hz</div>
         <div class="clarity">
-            Clarity: {detectedClarity}% {detectedClarity > 80 ? "👍" : "👎"}
+            Clarity: {Math.round($detectedClarity)}% {$detectedClarity > 80 ? "👍" : "👎"}
         </div>
-        <div class="cent">{Cent} C {Math.abs(Cent) < 10 ? "😁" : "😢"}</div>
+        <div class="cent">{Math.round($Cent)} C {Math.abs($Cent) < 10 ? "😁" : "😢"}</div>
     </div>
     {#if $selectedInstrument != "Chromatic"}
         {#if tunedNotes.size != 0 && tunedNotes.size == Object.values(notes).length}
