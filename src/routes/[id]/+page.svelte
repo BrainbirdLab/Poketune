@@ -1,13 +1,11 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import FreguencyGenerator from "$lib/components/FreguencyGenerator.svelte";
-    import InstrumentIcon from "$lib/components/InstrumentIcon.svelte";
     import Metronome from "$lib/components/Metronome.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
     import { selectedInstrument, type InstrumentTypes, lastPage } from "$lib/store";
     import { onMount } from "svelte";
     import { fly } from "svelte/transition";
-    import { showToastMessage } from "domtoastmessage";
 
     export let data;
     selectedInstrument.set(data.name as InstrumentTypes);
