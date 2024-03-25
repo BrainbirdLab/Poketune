@@ -1,7 +1,7 @@
 <script lang="ts">
     import "$lib/global.scss";
     import { onMount } from "svelte";
-    import { fade, fly } from "svelte/transition";
+    import { fly } from "svelte/transition";
     import { showToastMessage } from "domtoastmessage";
     import NavigationIndicator from "$lib/components/NavigationIndicator.svelte";
     import Logo from "$lib/components/logo.svelte";
