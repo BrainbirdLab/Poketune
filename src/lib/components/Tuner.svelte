@@ -11,7 +11,7 @@
     import WaveCanvas from "./waveCanvas.svelte";
     import { createEventDispatcher } from 'svelte'
     import { tweened } from "svelte/motion";
-    import Logo from "./logo.svelte";
+    import Logo from "$lib/components/logo.svelte";
     import { showToastMessage } from "domtoastmessage";
 
     const dispatch = createEventDispatcher();

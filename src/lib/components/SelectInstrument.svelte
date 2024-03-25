@@ -3,8 +3,9 @@
     import { fly } from "svelte/transition";
     import { instrumentNames } from "$lib/store";
     import { onMount } from "svelte";
-    import Logo from "./logo.svelte";
-    import InstrumentIcon from "./InstrumentIcon.svelte";
+    
+    import Logo from "$lib/components/logo.svelte";
+    import InstrumentIcon from "$lib/components/InstrumentIcon.svelte";
 
     let mounted = false;
 

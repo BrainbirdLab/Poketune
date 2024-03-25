@@ -38,6 +38,7 @@ Remove scrollbars
 :root{
 	--primary: #0b1d37;
 	--secondary: #2c3e50;
+	--accent: #266dfa;
 }
 
 body{
@@ -73,7 +74,7 @@ img{
 	height: 50px;
 	min-height: 50px;
 	border-radius: 50%;
-	background: #266dfa;
+	background: var(--accent);
 	cursor: pointer;
 	transition: 100ms;
 	position: relative;

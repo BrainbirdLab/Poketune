@@ -290,7 +290,7 @@
         position: absolute;
         width: 20px;
         height: 20px;
-        background-color: #266dfa;
+        background-color: var(--accent);
         cursor: pointer;
         border-radius: 999px;
         margin-top: -8px;
