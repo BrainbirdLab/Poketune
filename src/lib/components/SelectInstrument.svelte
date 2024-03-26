@@ -6,6 +6,8 @@
     
     import Logo from "$lib/components/logo.svelte";
     import InstrumentIcon from "$lib/components/InstrumentIcon.svelte";
+    import { pushState } from "$app/navigation";
+    import { page } from "$app/stores";
 
     let mounted = false;
 
@@ -15,12 +17,10 @@
         mounted = true;
     });
 
-    let showcredits = false;
-
     function handler(node: HTMLElement) {
         node.onclick = (e) => {
             if (e.target === node) {
-                showcredits = false;
+                history.back();
             }
         };
 
@@ -40,7 +40,9 @@
                 PokeTune
                 <Logo size={35} />
             </div>
-            <button on:click={() => {showcredits = true}}><i class="fa-solid fa-circle-info"></i></button>
+            <button on:click={() => {
+                pushState('', { credits: true });
+            }}><i class="fa-solid fa-circle-info"></i></button>
         </div>
         <div class="instruments">
             {#each instrumentNames as instrument, i}
@@ -56,7 +58,7 @@
         </div>
     </div>
 {/if}
-{#if showcredits}    
+{#if $page.state.credits}    
 <div class="creditsWrapper" transition:fly={{y: 10, duration: 200}} use:handler>
     <div class="credits">
         <div class="info">
@@ -79,7 +81,7 @@
             >
         </div>
         <button on:click={() => {
-            showcredits = false;
+            history.back();
         }}>Close</button>
     </div>
 </div>

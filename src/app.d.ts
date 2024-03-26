@@ -7,6 +7,9 @@ declare global {
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
+		interface PageState {
+			credits: boolean;
+		}
 	}
 
 	//define __VERSION__ as a global variable
