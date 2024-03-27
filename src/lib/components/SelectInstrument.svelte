@@ -212,7 +212,7 @@
         align-items: center;
         justify-content: center;
         align-content: center;
-        height: 100vh;
+        height: 100%;
         width: min(100vw, 850px);
         overflow: hidden;
     }
