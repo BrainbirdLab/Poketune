@@ -54,6 +54,7 @@
         width: 100%;
         position: fixed;
         inset: 0;
+        z-index: 1000;
     }
 
     .container {
@@ -64,10 +65,5 @@
         height: 100%;
         width: 100%;
         overflow: hidden;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: -1;
     }
 </style>
