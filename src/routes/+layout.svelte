@@ -32,7 +32,7 @@
             inject();
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                loaded = false;
+                loaded = true;
             }, 600);
         } catch(e){
             console.log(e);

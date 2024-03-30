@@ -4,8 +4,7 @@
 	"private": true,
 	"schema": "https://schemastore.org/package",
 	"engines": {
-		"pnpm": ">=3",
-		"npm": ">=8"
+		"pnpm": ">=3"
 	},
 	"scripts": {
 		"dev": "vite dev",
