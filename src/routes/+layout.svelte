@@ -24,11 +24,16 @@
         });
     }
 
+    let timeout: number;
+
     onMount(async () => {
         try{
             detectSWUpdate();
-            loaded = true;
             inject();
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                loaded = false;
+            }, 600);
         } catch(e){
             console.log(e);
         }
