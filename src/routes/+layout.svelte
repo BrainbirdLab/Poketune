@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { inject } from '@vercel/analytics'
     import "$lib/global.scss";
     import { onMount } from "svelte";
     import { fly } from "svelte/transition";
@@ -24,8 +25,13 @@
     }
 
     onMount(async () => {
-        detectSWUpdate();
-        loaded = true;
+        try{
+            detectSWUpdate();
+            loaded = true;
+            inject();
+        } catch(e){
+            console.log(e);
+        }
     });
 </script>
 

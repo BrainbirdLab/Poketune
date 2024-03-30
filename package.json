@@ -4,9 +4,9 @@
 	"private": true,
 	"schema": "https://schemastore.org/package",
 	"engines": {
-	  "node": ">=16.13.0",
-	  "pnpm": ">=3",
-	  "npm": ">=8"
+		"node": ">=16.13.0",
+		"pnpm": ">=3",
+		"npm": ">=8"
 	},
 	"scripts": {
 		"dev": "vite dev",
@@ -21,6 +21,7 @@
 		"@sveltejs/adapter-node": "^2.0.2",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"@vercel/analytics": "^1.2.2",
 		"domtoastmessage": "^1.0.5",
 		"pitchy": "^4.0.7",
 		"sass": "^1.69.5",
