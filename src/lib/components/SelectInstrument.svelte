@@ -59,8 +59,8 @@
     </div>
 {/if}
 {#if $page.state.credits}    
-<div class="creditsWrapper" transition:fly={{y: 10, duration: 200}} use:handler>
-    <div class="credits">
+<div class="creditsWrapper" use:handler>
+    <div class="credits" transition:fly={{y: 10, duration: 200}}>
         <div class="info">
             <div class="title">
                 PokeTune
