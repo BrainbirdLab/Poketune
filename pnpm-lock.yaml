@@ -6,8 +6,8 @@ settings:
 
 devDependencies:
   '@itsfuad/domtoastmessage':
-    specifier: ^1.0.6
-    version: 1.0.6
+    specifier: ^1.0.7
+    version: 1.0.7
   '@neoconfetti/svelte':
     specifier: ^2.2.0
     version: 2.2.1
@@ -259,8 +259,8 @@ packages:
     dev: true
     optional: true
 
-  /@itsfuad/domtoastmessage@1.0.6:
-    resolution: {integrity: sha512-JFqWKeYJCHoVbdDUycTNUlJvXejQdx9wS1W/j3treLukzhELLlgQYLdVPe9W0R4fNtgSgB2MMU1O4V5jsJeQyQ==, tarball: https://npm.pkg.github.com/download/@itsfuad/domtoastmessage/1.0.6/f04110bbf09337470104b9b5e0cdc67639996338}
+  /@itsfuad/domtoastmessage@1.0.7:
+    resolution: {integrity: sha512-Kh4TdysTGvTwUXvf7hYnoi/rEapYDiRWyrwWzu/7GGNCACoHJQw+LSTU3MIoAn0dAxZJmhM6rfIwHnkRVpuAFA==, tarball: https://npm.pkg.github.com/download/@itsfuad/domtoastmessage/1.0.7/687ca2fce11da48f04ec894261a6c5f5c8607bdc}
     dev: true
 
   /@jridgewell/gen-mapping@0.3.5:
