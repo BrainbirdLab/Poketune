@@ -14,7 +14,7 @@ const ASSETS = [
 ];
 
 self.addEventListener("message", (event) => {
-	if (event.data && event.data.type === "SKIP_WAITING") {
+	if (event && event.data && event.data.type === "SKIP_WAITING") {
 		self.skipWaiting();
 		console.log("Service worker Updated");
 	}
