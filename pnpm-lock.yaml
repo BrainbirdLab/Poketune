@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@itsfuad/domtoastmessage':
+    specifier: ^1.0.6
+    version: 1.0.6
   '@neoconfetti/svelte':
     specifier: ^2.2.0
     version: 2.2.1
@@ -23,9 +26,6 @@ devDependencies:
   '@vercel/analytics':
     specifier: ^1.2.2
     version: 1.2.2
-  domtoastmessage:
-    specifier: ^1.0.5
-    version: 1.0.6
   pitchy:
     specifier: ^4.0.7
     version: 4.1.0
@@ -261,6 +261,10 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@itsfuad/domtoastmessage@1.0.6:
+    resolution: {integrity: sha512-JFqWKeYJCHoVbdDUycTNUlJvXejQdx9wS1W/j3treLukzhELLlgQYLdVPe9W0R4fNtgSgB2MMU1O4V5jsJeQyQ==, tarball: https://npm.pkg.github.com/download/@itsfuad/domtoastmessage/1.0.6/f04110bbf09337470104b9b5e0cdc67639996338}
+    dev: true
 
   /@jridgewell/gen-mapping@0.3.5:
     resolution: {integrity: sha512-IzL8ZoEDIBRWEzlCcRhOaCupYyN5gdIK+Q6fbFdPDg6HqX6jpkItn7DFIpW9LQzXG6Df9sA7+OKnq0qlz/GaQg==}
@@ -747,10 +751,6 @@ packages:
 
   /devalue@4.3.2:
     resolution: {integrity: sha512-KqFl6pOgOW+Y6wJgu80rHpo2/3H07vr8ntR9rkkFIRETewbf5GaYYcakYfiKz89K+sLsuPkQIZaXDMjUObZwWg==}
-    dev: true
-
-  /domtoastmessage@1.0.6:
-    resolution: {integrity: sha512-Fa0xXBidPj1eVvO1Xoc4kkmVebJP/1EGe2Iov4W00GPAEkEqrtcr9fdXkOvPTGbiwWJVePLwt+xVKI4B6JmVaQ==}
     dev: true
 
   /es6-promise@3.3.1:
