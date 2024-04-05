@@ -1,9 +1,8 @@
 <script lang="ts">
-    import { inject } from '@vercel/analytics'
     import "$lib/global.scss";
     import { onMount } from "svelte";
     import { fly } from "svelte/transition";
-    import { showToastMessage } from "domtoastmessage";
+    import { showToastMessage } from "@itsfuad/domtoastmessage";
     import NavigationIndicator from "$lib/components/NavigationIndicator.svelte";
     import Logo from "$lib/components/logo.svelte";
 
@@ -29,7 +28,6 @@
     onMount(async () => {
         try{
             detectSWUpdate();
-            inject();
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 loaded = true;
