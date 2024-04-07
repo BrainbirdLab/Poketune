@@ -10,11 +10,19 @@
     const dispatch = createEventDispatcher();
 
     let bpm = 120;
-    const pattern = writable(4);
+
+    let pattern = 4;
 
     let snareIndexes: number[] = [];
 
-    //$: snareIndexes = Array.from({length: pattern}, (_, i) => snareIndexes[i] || 0) as number[];
+    $: {
+        //add 0s to the end of the array if the pattern is bigger than the snareIndexes
+        if (snareIndexes.length < pattern) {
+            snareIndexes = [...snareIndexes, ...Array.from({length: pattern - snareIndexes.length}, () => 0)];
+        } else {
+            snareIndexes = snareIndexes.slice(0, pattern);
+        }
+    }
 
     let tickDirection = 1;
     
@@ -22,19 +30,25 @@
     
     let playing = false;
 
-    const unsubPattern = pattern.subscribe((v) => {
-        snareIndexes = Array.from({length: v}, (_, i) => 0);
-    });
-
     let mounted = false;
+
     onMount(() => {
 
         let s = localStorage.getItem('snareIndexes'); // [0, 1, 0, 1, 0, 1, 0, 1]
 
-        if (s) {
-            snareIndexes = JSON.parse(s);
-        } else {
-            snareIndexes = Array.from({length: $pattern}, (_, i) => snareIndexes[i] || 0);
+        try {
+            if (s) {
+                snareIndexes = JSON.parse(s);
+                //if not format of array then throw error
+                if (!Array.isArray(snareIndexes) || snareIndexes.some(i => ![0, 1].includes(i))) {
+                    throw new Error('Invalid format');
+                }
+                //console.log('snareIndexes', snareIndexes);
+            }
+        } catch (_){
+            //console.log('Default snareIndexes', snareIndexes);
+            snareIndexes = Array.from({length: pattern}, () => 0);
+            localStorage.setItem('snareIndexes', JSON.stringify(snareIndexes));
         }
 
         mounted = true;
@@ -160,7 +174,6 @@
 
     onDestroy(() => {
         clearTimeout(timeoutId);
-        unsubPattern();
     });
 
 </script>
@@ -173,7 +186,7 @@
     <div class="beats" use:selectSnare>
         <div class="label">Beats <i class="fa-solid fa-drum"></i></div>
         <div class="beatsContainer">
-            {#each Array.from({length: $pattern}) as _, i}
+            {#each snareIndexes as _, i}
                 <div class="beat {snareIndexes[i] === 1 ? 'snare' : ''} {playing && index == i ? 'playing' : ''}" data-beat={i}>{i+1}</div>
             {/each}
         </div>
@@ -186,7 +199,7 @@
         </div>
         <div class="input">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
-            <Range fieldName="pattern" bind:value={$pattern} min={3} defaultVal={4} max={16} fastStep={2} reference={4}/>
+            <Range fieldName="pattern" save={false} bind:value={pattern} min={3} defaultVal={4} max={16} fastStep={2} reference={4}/>
         </div>
     </div>
 

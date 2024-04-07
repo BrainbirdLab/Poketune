@@ -12,7 +12,7 @@
     import { createEventDispatcher } from 'svelte'
     import { tweened } from "svelte/motion";
     import Logo from "$lib/components/logo.svelte";
-    import { showToastMessage } from "domtoastmessage";
+    import { showToastMessage } from "@itsfuad/domtoastmessage";
 
     const dispatch = createEventDispatcher();
 

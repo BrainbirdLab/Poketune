@@ -10,8 +10,12 @@
     export let reference: number = 0;
     export let unit: string = "";
     export let showSign: boolean = false;
+    export let save: boolean = true;
 
     onMount(() => {
+        if (!save){
+            return;
+        }
         const v = localStorage.getItem(fieldName);
         if (v && !isNaN(parseInt(v))) {
             value = parseInt(v);
@@ -28,6 +32,9 @@
     });
 
     afterUpdate(() => {
+        if (!save){
+            return;
+        }
         if (localStorage) {
             localStorage.setItem(fieldName, value.toString());
         }
