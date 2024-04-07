@@ -75,7 +75,7 @@
     <div class="input">
         <div class="label" in:fly|global={{x: 10}}>
             Wave type
-            <img src="/images/Frequency (Mini).png" alt="" />
+            <img src="/images/wave-{waveType[selectedWaveType]}.png" alt="{waveType[selectedWaveType]}_wave" />
         </div>
         <div class="waveTypes">
             {#each waveType as wave, i}

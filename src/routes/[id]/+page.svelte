@@ -87,11 +87,9 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        top: 2px;
         gap: 5px;
-        left: 0;
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
         text-decoration: none;
         border: none;
         outline: none;
