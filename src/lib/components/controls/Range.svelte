@@ -72,6 +72,14 @@
     }
 </script>
 
+<svelte:window on:keydown={(e) => {
+    if (e.key === "ArrowLeft") {
+        rangeUpdate(-1);
+    } else if (e.key === "ArrowRight") {
+        rangeUpdate(1);
+    }
+}} />
+
 <div class="range {fieldName}">
     <button
         class="updateButton"

@@ -6,7 +6,7 @@
     import { PitchDetector } from "pitchy";
     import { onDestroy, onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
-    import Range from "./Range.svelte";
+    import Range from "./controls/Range.svelte";
     import { writable } from "svelte/store";
     import WaveCanvas from "./waveCanvas.svelte";
     import { createEventDispatcher } from 'svelte'
@@ -379,6 +379,21 @@
     }
 
 </script>
+
+<svelte:window on:keypress={(e) => {
+    //if space is pressed, start/stop the tuner
+    console.log(e.key);
+    if (e.key == " ") {
+        if (isListening) {
+            stop();
+        } else {
+            start();
+        }
+    } else if (e.key == "Escape") {
+        history.back();
+    }
+}} />
+
 
 {#if mounted}
 <div class="tuner" in:fly|global={{y: -10}}>

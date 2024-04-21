@@ -1,8 +1,8 @@
 <script lang="ts">
     import { sentenceCase } from "$lib/store";
     import { fly } from "svelte/transition";
-    import Slider from "./Slider.svelte";
-    import Range from "./Range.svelte";
+    import Slider from "./controls/Slider.svelte";
+    import Range from "./controls/Range.svelte";
     import { onDestroy, onMount } from "svelte";
     import { createEventDispatcher } from 'svelte'
     import WaveCanvas from "./waveCanvas.svelte";
@@ -69,6 +69,16 @@
         }
     });
 </script>
+
+<svelte:window on:keypress={(e) => {
+    //if space is pressed, start/stop the tuner
+    if (e.key == " ") {
+        handleStart();
+    } else if (e.key == "Escape") {
+        history.back();
+    }
+}} />
+
 
 {#if mounted}
 <div class="container">

@@ -1,7 +1,7 @@
 
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
-    import Range from "./Range.svelte";
+    import Range from "./controls/Range.svelte";
     import { fly } from "svelte/transition";
     import {writable} from "svelte/store";
     import MetronomeAnimated from "./Icons/MetronomeAnimated.svelte";
@@ -177,6 +177,19 @@
     });
 
 </script>
+
+<svelte:window on:keypress={(e) => {
+    //if space is pressed, start/stop the tuner
+    if (e.key == " ") {
+        if (playing) {
+            stop();
+        } else {
+            play();
+        }
+    } else if (e.key == "Escape") {
+        history.back();
+    }
+}} />
 
 {#if mounted}
 <div class="wrapper" in:fly|global={{y: -10}}>
