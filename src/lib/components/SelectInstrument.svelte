@@ -70,7 +70,7 @@
         </div>
         <div class="dev">Developed by Fuad Hasan</div>
         <div class="src">
-            <a href="https://github.com/itsfuad/Poketune" target="_blank"
+            <a href="https://github.com/BrainbirdLab/Poketune" target="_blank"
                 >Source Code <i class="fa-solid fa-up-right-from-square"></i></a
             >
         </div>
