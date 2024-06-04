@@ -1,7 +1,7 @@
 <script lang="ts">
     
     import { confetti } from "@neoconfetti/svelte";
-    import { selectedInstrument } from "$lib/store";
+    import { selectedInstrument, type InstrumentTypes } from "$lib/store";
     import { type Tuning, getReferenceNotes, tuneInstrument, getFrequency } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
     import { onDestroy, onMount } from "svelte";
@@ -81,6 +81,8 @@
     });
 
     let mounted = false;
+
+
 
 
     onMount(() => {
@@ -246,70 +248,89 @@
 
     let audioBuffer: AudioBuffer | null = null;
     let streamMuteTimeout: number;
+    let playContext: AudioContext;
+    let dividerFrequency: number;
+
+    const dividerMap: Map<InstrumentTypes, number> = new Map([
+        ["Guitar", getFrequency("E", 2)],
+        ["Ukulele", getFrequency("G", 4)],
+        ["Bass", getFrequency("E", 1)],
+    ]);
+
+    async function loadAudioBuffers() {
+        //load the selected instrument audio and adjust by the pitch shift
+        try{
+            if (!dividerMap.has($selectedInstrument)) {
+                showToastMessage("Invalid instrument selected");
+                return;
+            }
+
+            dividerFrequency = dividerMap.get($selectedInstrument) as number;
+
+            const response = await fetch(`/sounds/${$selectedInstrument.toLowerCase()}.mp3`);
+
+            const arrayBuffer = await response.arrayBuffer();
+
+            playContext = new AudioContext();
+
+            audioBuffer = await playContext.decodeAudioData(arrayBuffer);
+
+        } catch (e){
+            console.error(e);
+            showToastMessage(e as string);
+        }
+    }
+
+    loadAudioBuffers();
 
     async function playNote(frequency: number){
 
         try{
-            let dividerFrequency: number = 0;
-            //load audio
-            let url = '';
-            if ($selectedInstrument == "Guitar"){
-                url = "/sounds/guitar.mp3";
-                dividerFrequency = getFrequency("E", 2);
-            } else if ($selectedInstrument == "Ukulele"){
-                url = "/sounds/ukulele.mp3";
-                dividerFrequency = getFrequency("G", 4);
-            } else if ($selectedInstrument == "Bass"){
-                url = "/sounds/bass.mp3";
-                dividerFrequency = getFrequency("E", 1);
-            }
-    
-            const noteAudioContext = new AudioContext();
-    
-            const response = await fetch(url);
-            const arrayBuffer = await response.arrayBuffer();
-            audioBuffer = await noteAudioContext.decodeAudioData(arrayBuffer);
-    
-            const source = noteAudioContext.createBufferSource();
-            source.buffer = audioBuffer;
-    
-            const gainNode = noteAudioContext.createGain();
-            const distortion = noteAudioContext.createWaveShaper();
-            const phaser = noteAudioContext.createDelay();
+
+            const instrumentSound = playContext.createBufferSource();
+
+            instrumentSound.buffer = audioBuffer;
+
+            const gainNode = playContext.createGain();
+
+            const distortion = playContext.createWaveShaper();
+
+            const phaser = playContext.createDelay();
+
             phaser.delayTime.value = 0.1;
-    
-            gainNode.connect(noteAudioContext.destination);
+
+            gainNode.connect(playContext.destination);
+
             distortion.connect(gainNode);
             phaser.connect(distortion);
-            source.connect(gainNode);
-    
-    
-            gainNode.gain.setValueAtTime(1, noteAudioContext.currentTime);
-    
+            instrumentSound.connect(gainNode);
+
+            gainNode.gain.setValueAtTime(1, playContext.currentTime);
+
             gainNode.gain.exponentialRampToValueAtTime(
                 0.1,
-                noteAudioContext.currentTime + 1,
+                playContext.currentTime + 1,
             );
-    
+
             gainNode.gain.exponentialRampToValueAtTime(
                 0.1,
-                noteAudioContext.currentTime + 1.01,
+                playContext.currentTime + 1.01,
             );
-    
-            source.playbackRate.value = frequency / dividerFrequency;
-            
-            
+
+            instrumentSound.playbackRate.value = frequency / dividerFrequency;
+
+            instrumentSound.start();
+
             //we have to mute the microphone so that the sound is not picked up by the microphone
+
             if (stream) {
                 stream.getAudioTracks().forEach((track) => {
                     track.enabled = false;
                 });
             }
-    
+
             clearTimeout(streamMuteTimeout);
-    
-            source.start();
-    
+
             streamMuteTimeout = setTimeout(() => {
                 //unmute the microphone
                 if (stream) {
