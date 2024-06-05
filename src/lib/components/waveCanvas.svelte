@@ -56,7 +56,8 @@
                 
                 analyserNode.getByteTimeDomainData(dataArray);
 
-                //console.log(bufferLength, dataArray);
+                
+
                 let sliceWidth = (WIDTH * 1.0) / bufferLength;
                 let x = 0;
 

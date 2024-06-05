@@ -61,13 +61,15 @@ self.addEventListener("fetch", (event) => {
 				cache.put(event.request, response.clone());
 			}
 
-			//console.log(`Serving ${event.request.url} from network`);
+			
+
 			return response;
 		} catch (err) {
 			const response = await cache.match(event.request);
 
 			if (response) {
-				//console.log(`Serving ${event.request.url} from cache`);
+				
+
 				return response;
 			}
 

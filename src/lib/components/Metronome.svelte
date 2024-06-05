@@ -43,10 +43,12 @@
                 if (!Array.isArray(snareIndexes) || snareIndexes.some(i => ![0, 1].includes(i))) {
                     throw new Error('Invalid format');
                 }
-                //console.log('snareIndexes', snareIndexes);
+                
+
             }
         } catch (_){
-            //console.log('Default snareIndexes', snareIndexes);
+            
+
             snareIndexes = Array.from({length: pattern}, () => 0);
             localStorage.setItem('snareIndexes', JSON.stringify(snareIndexes));
         }
@@ -83,7 +85,8 @@
 
             tickDirection *= -1;
             const bt = snareIndexes[index] == 1;
-            //console.log(bt, index, snareIndexes[index], snareIndexes);
+            
+
             if (bt) {
                 playSound(true);
             } else {

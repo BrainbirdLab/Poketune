@@ -1,15 +1,19 @@
 <script lang="ts">
-    
     import { confetti } from "@neoconfetti/svelte";
     import { selectedInstrument, type InstrumentTypes } from "$lib/store";
-    import { type Tuning, getReferenceNotes, tuneInstrument, getFrequency } from "$lib/tuner";
+    import {
+        type Tuning,
+        getReferenceNotes,
+        tuneInstrument,
+        getFrequency,
+    } from "$lib/tuner";
     import { PitchDetector } from "pitchy";
     import { onDestroy, onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
     import Range from "./controls/Range.svelte";
     import { writable } from "svelte/store";
     import WaveCanvas from "./waveCanvas.svelte";
-    import { createEventDispatcher } from 'svelte'
+    import { createEventDispatcher } from "svelte";
     import { tweened } from "svelte/motion";
     import Logo from "$lib/components/logo.svelte";
     import { showToastMessage } from "@itsfuad/domtoastmessage";
@@ -22,15 +26,15 @@
 
     let Octave: number;
     let Note: string;
-    
+
     let canvas: HTMLCanvasElement;
-    
+
     let isListening = false;
-    
+
     let audioContext: AudioContext;
-    
+
     let tunedNotes = new Set<string>();
-        
+
     const Cent = tweened(0, { duration: 100 });
     const Frequency = tweened(0, { duration: 100 });
     const detectedClarity = tweened(0, { duration: 100 });
@@ -43,7 +47,10 @@
 
     const pitchShiftBy = writable(0);
 
-    let notes: { [key: string]: Tuning } = getReferenceNotes($selectedInstrument, $pitchShiftBy);
+    let notes: { [key: string]: Tuning } = getReferenceNotes(
+        $selectedInstrument,
+        $pitchShiftBy,
+    );
 
     $: leftNotes = Object.values(notes).slice(
         0,
@@ -52,15 +59,16 @@
 
     $: rightNotes = Object.values(notes).slice(Object.values(notes).length / 2);
 
-
     let lastNote = "";
     let complete = false;
 
     const unsubPitchShiftBy = pitchShiftBy.subscribe((val) => {
-
         reset();
 
-        if ($selectedInstrument == "Chromatic" || $selectedInstrument == "none") {
+        if (
+            $selectedInstrument == "Chromatic" ||
+            $selectedInstrument == "none"
+        ) {
             return;
         }
 
@@ -82,16 +90,13 @@
 
     let mounted = false;
 
-
-
-
     onMount(() => {
-
         correctNoteSound = new Audio("/sounds/correct.mp3");
         allDoneSound = new Audio("/sounds/allDone.mp3");
 
         const pitchShift = localStorage.getItem("pitchShiftBy") || 0;
-        //console.log(pitchShift);
+        
+
         if (pitchShift) {
             //if pitch shift is <= 10 or >= -10 then only set, else set to 0
             if (Math.abs(Number(pitchShift)) <= 10) {
@@ -110,22 +115,25 @@
     });
 
     function stop() {
-        //console.log("stop");
-        try{
+        
+
+        try {
             if (!audioContext) {
-                //console.log("No audio context");
+                
+
                 return;
             }
-    
+
             if (audioContext.state === "closed") {
-                //console.log("Already closed");
+                
+
                 return;
             }
-    
+
             if (interval) {
                 clearInterval(interval);
             }
-    
+
             audioContext.close().then(() => {
                 isListening = false;
                 Cent.set(0);
@@ -133,40 +141,43 @@
                 Note = "";
                 detectedClarity.set(0);
             });
-    
-            dispatch('keepAwake', false);
-    
+
+            dispatch("keepAwake", false);
+
             reset();
-    
+
             stream.getTracks().forEach((track) => track.stop());
-    
+
             analyserNode.disconnect();
-        } catch (e){
+        } catch (e) {
             console.error(e);
             showToastMessage(e as string);
         }
     }
 
     async function start() {
-        //console.log("start");
-        try{
+        
+
+        try {
             //if closed
             if (audioContext?.state != "running") {
                 //create new audio context
-    
-                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    
+
+                stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                });
+
                 if (stream) {
                     audioContext = new window.AudioContext();
                     analyserNode = audioContext.createAnalyser();
                     audioContext
                         .createMediaStreamSource(stream)
                         .connect(analyserNode);
-    
+
                     isListening = true;
-    
-                    dispatch('keepAwake', true);
-    
+
+                    dispatch("keepAwake", true);
+
                     if (audioContext.state === "running") {
                         interval = setInterval(() => {
                             updatePitch(analyserNode, audioContext.sampleRate);
@@ -174,16 +185,17 @@
                     }
                 }
             }
-        } catch (e){
+        } catch (e) {
             console.error(e);
             showToastMessage(e as string);
         }
     }
 
-    const correctNotePlayedTimeout: {[key: string]: number} = {};
+    const correctNotePlayedTimeout: { [key: string]: number } = {};
 
     function updatePitch(analyserNode: AnalyserNode, sampleRate: number) {
-        //console.log("updatePitch ", count++);
+        
+
         const detector = PitchDetector.forFloat32Array(analyserNode.fftSize);
         const dataArray = new Float32Array(detector.inputLength);
         analyserNode.getFloatTimeDomainData(dataArray);
@@ -207,17 +219,18 @@
         Cent.set(tune.cent);
         Frequency.set((pitch * 100) / 100);
 
-        console.log($Cent);
-
         const noteId = Note + Octave;
-        
-        if (($selectedInstrument != "Chromatic" && $selectedInstrument != "none") && Math.abs($Cent) < 8 && Math.abs($Cent) > 0) {
+
+        if (
+            $selectedInstrument != "Chromatic" &&
+            $selectedInstrument != "none" &&
+            Math.abs($Cent) < 8 &&
+            Math.abs($Cent) > 0
+        ) {
             tunedNotes.add(noteId);
             tunedNotes = new Set<string>(tunedNotes);
             //if correct note is played and all notes are not tuned
-            if (
-                lastNote != Note + Octave
-            ) {
+            if (lastNote != Note + Octave) {
                 if (
                     tunedNotes.size == Object.values(notes).length &&
                     !complete
@@ -259,34 +272,31 @@
 
     async function loadAudioBuffers() {
         //load the selected instrument audio and adjust by the pitch shift
-        try{
-            if (!dividerMap.has($selectedInstrument)) {
-                showToastMessage("Invalid instrument selected");
-                return;
-            }
-
+        try {
             dividerFrequency = dividerMap.get($selectedInstrument) as number;
 
-            const response = await fetch(`/sounds/${$selectedInstrument.toLowerCase()}.mp3`);
+            const response = await fetch(
+                `/sounds/${$selectedInstrument.toLowerCase()}.mp3`,
+            );
 
             const arrayBuffer = await response.arrayBuffer();
 
             playContext = new AudioContext();
 
             audioBuffer = await playContext.decodeAudioData(arrayBuffer);
-
-        } catch (e){
+        } catch (e) {
             console.error(e);
             showToastMessage(e as string);
         }
     }
 
-    loadAudioBuffers();
+    if (dividerMap.has($selectedInstrument)) {
+        loadAudioBuffers();
+    }
 
-    async function playNote(frequency: number){
 
-        try{
-
+    async function playNote(frequency: number) {
+        try {
             const instrumentSound = playContext.createBufferSource();
 
             instrumentSound.buffer = audioBuffer;
@@ -339,7 +349,7 @@
                     });
                 }
             }, 300);
-        } catch (e){
+        } catch (e) {
             console.error(e);
             showToastMessage(e as string);
         }
@@ -348,7 +358,6 @@
     const playNoteTimeouts: { [key: string]: number } = {};
 
     function handleClickOnNote(node: HTMLElement) {
-
         node.onclick = async (e) => {
             const target = e.target as HTMLElement;
 
@@ -356,19 +365,17 @@
                 return;
             }
 
-            
             const frequencyStr = target.dataset.frequency;
             if (!frequencyStr) {
                 return;
             }
-            
-            
+
             const frequency = Number(frequencyStr);
-            
+
             if (!frequency) {
                 return;
             }
-            
+
             if (playNoteTimeouts[frequencyStr]) {
                 clearTimeout(playNoteTimeouts[frequencyStr]);
             }
@@ -382,7 +389,6 @@
                 delete playNoteTimeouts[frequencyStr];
                 target.removeAttribute("data-playing");
             }, 300);
-            
         };
 
         return {
@@ -398,145 +404,180 @@
         lastNote = "";
         complete = false;
     }
-
 </script>
 
-<svelte:window on:keypress={(e) => {
-    //if space is pressed, start/stop the tuner
-    console.log(e.key);
-    if (e.key == " ") {
-        if (isListening) {
-            stop();
-        } else {
-            start();
+<svelte:window
+    on:keypress={(e) => {
+        //if space is pressed, start/stop the tuner
+        console.log(e.key);
+        if (e.key == " ") {
+            if (isListening) {
+                stop();
+            } else {
+                start();
+            }
+        } else if (e.key == "Escape") {
+            history.back();
         }
-    } else if (e.key == "Escape") {
-        history.back();
-    }
-}} />
-
+    }}
+/>
 
 {#if mounted}
-<div class="tuner" in:fly|global={{y: -10}}>
-    <div class="noteContainer">
-        {#if Note}
-            <div class="noteName" in:fly|global={{ y: 5 }}>
-                {Note}
-                <div class="octave">{Octave}</div>
-            </div>
-        {:else}
-            <div class="noteName" in:fly|global={{ y: 5 }}>-.-</div>
-        {/if}
-        <WaveCanvas Note={Note} analyserNode={analyserNode} isListening={isListening} />
-    </div>
-    <div class="meter">
-        <div class="range">
-            <div class="scale">
-                {#each [-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60] as num, i}
-                    <div class="point">
-                        <div
-                            class="meter-scale"
-                            class:strong={i == 0 || i == 6 || i == 12}
-                            in:fly|global={{ y: 10, delay: 40 * (i + 1) }}
-                        />
-                        <div
-                            class="number"
-                            in:fly|global={{ y: 10, delay: 40 * (i + 1) }}
-                        >
-                            {num}
+    <div class="tuner" in:fly|global={{ y: -10 }}>
+        <div class="noteContainer">
+            {#if Note}
+                <div class="noteName" in:fly|global={{ y: 5 }}>
+                    {Note}
+                    <div class="octave">{Octave}</div>
+                </div>
+            {:else}
+                <div class="noteName" in:fly|global={{ y: 5 }}>-.-</div>
+            {/if}
+            <WaveCanvas {Note} {analyserNode} {isListening} />
+        </div>
+        <div class="meter">
+            <div class="range">
+                <div class="scale">
+                    {#each [-60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60] as num, i}
+                        <div class="point">
+                            <div
+                                class="meter-scale"
+                                class:strong={i == 0 || i == 6 || i == 12}
+                                in:fly|global={{ y: 10, delay: 40 * (i + 1) }}
+                            />
+                            <div
+                                class="number"
+                                in:fly|global={{ y: 10, delay: 40 * (i + 1) }}
+                            >
+                                {num}
+                            </div>
                         </div>
-                    </div>
-                {/each}
-                <div
-                    class="pointer"
-                    style="width: max(calc((100% / 12)*{Math.abs($Cent) /
-                        10}), 5px);"
-                    class:left={$Cent < -2}
-                    class:right={$Cent > 2}
-                    class:strong={Math.abs($Cent) < 10}
-                    class:average={Math.abs($Cent) > 10 && Math.abs($Cent) < 20}
-                    class:weak={Math.abs($Cent) > 20 && Math.abs($Cent) < 30}
-                    class:poor={Math.abs($Cent) > 30}
-                ></div>
-            </div>
-            <div class="labels">
-                <div class="label" in:fly={{ y: 10, delay: 100 }}>♭</div>
-                <div class="label" in:fly={{ y: 10, delay: 350 }}>♮</div>
-                <div class="label" in:fly={{ y: 10, delay: 600 }}>♯</div>
+                    {/each}
+                    <div
+                        class="pointer"
+                        style="width: max(calc((100% / 12)*{Math.abs($Cent) /
+                            10}), 5px);"
+                        class:left={$Cent < -2}
+                        class:right={$Cent > 2}
+                        class:strong={Math.abs($Cent) < 10}
+                        class:average={Math.abs($Cent) > 10 &&
+                            Math.abs($Cent) < 20}
+                        class:weak={Math.abs($Cent) > 20 &&
+                            Math.abs($Cent) < 30}
+                        class:poor={Math.abs($Cent) > 30}
+                    ></div>
+                </div>
+                <div class="labels">
+                    <div class="label" in:fly={{ y: 10, delay: 100 }}>♭</div>
+                    <div class="label" in:fly={{ y: 10, delay: 350 }}>♮</div>
+                    <div class="label" in:fly={{ y: 10, delay: 600 }}>♯</div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="info">
-        <div class="freq">f: {Math.round($Frequency)} Hz</div>
-        <div class="clarity">
-            Clarity: {Math.round($detectedClarity)}% {$detectedClarity > 80 ? "👍" : "👎"}
+        <div class="info">
+            <div class="freq">f: {Math.round($Frequency)} Hz</div>
+            <div class="clarity">
+                Clarity: {Math.round($detectedClarity)}% {$detectedClarity > 80
+                    ? "👍"
+                    : "👎"}
+            </div>
+            <div class="cent">
+                {Math.round($Cent)} C {Math.abs($Cent) < 10 ? "😁" : "😢"}
+            </div>
         </div>
-        <div class="cent">{Math.round($Cent)} C {Math.abs($Cent) < 10 ? "😁" : "😢"}</div>
-    </div>
-    {#if $selectedInstrument != "Chromatic"}
-        {#if tunedNotes.size != 0 && tunedNotes.size == Object.values(notes).length}
-            <div class="conf" use:confetti></div>
-        {/if}
+        {#if $selectedInstrument != "Chromatic"}
+            {#if tunedNotes.size != 0 && tunedNotes.size == Object.values(notes).length}
+                <div class="conf" use:confetti></div>
+            {/if}
 
-        <div class="noteVisual" use:handleClickOnNote>
-            <div class="notes left">
-                <!-- Display E A D -->
-                {#each Object.values(leftNotes) as note, i}
-                    <div
-                        class="note"
-                        id="{note.note}{note.octave}"
-                        data-frequency={note.frequency}
-                        class:inRange={Note + Octave == note.note + note.octave}
-                        in:fly|global={{ y: 5, delay: 40 * (i + 1) }}
-                        class:tuned={tunedNotes.has(note.note + note.octave)}
-                    >
-                        <div class="name">{note.note}{note.octave}</div>
-                        <div class="freq">{note.frequency.toFixed(2)} Hz</div>
+            <div class="noteVisual" use:handleClickOnNote>
+                <div class="notes left">
+                    <!-- Display E A D -->
+                    {#each Object.values(leftNotes) as note, i}
+                        <div
+                            class="note"
+                            id="{note.note}{note.octave}"
+                            data-frequency={note.frequency}
+                            class:inRange={Note + Octave ==
+                                note.note + note.octave}
+                            in:fly|global={{ y: 5, delay: 40 * (i + 1) }}
+                            class:tuned={tunedNotes.has(
+                                note.note + note.octave,
+                            )}
+                        >
+                            <div class="name">{note.note}{note.octave}</div>
+                            <div class="freq">
+                                {note.frequency.toFixed(2)} Hz
+                            </div>
+                        </div>
+                    {/each}
+                </div>
+                <div class="input pitch" in:fly|global={{ y: 20 }}>
+                    <div class="label">
+                        Change pitch <i class="fa-solid fa-wave-square"></i>
                     </div>
-                {/each}
+                    <Range
+                        showSign={true}
+                        fieldName="pitchShiftBy"
+                        fastStep={10}
+                        bind:value={$pitchShiftBy}
+                        min={-100}
+                        defaultVal={0}
+                        max={100}
+                    />
+                </div>
+                <div class="notes right">
+                    <!-- Display G B E -->
+                    {#each Object.values(rightNotes) as note, i}
+                        <div
+                            class="note"
+                            id="{note.note}{note.octave}"
+                            data-frequency={note.frequency}
+                            class:inRange={Note + Octave ==
+                                note.note + note.octave}
+                            in:fly|global={{ y: 5, delay: 40 * (i + 1) }}
+                            class:tuned={tunedNotes.has(
+                                note.note + note.octave,
+                            )}
+                        >
+                            <div class="name">{note.note}{note.octave}</div>
+                            <div class="freq">
+                                {note.frequency.toFixed(2)} Hz
+                            </div>
+                        </div>
+                    {/each}
+                </div>
             </div>
-            <div class="input pitch" in:fly|global={{y: 20}}>
-                <div class="label">Change pitch <i class="fa-solid fa-wave-square"></i></div>
-                <Range showSign={true} fieldName="pitchShiftBy" fastStep={10} bind:value={$pitchShiftBy} min={-100} defaultVal={0} max={100}/>
-            </div>
-            <div class="notes right">
-                <!-- Display G B E -->
-                {#each Object.values(rightNotes) as note, i}
-                    <div
-                        class="note"
-                        id="{note.note}{note.octave}"
-                        data-frequency={note.frequency}
-                        class:inRange={Note + Octave == note.note + note.octave}
-                        in:fly|global={{ y: 5, delay: 40 * (i + 1) }}
-                        class:tuned={tunedNotes.has(note.note + note.octave)}
-                    >
-                        <div class="name">{note.note}{note.octave}</div>
-                        <div class="freq">{note.frequency.toFixed(2)} Hz</div>
-                    </div>
-                {/each}
-            </div>
-        </div>
         {/if}
         <div class="buttons on-off">
             {#if isListening}
-                <button class:listening={isListening} in:fade class="startButton stop" on:click={stop}>
-                    <Logo size={50}/>
+                <button
+                    class:listening={isListening}
+                    in:fade
+                    class="startButton stop"
+                    on:click={stop}
+                >
+                    <Logo size={50} />
                 </button>
             {:else}
-                <button class:listening={isListening} in:fade class="startButton start" on:click={start}>
-                    <Logo size={50}/>
+                <button
+                    class:listening={isListening}
+                    in:fade
+                    class="startButton start"
+                    on:click={start}
+                >
+                    <Logo size={50} />
                 </button>
             {/if}
         </div>
-</div>
+    </div>
 {/if}
 
 <style lang="scss">
-
-    .on-off{
+    .on-off {
         min-height: 100px;
     }
-    .on-off button{
+    .on-off button {
         position: relative;
         background: transparent !important;
         z-index: 2;
@@ -546,7 +587,7 @@
         align-items: center;
         //ripple effect
         &.listening:after {
-            content: '';
+            content: "";
             position: absolute;
             pointer-events: none;
             width: 100%;
@@ -561,7 +602,7 @@
         }
     }
 
-    @keyframes ripple{
+    @keyframes ripple {
         0% {
             transform: translate(-50%, -50%) scale(0);
             opacity: 1;
@@ -799,7 +840,6 @@
             color: #607d8b;
         }
     }
-
 
     //for larger screens increase font size
     @media (min-width: 768px) {
