@@ -94,7 +94,7 @@
     </button>
     <div class="value">
         {#key value}
-            <div class="main" style="width: {max.toString().length + 2}ch;">
+            <div class="main">
                 {#if showSign}
                     {value > 0 ? "+" : ""}
                 {/if}
@@ -150,6 +150,7 @@
         justify-content: center;
         font-size: 1rem;
         font-weight: 700;
+        width: 5ch;
         color: #fff;
         position: relative;
         z-index: 1;
