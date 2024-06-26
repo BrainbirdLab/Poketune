@@ -190,9 +190,15 @@
         history.back();
     }
 }} 
-on:keydown={calculateBpm}
-on:keyup={() => {
-    tapBpm = false;
+on:keydown={(e) => {
+    if (e.key == "g") {
+        calculateBpm();
+    }
+}}
+on:keyup={(e) => {
+    if (e.key == "g") {
+        tapBpm = false;
+    }
 }}
 />
 
