@@ -512,7 +512,7 @@
                         </div>
                     {/each}
                 </div>
-                <div class="input pitch" in:fly|global={{ y: 20 }}>
+                <div class="input pitch" in:fly|global={{ y: 20 }} title="Shortcut key: Left and right Arrow">
                     <div class="label">
                         Change pitch <i class="fa-solid fa-wave-square"></i>
                     </div>
@@ -524,6 +524,8 @@
                         min={-100}
                         defaultVal={0}
                         max={100}
+                        highKey={"ArrowRight"}
+                        lowKey={"ArrowLeft"}
                     />
                 </div>
                 <div class="notes right">

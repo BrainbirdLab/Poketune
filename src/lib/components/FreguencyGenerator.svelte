@@ -104,7 +104,7 @@
             {/each}
         </div>
     </div>
-    <div class="input slider" in:fly|global={{y: -10}}>
+    <div class="input slider" in:fly|global={{y: -10}} title="Shortcut key: Left and right Arrow">
         <div class="label">
             Change frequency <i class="fas fa-wave-square"></i>
         </div>
@@ -119,7 +119,10 @@
             max={20_000}
             bind:value={frequency}
             unit="Hz"
-            fastStep={20}>
+            fastStep={20}
+            highKey={"ArrowRight"}
+            lowKey={"ArrowLeft"}
+        >
         </Range>
     </div>
     <button in:fly|global={{x: -10}} on:click={handleStart} class="beatButton">

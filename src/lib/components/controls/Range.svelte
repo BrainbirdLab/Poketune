@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { afterUpdate, onMount } from "svelte";
+    import { afterUpdate, onDestroy, onMount } from "svelte";
 
     export let min: number;
     export let max: number;
@@ -11,6 +11,9 @@
     export let unit: string = "";
     export let showSign: boolean = false;
     export let save: boolean = true;
+
+    export let highKey: "ArrowRight" | "ArrowUp" | "W" | "D"; 
+    export let lowKey: "ArrowLeft" | "ArrowDown"| "S" | "A";
 
     onMount(() => {
         if (!save){
@@ -30,6 +33,14 @@
             value = max;
         }
     });
+
+    function KeyListener(e: KeyboardEvent) {
+        if (e.key === lowKey) {
+            rangeUpdate(-1);
+        } else if (e.key === highKey) {
+            rangeUpdate(1);
+        }
+    }
 
     afterUpdate(() => {
         if (!save){
@@ -72,13 +83,7 @@
     }
 </script>
 
-<svelte:window on:keydown={(e) => {
-    if (e.key === "ArrowLeft") {
-        rangeUpdate(-1);
-    } else if (e.key === "ArrowRight") {
-        rangeUpdate(1);
-    }
-}} />
+<svelte:window on:keydown={KeyListener} />
 
 <div class="range {fieldName}">
     <button
@@ -119,9 +124,6 @@
 </div>
 
 <style lang="scss">
-    .reference {
-        margin-left: -15px;
-    }
 
     .range {
         display: flex;

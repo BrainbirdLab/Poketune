@@ -3,7 +3,6 @@
     import { onDestroy, onMount } from "svelte";
     import Range from "./controls/Range.svelte";
     import { fly } from "svelte/transition";
-    import {writable} from "svelte/store";
     import MetronomeAnimated from "./Icons/MetronomeAnimated.svelte";
     import { createEventDispatcher } from 'svelte'
 
@@ -179,20 +178,23 @@
         clearTimeout(timeoutId);
     });
 
+    let bpmBtn: HTMLButtonElement;
+
 </script>
 
 <svelte:window on:keypress={(e) => {
     //if space is pressed, start/stop the tuner
     if (e.key == " ") {
-        if (playing) {
-            stop();
-        } else {
-            play();
-        }
+        play();
     } else if (e.key == "Escape") {
         history.back();
     }
-}} />
+}} 
+on:keydown={calculateBpm}
+on:keyup={() => {
+    tapBpm = false;
+}}
+/>
 
 {#if mounted}
 <div class="wrapper" in:fly|global={{y: -10}}>
@@ -209,18 +211,26 @@
     </div>
 
     <div class="inputs">
-        <div class="input">
+        <div class="input" title="Shortcut key: Left and right Arrow">
             <div class="label">BPM <i class="fa-solid fa-drum"></i></div>
-            <Range fieldName="bpm" bind:value={bpm} min={40} defaultVal={120} max={400} fastStep={10}/>
+            <Range fieldName="bpm" bind:value={bpm} min={40} defaultVal={120} max={400} fastStep={10}
+                highKey={"ArrowRight"}
+                lowKey={"ArrowLeft"}
+            />
         </div>
-        <div class="input">
+        <div class="input" title="Shortcut key: Up and down Arrow">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
-            <Range fieldName="pattern" save={false} bind:value={pattern} min={3} defaultVal={4} max={16} fastStep={2} reference={4}/>
+            <Range fieldName="pattern" save={false} bind:value={pattern} min={3} defaultVal={4} max={16} fastStep={2} reference={4}
+            highKey={"ArrowUp"}
+            lowKey={"ArrowDown"}
+            />
         </div>
     </div>
 
     <div class="group">
         <button class="beatButton"
+        title="Shortcut key: G"
+        bind:this={bpmBtn}
         class:pressed={tapBpm}
             on:mousedown|preventDefault={calculateBpm}
             on:mouseup|preventDefault={() => tapBpm = false}
@@ -234,7 +244,7 @@
             </div>
         </button>
     
-        <div class="play pause">
+        <div class="play pause" title="Shortcut key: Space">
             <button class="beatButton" class:stop={playing} on:click={play}>
                 {#if playing}
                 <i class="fa-solid fa-pause"></i>
