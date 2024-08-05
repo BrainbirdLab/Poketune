@@ -10,7 +10,7 @@ PokeTune is a Progressive Web App (PWA) designed to help you tune your musical i
 
 - **Multiple Instrument Support**: Whether you're tuning a guitar, piano, violin, or any other instrument, PokeTune offers support for a wide range of musical instruments.
 
-- **Built in Metronome** : Choose BPM and beats of your own.
+- **Built in Metronome** : Choose BPM and create beat patterns of your own.
 
 - **Real-time Tuning**: With real-time feedback, you can adjust the tuning of your instrument and see the changes in pitch instantly on the app.
 
