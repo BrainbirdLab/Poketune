@@ -13,6 +13,7 @@
         position: relative;
         width: 150px;
         height: 120px;
+        min-height: 120px;
         overflow: hidden;
         img{
             width: 100%;
@@ -49,6 +50,7 @@
         .metronome{
             width: 250px;
             height: 200px;
+            min-height: 200px
             :global(.metro-image){
                 height: 250px;
             }
