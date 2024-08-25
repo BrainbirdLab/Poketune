@@ -50,7 +50,7 @@
         .metronome{
             width: 250px;
             height: 200px;
-            min-height: 200px
+            min-height: 200px;
             :global(.metro-image){
                 height: 250px;
             }
