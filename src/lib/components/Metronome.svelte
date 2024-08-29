@@ -10,7 +10,7 @@
 
     let bpm = 120;
 
-    let pattern = 4;
+    let pattern: number;
 
     let snareIndexes: number[] = [];
 
@@ -34,6 +34,13 @@
     onMount(() => {
 
         let s = localStorage.getItem('snareIndexes'); // [0, 1, 0, 1, 0, 1, 0, 1]
+
+        if (localStorage.getItem('pattern')) {
+            pattern = parseInt(localStorage.getItem('pattern') as string);
+        } else {
+            pattern = 4;
+            localStorage.setItem('pattern', pattern.toString());
+        }
 
         try {
             if (s) {
@@ -210,9 +217,11 @@ on:keyup={(e) => {
     <div class="beats" use:selectSnare>
         <div class="label">Beats <i class="fa-solid fa-drum"></i></div>
         <div class="beatsContainer">
+            {#key snareIndexes}
             {#each snareIndexes as _, i}
                 <div class="beat {snareIndexes[i] === 1 ? 'snare' : ''} {playing && index == i ? 'playing' : ''}" data-beat={i}>{i+1}</div>
             {/each}
+            {/key}
         </div>
     </div>
 
@@ -226,7 +235,7 @@ on:keyup={(e) => {
         </div>
         <div class="input" title="Shortcut key: Up and down Arrow">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
-            <Range fieldName="pattern" save={false} bind:value={pattern} min={3} defaultVal={4} max={16} fastStep={2} reference={4}
+            <Range fieldName="pattern" bind:value={pattern} min={3} defaultVal={4} max={16} fastStep={2} reference={4}
             highKey={"ArrowUp"}
             lowKey={"ArrowDown"}
             />
