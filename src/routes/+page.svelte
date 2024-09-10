@@ -6,9 +6,4 @@
     lastPage.set("/");
 </script>
 
-<svelte:head>
-    <title>PokeTune</title>
-    <link rel="icon" type="image/png" href="/images/icon (Mini).png" />
-</svelte:head>
-
 <SelectInstrument />
