@@ -1,34 +1,34 @@
 <script lang="ts">
-    import { sentenceCase } from "$lib/store";
+    import { activateWakeLock, sentenceCase } from "$lib/store";
     import { fly } from "svelte/transition";
     import Slider from "./controls/Slider.svelte";
     import Range from "./controls/Range.svelte";
     import { onDestroy, onMount } from "svelte";
-    import { createEventDispatcher } from 'svelte'
     import WaveCanvas from "./waveCanvas.svelte";
 
-    const dispatch = createEventDispatcher();
-
-    let start = false;
-    let frequency = 20;
+    let start = $state(false);
+    let frequency = $state(20);
 
     const waveType = ["sine", "square", "sawtooth", "triangle"];
 
-    let selectedWaveType = 0;
+    let selectedWaveType = $state(0);
 
     let audioCtx = new AudioContext();
-    let oscillator: OscillatorNode;
-
+    
+    let oscillator: OscillatorNode = $state<OscillatorNode>() as OscillatorNode;
     let analyserNode = audioCtx.createAnalyser();
 
-    $: {
-        if (oscillator) {
-            oscillator.frequency.value = frequency;
-            oscillator.type = waveType[selectedWaveType] as OscillatorType;
-        }
-    }
 
-    let mounted = false;
+    $effect(() => {
+        if (!oscillator) {
+            return;
+        }
+        oscillator.frequency.value = frequency;
+        oscillator.type = waveType[selectedWaveType] as OscillatorType;
+    });
+
+    let mounted = $state(false);
+
     onMount(() => {
         const v = localStorage.getItem("selectedWave");
         if (v && !isNaN(parseInt(v)) && parseInt(v) < waveType.length && parseInt(v) >= 0) {
@@ -46,7 +46,7 @@
             if (analyserNode) {
                 analyserNode.disconnect();
             }
-            dispatch("keepAwake", false);
+            activateWakeLock.set(false);
         } else {
             oscillator = audioCtx.createOscillator();
             oscillator.type = waveType[selectedWaveType] as OscillatorType;
@@ -55,7 +55,7 @@
             oscillator.connect(analyserNode);
             oscillator.start();
             //add frequency to analyser
-            dispatch("keepAwake", true);
+            activateWakeLock.set(true);
         }
         start = !start;
     }
@@ -70,7 +70,7 @@
     });
 </script>
 
-<svelte:window on:keypress={(e) => {
+<svelte:window onkeypress={(e) => {
     //if space is pressed, start/stop the tuner
     if (e.key == " ") {
         handleStart();
@@ -93,7 +93,7 @@
                     in:fly|global={{ y: 10, delay: 50 * (i + 1) }}
                     class="waveType"
                     class:selected={selectedWaveType == i}
-                    on:click={() => {
+                    onclick={() => {
                         selectedWaveType = i;
                         localStorage.setItem("selectedWave", i.toString());
                     }}
@@ -125,7 +125,7 @@
         >
         </Range>
     </div>
-    <button in:fly|global={{x: -10}} on:click={handleStart} class="beatButton">
+    <button in:fly|global={{x: -10}} onclick={handleStart} class="beatButton">
         {#if start}
         <WaveCanvas height={50} waveWidth={3} zIndex={-1} absolute={true} color={"#b291ff3d"} Note={waveType[selectedWaveType]} isListening={start} analyserNode={analyserNode}/>
             <i class="fa-solid fa-pause"></i> Stop

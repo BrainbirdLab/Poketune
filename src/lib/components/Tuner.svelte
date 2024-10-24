@@ -1,6 +1,6 @@
 <script lang="ts">
     import { confetti } from "@neoconfetti/svelte";
-    import { selectedInstrument, type InstrumentTypes } from "$lib/store";
+    import { activateWakeLock, selectedInstrument, type InstrumentTypes } from "$lib/store";
     import {
         type Tuning,
         getReferenceNotes,
@@ -13,33 +13,28 @@
     import Range from "./controls/Range.svelte";
     import { writable } from "svelte/store";
     import WaveCanvas from "./waveCanvas.svelte";
-    import { createEventDispatcher } from "svelte";
     import { tweened } from "svelte/motion";
     import Logo from "$lib/components/logo.svelte";
     import { showToastMessage } from "@itsfuad/domtoastmessage";
-
-    const dispatch = createEventDispatcher();
 
     //load audio
     let correctNoteSound: HTMLAudioElement;
     let allDoneSound: HTMLAudioElement;
 
-    let Octave: number;
-    let Note: string;
+    let Octave: number = $state(0);
+    let Note: string = $state("");
 
-    let canvas: HTMLCanvasElement;
-
-    let isListening = false;
+    let isListening = $state(false);
 
     let audioContext: AudioContext;
 
-    let tunedNotes = new Set<string>();
+    let tunedNotes = $state(new Set<string>());
 
     const Cent = tweened(0, { duration: 100 });
     const Frequency = tweened(0, { duration: 100 });
     const detectedClarity = tweened(0, { duration: 100 });
 
-    let analyserNode: AnalyserNode;
+    let analyserNode: AnalyserNode = $state() as AnalyserNode;
 
     let stream: MediaStream;
 
@@ -47,17 +42,17 @@
 
     const pitchShiftBy = writable(0);
 
-    let notes: { [key: string]: Tuning } = getReferenceNotes(
+    let notes: { [key: string]: Tuning } = $state(getReferenceNotes(
         $selectedInstrument,
         $pitchShiftBy,
-    );
+    ));
+ 
+    let leftNotes = $derived(Object.values(notes).slice(
+            0,
+            Object.values(notes).length / 2,
+        ));
 
-    $: leftNotes = Object.values(notes).slice(
-        0,
-        Object.values(notes).length / 2,
-    );
-
-    $: rightNotes = Object.values(notes).slice(Object.values(notes).length / 2);
+    let rightNotes = $derived(Object.values(notes).slice(Object.values(notes).length / 2));
 
     let lastNote = "";
     let complete = false;
@@ -88,7 +83,7 @@
         }
     });
 
-    let mounted = false;
+    let mounted = $state(false);
 
     onMount(() => {
         correctNoteSound = new Audio("/sounds/correct.mp3");
@@ -119,14 +114,10 @@
 
         try {
             if (!audioContext) {
-                
-
                 return;
             }
 
             if (audioContext.state === "closed") {
-                
-
                 return;
             }
 
@@ -142,7 +133,7 @@
                 detectedClarity.set(0);
             });
 
-            dispatch("keepAwake", false);
+            activateWakeLock.set(false);
 
             reset();
 
@@ -176,7 +167,7 @@
 
                     isListening = true;
 
-                    dispatch("keepAwake", true);
+                    activateWakeLock.set(true);
 
                     if (audioContext.state === "running") {
                         interval = setInterval(() => {
@@ -407,9 +398,8 @@
 </script>
 
 <svelte:window
-    on:keypress={(e) => {
+    onkeypress={(e) => {
         //if space is pressed, start/stop the tuner
-        console.log(e.key);
         if (e.key == " ") {
             if (isListening) {
                 stop();
@@ -444,7 +434,7 @@
                                 class="meter-scale"
                                 class:strong={i == 0 || i == 6 || i == 12}
                                 in:fly|global={{ y: 10, delay: 40 * (i + 1) }}
-                            />
+                            ></div>
                             <div
                                 class="number"
                                 in:fly|global={{ y: 10, delay: 40 * (i + 1) }}
@@ -557,7 +547,7 @@
                     class:listening={isListening}
                     in:fade
                     class="startButton stop"
-                    on:click={stop}
+                    onclick={stop}
                 >
                     <Logo size={50} />
                 </button>
@@ -566,7 +556,7 @@
                     class:listening={isListening}
                     in:fade
                     class="startButton start"
-                    on:click={start}
+                    onclick={start}
                 >
                     <Logo size={50} />
                 </button>

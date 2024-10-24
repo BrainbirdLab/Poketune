@@ -14,7 +14,7 @@
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	font-family: 'Now';
+	font-family: 'Now', sans-serif;
 	color: white;
 	user-select: none;
 	-webkit-user-drag: none;
@@ -63,8 +63,6 @@ button{
 img{
 	-webkit-user-drag: none;
 	display: block;
-	//max-width: 100%;
-	//max-height: 100%;
 	object-fit: contain;
 }
 

@@ -1,19 +1,22 @@
 <script lang="ts">
-    import { afterUpdate, onDestroy, onMount } from "svelte";
+    import { onMount } from "svelte";
 
-    export let min: number;
-    export let max: number;
-    export let defaultVal: number;
-    export let fieldName: string;
-    export let value: number;
-    export let fastStep: number = 5;
-    export let reference: number = 0;
-    export let unit: string = "";
-    export let showSign: boolean = false;
-    export let save: boolean = true;
+    interface Props {
+        min: number;
+        max: number;
+        defaultVal: number;
+        fieldName: string;
+        value: number;
+        fastStep: number;
+        reference?: number;
+        unit?: string;
+        showSign?: boolean;
+        save?: boolean;
+        highKey: "ArrowRight" | "ArrowUp" | "W" | "D";
+        lowKey: "ArrowLeft" | "ArrowDown" | "S" | "A";
+    }
 
-    export let highKey: "ArrowRight" | "ArrowUp" | "W" | "D"; 
-    export let lowKey: "ArrowLeft" | "ArrowDown"| "S" | "A";
+   let { min, max, defaultVal, fieldName, value = $bindable(), fastStep = 5, reference = 0, unit = "", showSign = false, save = true, highKey, lowKey }: Props = $props();
 
     onMount(() => {
         if (!save){
@@ -42,7 +45,7 @@
         }
     }
 
-    afterUpdate(() => {
+    $effect(() => {
         if (!save){
             return;
         }
@@ -87,13 +90,14 @@
 
 <div class="range {fieldName}">
     <button
+        aria-label="decrement" 
         class="updateButton"
-        on:mousedown|preventDefault={() => startUpdating(-1)}
-        on:mouseup|preventDefault={stopUpdating}
-        on:mouseleave|preventDefault={stopUpdating}
-        on:touchstart|preventDefault={(e) => startUpdating(-1)}
-        on:touchend|preventDefault={stopUpdating}
-        on:touchcancel|preventDefault={stopUpdating}
+        onmousedown={(e) => { e.preventDefault(); startUpdating(-1)}}
+        onmouseup={(e) => { e.preventDefault(); stopUpdating()}}
+        onmouseleave={(e) => { e.preventDefault(); stopUpdating()}}
+        ontouchstart={(e) => { e.preventDefault(); startUpdating(-1)}}
+        ontouchend={(e) => { e.preventDefault(); stopUpdating()}}
+        ontouchcancel={(e) => { e.preventDefault(); stopUpdating()}}
     >
         <i class="fa-solid fa-minus"></i>
     </button>
@@ -111,13 +115,14 @@
         {/if}
     </div>
     <button
+        aria-label="increment" 
         class="updateButton"
-        on:mousedown|preventDefault={() => startUpdating(1)}
-        on:mouseup|preventDefault={stopUpdating}
-        on:mouseleave|preventDefault={stopUpdating}
-        on:touchstart|preventDefault={(e) => startUpdating(1)}
-        on:touchend|preventDefault={stopUpdating}
-        on:touchcancel|preventDefault={stopUpdating}
+        onmousedown={(e) => { e.preventDefault(); startUpdating(1)}}
+        onmouseup={(e) => { e.preventDefault(); stopUpdating()}}
+        onmouseleave={(e) => { e.preventDefault(); stopUpdating()}}
+        ontouchstart={(e) => { e.preventDefault(); startUpdating(1)}}
+        ontouchend={(e) => { e.preventDefault(); stopUpdating()}}
+        ontouchcancel={(e) => { e.preventDefault(); stopUpdating()}}
     >
         <i class="fa-solid fa-plus"></i>
     </button>

@@ -7,25 +7,16 @@
     import { onMount } from "svelte";
     import { fly } from "svelte/transition";
 
-    export let data;
+    let { data } = $props();
+    
+    let mounted = $state(false);
+
     selectedInstrument.set(data.name as InstrumentTypes);
 
-    let awakeLock: WakeLockSentinel | null = null;
-
-    async function keepAwake(evt: CustomEvent<boolean>){
-        if (evt.detail){
-            awakeLock = await navigator.wakeLock.request("screen");
-            //showToastMessage("Screen Wake locked");
-        } else {
-            awakeLock?.release();
-            //showToastMessage("Screen Wake released");
-        }
-    }
-
-    let mounted = false;
     onMount(() => {
         mounted = true;
     });
+
 </script>
 
 <svelte:head>
@@ -35,7 +26,7 @@
 
 {#if mounted}
 <div class="topbar">
-    <button in:fly|global={{x: -10}} class="goback" on:click={()=>{
+    <button aria-label="back" in:fly|global={{x: -10}} class="goback" onclick={()=>{
         selectedInstrument.set("none");
         if ($lastPage != "/"){
             lastPage.set("/");
@@ -53,11 +44,11 @@
     {/if}
 </div>
 {#if $selectedInstrument == "Metronome"}
-    <Metronome on:keepAwake={keepAwake}/>
+    <Metronome/>
 {:else if $selectedInstrument == "Frequency"}
-    <FreguencyGenerator on:keepAwake={keepAwake}/>
+    <FreguencyGenerator/>
 {:else if $selectedInstrument != "none"}
-    <Tuner on:keepAwake={keepAwake}/>
+    <Tuner/>
 {/if}
 {/if}
 

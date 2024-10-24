@@ -26,3 +26,5 @@ export const instrumentNames = [
     'Metronome',
     'Frequency',
 ];
+
+export const activateWakeLock = writable(false);

@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let style: string = "";
+    let {style = ""}: {style?: string} = $props();
 </script>
 
 <div class="metronome">
