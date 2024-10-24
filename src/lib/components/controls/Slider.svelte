@@ -3,26 +3,27 @@
     import { fly, fade } from "svelte/transition";
 
     // Props
-    export let min = 0;
-    export let max = 100;
-    export let initialValue = 0;
-    export let id: string = "";
-    export let value =
-        typeof initialValue === "string"
-            ? parseInt(initialValue)
-            : initialValue;
+    interface Props {
+        min: number;
+        max: number;
+        initialValue?: number | string;
+        id?: string;
+        value: number;
+    }
+    
+    let { min = 0, max = 100, initialValue, id, value = $bindable(typeof initialValue === "string" ? parseInt(initialValue) : initialValue) }: Props = $props();
 
     // Node Bindings
-    let container: HTMLElement;
-    let thumb: HTMLElement;
-    let progressBar: HTMLElement;
-    let element: HTMLElement;
+    let container: HTMLElement = $state() as HTMLElement;
+    let thumb: HTMLElement = $state() as HTMLElement;
+    let progressBar: HTMLElement = $state() as HTMLElement;
+    let element: HTMLElement = $state() as HTMLElement;
 
     // Internal State
     let elementX = 0;
     let currentThumb: HTMLElement | null = null;
-    let holding = false;
-    let thumbHover = false;
+    let holding = $state(false);
+    let thumbHover = $state(false);
     let keydownAcceleration = 0;
     let accelerationTimer = 0;
 
@@ -144,24 +145,30 @@
     }
 
     // React to left position of element relative to window
-    $: if (element) elementX = element.getBoundingClientRect().left;
+    $effect(() => {
+        if (element) elementX = element.getBoundingClientRect().left;
+    });
 
     // Set a class based on if dragging
-    $: holding = Boolean(currentThumb);
+    $effect(() => {
+        holding = Boolean(currentThumb);
+    });
 
     // Update progressbar and thumb styles to represent value
-    $: if (progressBar && thumb) {
-        // Limit value min -> max
-        value = value > min ? value : min;
-        value = value < max ? value : max;
+    $effect(() => {
+        if (progressBar && thumb) {
+            // Limit value min -> max
+            value = value > min ? value : min;
+            value = value < max ? value : max;
 
-        let percent = ((value - min) * 100) / (max - min);
-        let offsetLeft = (container.clientWidth - 10) * (percent / 100) + 5;
+            let percent = ((value - min) * 100) / (max - min);
+            let offsetLeft = (container.clientWidth - 10) * (percent / 100) + 5;
 
-        // Update thumb position + active range track width
-        thumb.style.left = `${offsetLeft}px`;
-        progressBar.style.width = `${offsetLeft}px`;
-    }
+            // Update thumb position + active range track width
+            thumb.style.left = `${offsetLeft}px`;
+            progressBar.style.width = `${offsetLeft}px`;
+        }
+    });
 
     function handleEvents(node: HTMLElement){
         //on:touchstart={onDragStart}
@@ -197,18 +204,18 @@
     <div
         class="range__wrapper"
         tabindex="0"
-        on:keydown={onKeyPress}
+        onkeydown={onKeyPress}
         bind:this={element}
         role="slider"
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
         {id}
-        on:mousedown={onTrackEvent}
-        on:touchstart={onTrackEvent}
+        onmousedown={onTrackEvent}
+        ontouchstart={onTrackEvent}
     >
         <div class="range__track" bind:this={container}>
-            <div class="range__track--highlighted" bind:this={progressBar} />
+            <div class="range__track--highlighted" bind:this={progressBar} ></div>
             <div
                 tabindex="-1"
                 class="range__thumb"

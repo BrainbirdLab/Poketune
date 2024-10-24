@@ -3,19 +3,20 @@
     import { onMount } from "svelte";
     import { slide } from "svelte/transition";
 
-    export let Note: string;
-    export let isListening: boolean;
-    export let analyserNode: AnalyserNode;
-    export let color: string = "#2c3e5030";
-    export let waveWidth: number = 2;
+    interface Props {
+        Note: string;
+        isListening: boolean;
+        analyserNode: AnalyserNode;
+        color?: string;
+        waveWidth?: number;
+        absolute?: boolean;
+        zIndex?: number;
+        height?: number;
+    }
 
-    export let absolute: boolean = true;
+    let { Note, isListening, analyserNode, color = "#2c3e5030", waveWidth = 2, absolute = true, zIndex = -1, height = 100 }: Props = $props();
 
-    export let zIndex: number = -1;
-
-    export let height: number = 100;
-
-    let canvas: HTMLCanvasElement;
+    let canvas: HTMLCanvasElement = $state() as HTMLCanvasElement;
     let canvasContext: CanvasRenderingContext2D;
     let WIDTH: number;
     let HEIGHT: number;
@@ -91,7 +92,8 @@
     class:hidden={!isListening && !Note}
     in:slide|global={{ axis: "x", delay: 100 }}
     bind:this={canvas}
-/>
+>
+</canvas>
 
 <style lang="scss">
     canvas {

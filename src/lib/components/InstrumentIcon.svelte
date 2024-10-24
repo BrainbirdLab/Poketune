@@ -7,8 +7,13 @@
     import MetronomeImage from "./Icons/MetronomeImage.svelte";
     import UkuleleImage from "./Icons/UkuleleImage.svelte";
 
-    export let name: string;
-    export let size: number | undefined = undefined;
+    interface Props {
+        name: string;
+        size?: number;
+    }
+
+    let { name, size }: Props = $props();
+
 </script>
 
 {#if name === "Guitar"}

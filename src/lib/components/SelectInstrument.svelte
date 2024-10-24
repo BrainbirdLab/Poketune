@@ -9,7 +9,7 @@
     import { pushState } from "$app/navigation";
     import { page } from "$app/stores";
 
-    let mounted = false;
+    let mounted = $state(false);
 
     const version = __VERSION__;
 
@@ -40,7 +40,7 @@
                 PokeTune
                 <Logo size={35} />
             </div>
-            <button on:click={() => {
+            <button aria-label="info" onclick={() => {
                 pushState('', { credits: true });
             }}><i class="fa-solid fa-circle-info"></i></button>
         </div>
@@ -68,19 +68,29 @@
             </div>
             <div class="more">Musical instrument tuner. v{version}</div>
         </div>
-        <div class="dev">Developed by Fuad Hasan</div>
+        <div class="discord">
+            <a href="https://discord.gg/8v3GvJ9" target="_blank"
+                >
+                <i class="fa-brands fa-discord"></i>
+                Join Discord <i class="fa-solid fa-up-right-from-square"></i></a
+            >
+        </div>
         <div class="src">
             <a href="https://github.com/BrainbirdLab/Poketune" target="_blank"
-                >Source Code <i class="fa-solid fa-up-right-from-square"></i></a
+                >
+                <i class="fa-brands fa-github"></i>
+                Source Code <i class="fa-solid fa-up-right-from-square"></i></a
             >
         </div>
         <div class="images">
             <a href="https://www.flaticon.com" target="_blank"
-                >Icons & Images <i class="fa-solid fa-up-right-from-square"
+                >
+                <i class="fa-solid fa-image"></i>
+                Icons & Images <i class="fa-solid fa-up-right-from-square"
                 ></i></a
             >
         </div>
-        <button on:click={() => {
+        <button onclick={() => {
             history.back();
         }}>Close</button>
     </div>
@@ -124,7 +134,7 @@
             }
         }
 
-        .dev,
+        .discord,
         .src,
         .images {
             margin-top: 10px;
@@ -253,8 +263,4 @@
         }
     }
 
-    .instrument:has(input[type="radio"]:checked) {
-        transform: scale(0.95);
-        transition: 100ms ease-in-out;
-    }
 </style>

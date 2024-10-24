@@ -131,14 +131,7 @@ export function tuneInstrument(instrument: InstrumentTypes, pitch: number, pitch
         let diff = Infinity;
 
         Object.keys(standardTuning).forEach((note) => {
-            
-
-            
-
-            if (Math.abs(standardTuning[note].frequency - pitch) < Math.abs(diff)) {
-                diff = standardTuning[note].frequency - pitch;
-                closestNote = note;
-            } else if (!isFinite(diff)) {
+            if ((Math.abs(standardTuning[note].frequency - pitch) < Math.abs(diff)) || !isFinite(diff)) {
                 diff = standardTuning[note].frequency - pitch;
                 closestNote = note;
             }

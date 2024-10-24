@@ -4,82 +4,92 @@
     import Range from "./controls/Range.svelte";
     import { fly } from "svelte/transition";
     import MetronomeAnimated from "./Icons/MetronomeAnimated.svelte";
-    import { createEventDispatcher } from 'svelte'
+    import { flip } from "svelte/animate";
+    import { activateWakeLock } from "$lib/store";
 
-    const dispatch = createEventDispatcher();
+    let bpm = $state(120);
 
-    let bpm = 120;
+    let pattern: number = $state(0);
 
-    let pattern: number;
-
-    let snareIndexes: number[] = [];
-
-    $: {
-        //add 0s to the end of the array if the pattern is bigger than the snareIndexes
-        if (snareIndexes.length < pattern) {
-            snareIndexes = [...snareIndexes, ...Array.from({length: pattern - snareIndexes.length}, () => 0)];
-        } else {
-            snareIndexes = snareIndexes.slice(0, pattern);
-        }
-    }
-
-    let tickDirection = 1;
+    let tickDirection = $state(1);
     
-    let index = -1;
+    let index = $state(-1);
     
-    let playing = false;
+    let isPlaying = $state(false);
 
-    let mounted = false;
+    let mounted = $state(false);
+    
+    let clickTimes: number[] = [];
+    
+    let tapBpm = $state(false);
+
+    let snareIndexes: number[] = $state([]);
 
     onMount(() => {
 
-        let s = localStorage.getItem('snareIndexes'); // [0, 1, 0, 1, 0, 1, 0, 1]
-
+        
         if (localStorage.getItem('pattern')) {
             pattern = parseInt(localStorage.getItem('pattern') as string);
         } else {
             pattern = 4;
             localStorage.setItem('pattern', pattern.toString());
         }
+        
+        let s = localStorage.getItem('snareIndexes');
+
+        let parsedData: number[] = [];
 
         try {
             if (s) {
-                snareIndexes = JSON.parse(s);
+                parsedData = JSON.parse(s);
                 //if not format of array then throw error
-                if (!Array.isArray(snareIndexes) || snareIndexes.some(i => ![0, 1].includes(i))) {
+                if (!Array.isArray(parsedData) || parsedData.some(i => !([0, 1].includes(i)))) {
                     throw new Error('Invalid format');
                 }
-                
-
+                console.log("parsedData", parsedData);
+                console.log("isArray: ", Array.isArray(parsedData));
+            } else {
+                parsedData = Array.from({length: pattern}, () => 0);
+                localStorage.setItem('snareIndexes', JSON.stringify(parsedData));
             }
         } catch (_){
-            
-
-            snareIndexes = Array.from({length: pattern}, () => 0);
-            localStorage.setItem('snareIndexes', JSON.stringify(snareIndexes));
+            console.log(_);
+            parsedData = Array.from({length: pattern}, () => 0);
+            localStorage.setItem('snareIndexes', JSON.stringify(parsedData));
         }
+
+        snareIndexes = parsedData;
 
         mounted = true;
     });
-    
 
-    const context = new AudioContext();
+    $effect(() => {
+        //if pattern changes, update the snareIndexes by adding or removing elements, and save it to local storage
+        if (pattern > snareIndexes.length) {
+            snareIndexes = [...snareIndexes, ...Array.from({length: pattern - snareIndexes.length}, () => 0)];
+        } else if (pattern < snareIndexes.length) {
+            snareIndexes = snareIndexes.slice(0, pattern);
+        }
+        localStorage.setItem('snareIndexes', JSON.stringify(snareIndexes));
+    });
+
+    const audioContext = new AudioContext();
     
     function playSound(high: boolean = false) {
         //make a sound from raw frequency
-        const o = context.createOscillator();
-        const g = context.createGain();
+        const o = audioContext.createOscillator();
+        const g = audioContext.createGain();
         o.connect(g);
         o.type = 'sine';
         o.frequency.value = high ? 1000 : 500;
-        g.connect(context.destination);
+        g.connect(audioContext.destination);
         o.start(0);
-        g.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.03);
         //stop the sound after 0.03 seconds
-        o.stop(context.currentTime + 0.03);
+        o.stop(audioContext.currentTime + 0.03);
     }
 
-    let timeoutId: number;
+    let timeoutId: number = 0;
 
     function scheduleNextBeat() {
         timeoutId = setTimeout(() => {
@@ -91,7 +101,6 @@
 
             tickDirection *= -1;
             const bt = snareIndexes[index] == 1;
-            
 
             if (bt) {
                 playSound(true);
@@ -104,16 +113,16 @@
     }
 
     async function play() {
-        playing = !playing;
-        if (playing) {
-            if (context.state === 'suspended') {
-                await context.resume();
+        isPlaying = !isPlaying;
+        if (isPlaying) {
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
             }
-            dispatch('keepAwake', true);
+            activateWakeLock.set(true);
             scheduleNextBeat();
         } else {
             index = -1;
-            dispatch('keepAwake', false);
+            activateWakeLock.set(false);
             clearTimeout(timeoutId);
         }
     }
@@ -136,13 +145,7 @@
         };
     }
 
-    let clickTimes: number[] = [];
-
-    let tapBpm = false;
-
     function calculateBpm() {
-
-        //playSound(false);
 
         let currentTime = Date.now();
 
@@ -185,11 +188,9 @@
         clearTimeout(timeoutId);
     });
 
-    let bpmBtn: HTMLButtonElement;
-
 </script>
 
-<svelte:window on:keypress={(e) => {
+<svelte:window onkeypress={(e) => {
     //if space is pressed, start/stop the tuner
     if (e.key == " ") {
         play();
@@ -197,12 +198,12 @@
         history.back();
     }
 }} 
-on:keydown={(e) => {
+onkeydown={(e) => {
     if (e.key == "g") {
         calculateBpm();
     }
 }}
-on:keyup={(e) => {
+onkeyup={(e) => {
     if (e.key == "g") {
         tapBpm = false;
     }
@@ -212,16 +213,14 @@ on:keyup={(e) => {
 {#if mounted}
 <div class="wrapper" in:fly|global={{y: -10}}>
 
-    <MetronomeAnimated style="transform: rotate({playing ? 20*tickDirection : 0}deg); transition: {(60 / bpm) * 1000}ms ease-in-out;" />
+    <MetronomeAnimated style="transform: rotate({isPlaying ? 20*tickDirection : 0}deg); transition: {(60 / bpm) * 1000}ms ease-in-out;" />
 
     <div class="beats" use:selectSnare>
         <div class="label">Beats <i class="fa-solid fa-drum"></i></div>
         <div class="beatsContainer">
-            {#key snareIndexes}
-            {#each snareIndexes as _, i}
-                <div class="beat {snareIndexes[i] === 1 ? 'snare' : ''} {playing && index == i ? 'playing' : ''}" data-beat={i}>{i+1}</div>
+            {#each snareIndexes as _, i (i)}
+                <div animate:flip in:fly={{y: 10}} class="beat {snareIndexes[i] === 1 ? 'snare' : ''} {isPlaying && index == i ? 'playing' : ''}" data-beat={i}>{i+1}</div>
             {/each}
-            {/key}
         </div>
     </div>
 
@@ -245,13 +244,12 @@ on:keyup={(e) => {
     <div class="group">
         <button class="beatButton"
         title="Shortcut key: G"
-        bind:this={bpmBtn}
         class:pressed={tapBpm}
-            on:mousedown|preventDefault={calculateBpm}
-            on:mouseup|preventDefault={() => tapBpm = false}
-            on:touchstart|preventDefault={calculateBpm}
-            on:touchend|preventDefault={() => tapBpm = false}
-            on:mouseleave|preventDefault={() => tapBpm = false}
+            onmousedown={(e) => {e.preventDefault(); calculateBpm()}}
+            onmouseup={(e) => {e.preventDefault(); tapBpm = false}}
+            ontouchstart={(e) => {e.preventDefault(); calculateBpm()}}
+            ontouchend={(e) => {e.preventDefault(); tapBpm = false}}
+            onmouseleave={(e) => {e.preventDefault(); tapBpm = false}}
         >
             <i class="fa-solid fa-drum"></i>
             <div class="label">
@@ -260,13 +258,13 @@ on:keyup={(e) => {
         </button>
     
         <div class="play pause" title="Shortcut key: Space">
-            <button class="beatButton" class:stop={playing} on:click={play}>
-                {#if playing}
-                <i class="fa-solid fa-pause"></i>
-                <div class="label">Stop</div>
+            <button class="beatButton" class:stop={isPlaying} onclick={play}>
+                {#if isPlaying}
+                    <i class="fa-solid fa-pause"></i>
+                    <div class="label">Stop</div>
                 {:else}
-                <i class="fa-solid fa-play"></i>
-                <div class="label">Start</div>
+                    <i class="fa-solid fa-play"></i>
+                    <div class="label">Start</div>
                 {/if}
             </button>
         </div>

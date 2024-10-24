@@ -1,12 +1,16 @@
 <script lang="ts">
     import "$lib/global.scss";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { fly } from "svelte/transition";
     import { showToastMessage } from "@itsfuad/domtoastmessage";
     import NavigationIndicator from "$lib/components/NavigationIndicator.svelte";
     import Logo from "$lib/components/logo.svelte";
+    import { activateWakeLock } from "$lib/store";
+    import type { Unsubscriber } from "svelte/motion";
 
-    let loaded = false;
+    let { children } = $props();
+
+    let loaded = $state(false);
 
     async function detectSWUpdate(){
         const registration = await navigator.serviceWorker.ready;
@@ -25,20 +29,45 @@
 
     let timeout: number;
 
+    let awakeLock: WakeLockSentinel | null = null;
+
+    function keepAwake(val: boolean){
+        if (val){
+            navigator.wakeLock.request("screen").then((lock) => {
+                awakeLock = lock;
+                showToastMessage("Screen Wake locked");
+            });
+        } else {
+            if (awakeLock){
+                awakeLock.release();
+                showToastMessage("Screen Wake released");
+            }
+        }
+    }
+
+
+    let unsub: Unsubscriber;
+
+    onDestroy(() => {
+        if (unsub){
+            unsub();
+        }
+        keepAwake(false);
+    });
+
     onMount(async () => {
         try{
             detectSWUpdate();
             clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                loaded = true;
-            }, 600);
+            loaded = true;
+            unsub = activateWakeLock.subscribe(keepAwake);
         } catch(e){
             console.log(e);
         }
     });
 </script>
 
-<svelte:body on:contextmenu|preventDefault></svelte:body>
+<svelte:body oncontextmenu={(e) => e.preventDefault()}></svelte:body>
 
 <NavigationIndicator/>
 
@@ -48,7 +77,7 @@
         <Logo size={50}/>
     </div>
 {:else}
-    <slot/>
+    {@render children()}
 {/if}
 </div>
 
