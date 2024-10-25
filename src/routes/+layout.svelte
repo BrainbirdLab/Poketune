@@ -5,7 +5,7 @@
     import { showToastMessage } from "@itsfuad/domtoastmessage";
     import NavigationIndicator from "$lib/components/NavigationIndicator.svelte";
     import Logo from "$lib/components/logo.svelte";
-    import { activateWakeLock } from "$lib/store.svelte.ts";
+    import { activateWakeLock } from "$lib/store.svelte";
 
     let { children } = $props();
 

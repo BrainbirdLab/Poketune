@@ -1,4 +1,4 @@
-import { instrumentNames, sentenceCase, type InstrumentTypes } from '$lib/store.svelte.ts';
+import { instrumentNames, sentenceCase, type InstrumentTypes } from '$lib/store.svelte';
 import { redirect } from '@sveltejs/kit';
 
 export function load({params}){

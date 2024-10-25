@@ -5,7 +5,7 @@
     import { fly } from "svelte/transition";
     import MetronomeAnimated from "./Icons/MetronomeAnimated.svelte";
     import { flip } from "svelte/animate";
-    import { activateWakeLock } from "$lib/store.svelte.ts";
+    import { activateWakeLock } from "$lib/store.svelte";
 
     let bpm = $state(120);
 

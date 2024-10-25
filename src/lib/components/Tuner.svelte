@@ -1,6 +1,6 @@
 <script lang="ts">
     import { confetti } from "@neoconfetti/svelte";
-    import { activateWakeLock, selectedInstrument, type InstrumentTypes } from "$lib/store.svelte.ts";
+    import { activateWakeLock, selectedInstrument, type InstrumentTypes } from "$lib/store.svelte";
     import {
         type Tuning,
         getReferenceNotes,

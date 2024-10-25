@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { activateWakeLock, sentenceCase } from "$lib/store.svelte.ts";
+    import { activateWakeLock, sentenceCase } from "$lib/store.svelte";
     import { fly } from "svelte/transition";
     import Slider from "./controls/Slider.svelte";
     import Range from "./controls/Range.svelte";
