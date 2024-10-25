@@ -170,35 +170,15 @@
         }
     });
 
-    function handleEvents(node: HTMLElement){
-        //on:touchstart={onDragStart}
-        //on:mousedown={onDragStart}
-        //on:mouseover={() => (thumbHover = true)}
-        //on:mouseout={() => (thumbHover = false)}
-
-        node.ontouchstart = onDragStart;
-        node.onmousedown = onDragStart;
-        node.onmouseover = () => (thumbHover = true);
-        node.onmouseout = () => (thumbHover = false);
-
-        return {
-            destroy(){
-                node.ontouchstart = null;
-                node.onmousedown = null;
-                node.onmouseover = null;
-                node.onmouseout = null;
-            }
-        }
-    }
 </script>
 
 <svelte:window
-    on:touchmove|nonpassive={updateValueOnEvent}
-    on:touchcancel={onDragEnd}
-    on:touchend={onDragEnd}
-    on:mousemove={updateValueOnEvent}
-    on:mouseup={onDragEnd}
-    on:resize={resizeWindow}
+    ontouchmove={updateValueOnEvent}
+    ontouchcancel={onDragEnd}
+    ontouchend={onDragEnd}
+    onmousemove={updateValueOnEvent}
+    onmouseup={onDragEnd}
+    onresize={resizeWindow}
 />
 <div class="range">
     <div

@@ -11,7 +11,6 @@
     import { onDestroy, onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
     import Range from "./controls/Range.svelte";
-    import { writable } from "svelte/store";
     import WaveCanvas from "./waveCanvas.svelte";
     import { tweened } from "svelte/motion";
     import Logo from "$lib/components/logo.svelte";
