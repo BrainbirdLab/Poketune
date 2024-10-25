@@ -1,8 +1,6 @@
-import { writable, type Writable } from "svelte/store";
-
 export type InstrumentTypes = "Guitar" | "Bass" | "Ukulele" | "Chromatic" | "Metronome" | "Frequency" | "none";
 
-export const selectedInstrument: Writable<InstrumentTypes> = writable("none");
+export const selectedInstrument = ref<InstrumentTypes>("none");
 
 export function sentenceCase(str: string) {
     //lower case everything
@@ -15,7 +13,7 @@ export function sentenceCase(str: string) {
     return str;
 }
 
-export const lastPage: Writable<string> = writable("");
+export const lastPage = ref("");
 
 //list of instruments
 export const instrumentNames = [
@@ -27,4 +25,16 @@ export const instrumentNames = [
     'Frequency',
 ];
 
-export const activateWakeLock = writable(false);
+export const activateWakeLock = ref(false);
+
+export function ref<T>(value: T) {
+    let val = $state(value);
+    return {
+        set value(newVal: T) {
+            val = newVal;
+        },
+        get value() {
+            return val;
+        }
+    }
+}

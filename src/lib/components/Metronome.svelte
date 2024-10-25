@@ -5,7 +5,7 @@
     import { fly } from "svelte/transition";
     import MetronomeAnimated from "./Icons/MetronomeAnimated.svelte";
     import { flip } from "svelte/animate";
-    import { activateWakeLock } from "$lib/store";
+    import { activateWakeLock } from "$lib/store.svelte";
 
     let bpm = $state(120);
 
@@ -118,11 +118,11 @@
             if (audioContext.state === 'suspended') {
                 await audioContext.resume();
             }
-            activateWakeLock.set(true);
+            activateWakeLock.value = true;
             scheduleNextBeat();
         } else {
             index = -1;
-            activateWakeLock.set(false);
+            activateWakeLock.value = false;
             clearTimeout(timeoutId);
         }
     }
@@ -190,7 +190,9 @@
 
 </script>
 
-<svelte:window onkeypress={(e) => {
+<svelte:window 
+
+onkeypress={(e) => {
     //if space is pressed, start/stop the tuner
     if (e.key == " ") {
         play();
@@ -198,13 +200,15 @@
         history.back();
     }
 }} 
+
 onkeydown={(e) => {
-    if (e.key == "g") {
+    if (e.key == "b") {
         calculateBpm();
     }
 }}
+
 onkeyup={(e) => {
-    if (e.key == "g") {
+    if (e.key == "b") {
         tapBpm = false;
     }
 }}
@@ -243,7 +247,7 @@ onkeyup={(e) => {
 
     <div class="group">
         <button class="beatButton"
-        title="Shortcut key: G"
+        title="Shortcut key: B"
         class:pressed={tapBpm}
             onmousedown={(e) => {e.preventDefault(); calculateBpm()}}
             onmouseup={(e) => {e.preventDefault(); tapBpm = false}}

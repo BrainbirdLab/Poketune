@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { activateWakeLock, sentenceCase } from "$lib/store";
+    import { activateWakeLock, sentenceCase } from "$lib/store.svelte";
     import { fly } from "svelte/transition";
     import Slider from "./controls/Slider.svelte";
     import Range from "./controls/Range.svelte";
@@ -46,7 +46,7 @@
             if (analyserNode) {
                 analyserNode.disconnect();
             }
-            activateWakeLock.set(false);
+            activateWakeLock.value = false;
         } else {
             oscillator = audioCtx.createOscillator();
             oscillator.type = waveType[selectedWaveType] as OscillatorType;
@@ -55,7 +55,7 @@
             oscillator.connect(analyserNode);
             oscillator.start();
             //add frequency to analyser
-            activateWakeLock.set(true);
+            activateWakeLock.value = true;
         }
         start = !start;
     }

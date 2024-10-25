@@ -1,4 +1,4 @@
-import { instrumentNames, sentenceCase } from '$lib/store';
+import { instrumentNames, sentenceCase, type InstrumentTypes } from '$lib/store.svelte';
 import { redirect } from '@sveltejs/kit';
 
 export function load({params}){
@@ -7,7 +7,7 @@ export function load({params}){
     //if params.id is in InstrumentTypes type
     if (instrumentNames.includes(instrumentName)) {
         return {
-            name: instrumentName
+            name: instrumentName as InstrumentTypes
         }
     }
 

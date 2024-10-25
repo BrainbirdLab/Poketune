@@ -3,7 +3,7 @@
     import FreguencyGenerator from "$lib/components/FreguencyGenerator.svelte";
     import Metronome from "$lib/components/Metronome.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
-    import { selectedInstrument, type InstrumentTypes, lastPage } from "$lib/store";
+    import { selectedInstrument, type InstrumentTypes, lastPage } from "$lib/store.svelte";
     import { onMount } from "svelte";
     import { fly } from "svelte/transition";
 
@@ -11,7 +11,7 @@
     
     let mounted = $state(false);
 
-    selectedInstrument.set(data.name as InstrumentTypes);
+    selectedInstrument.value = data.name;
 
     onMount(() => {
         mounted = true;
@@ -27,9 +27,9 @@
 {#if mounted}
 <div class="topbar">
     <button aria-label="back" in:fly|global={{x: -10}} class="goback" onclick={()=>{
-        selectedInstrument.set("none");
-        if ($lastPage != "/"){
-            lastPage.set("/");
+        selectedInstrument.value = "none";
+        if (lastPage.value != "/"){
+            lastPage.value = "/";
             goto("/", { replaceState: true });
         } else {
             history.back();
@@ -37,17 +37,17 @@
     }}>
         <i class="fa-solid fa-caret-left fa-fw"></i>
     </button>
-    {#if $selectedInstrument != "none"}
+    {#if selectedInstrument.value != "none"}
     <div class="current" in:fly|global={{x: 10}}>
-        <div class="name">{$selectedInstrument}</div>
+        <div class="name">{selectedInstrument.value}</div>
     </div>
     {/if}
 </div>
-{#if $selectedInstrument == "Metronome"}
+{#if selectedInstrument.value == "Metronome"}
     <Metronome/>
-{:else if $selectedInstrument == "Frequency"}
+{:else if selectedInstrument.value == "Frequency"}
     <FreguencyGenerator/>
-{:else if $selectedInstrument != "none"}
+{:else if selectedInstrument.value != "none"}
     <Tuner/>
 {/if}
 {/if}

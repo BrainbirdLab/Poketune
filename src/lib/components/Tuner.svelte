@@ -1,6 +1,6 @@
 <script lang="ts">
     import { confetti } from "@neoconfetti/svelte";
-    import { activateWakeLock, selectedInstrument, type InstrumentTypes } from "$lib/store";
+    import { activateWakeLock, selectedInstrument, type InstrumentTypes } from "$lib/store.svelte";
     import {
         type Tuning,
         getReferenceNotes,
@@ -11,7 +11,6 @@
     import { onDestroy, onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
     import Range from "./controls/Range.svelte";
-    import { writable } from "svelte/store";
     import WaveCanvas from "./waveCanvas.svelte";
     import { tweened } from "svelte/motion";
     import Logo from "$lib/components/logo.svelte";
@@ -40,48 +39,16 @@
 
     let interval: number;
 
-    const pitchShiftBy = writable(0);
+    let pitchShiftBy = $state(0);
 
-    let notes: { [key: string]: Tuning } = $state(getReferenceNotes(
-        $selectedInstrument,
-        $pitchShiftBy,
-    ));
+    let notes: { [key: string]: Tuning } = $derived(getReferenceNotes(selectedInstrument.value, pitchShiftBy));
  
-    let leftNotes = $derived(Object.values(notes).slice(
-            0,
-            Object.values(notes).length / 2,
-        ));
+    let leftNotes = $derived(Object.values(notes).slice(0, Object.values(notes).length / 2, ));
 
     let rightNotes = $derived(Object.values(notes).slice(Object.values(notes).length / 2));
 
     let lastNote = "";
     let complete = false;
-
-    const unsubPitchShiftBy = pitchShiftBy.subscribe((val) => {
-        reset();
-
-        if (
-            $selectedInstrument == "Chromatic" ||
-            $selectedInstrument == "none"
-        ) {
-            return;
-        }
-
-        notes = getReferenceNotes($selectedInstrument, val);
-
-        const obj = Object.values(notes);
-        const firstNoteFrequency = obj[0].frequency;
-        const lastNoteFrequency = obj[obj.length - 1].frequency;
-
-        if (firstNoteFrequency < 16.35 || lastNoteFrequency > 7902.13) {
-            console.log(firstNoteFrequency, val, lastNoteFrequency);
-            if (firstNoteFrequency < 16.35) {
-                pitchShiftBy.set(val + 1);
-            } else if (lastNoteFrequency > 7902.13) {
-                pitchShiftBy.set(val - 1);
-            }
-        }
-    });
 
     let mounted = $state(false);
 
@@ -90,14 +57,13 @@
         allDoneSound = new Audio("/sounds/allDone.mp3");
 
         const pitchShift = localStorage.getItem("pitchShiftBy") || 0;
-        
 
         if (pitchShift) {
             //if pitch shift is <= 10 or >= -10 then only set, else set to 0
             if (Math.abs(Number(pitchShift)) <= 10) {
-                pitchShiftBy.set(Number(pitchShift));
+                pitchShiftBy = Number(pitchShift);
             } else {
-                pitchShiftBy.set(0);
+                pitchShiftBy = 0;
             }
         }
 
@@ -106,7 +72,6 @@
 
     onDestroy(() => {
         stop();
-        unsubPitchShiftBy();
     });
 
     function stop() {
@@ -133,7 +98,7 @@
                 detectedClarity.set(0);
             });
 
-            activateWakeLock.set(false);
+            activateWakeLock.value = false;
 
             reset();
 
@@ -167,7 +132,7 @@
 
                     isListening = true;
 
-                    activateWakeLock.set(true);
+                    activateWakeLock.value = true;
 
                     if (audioContext.state === "running") {
                         interval = setInterval(() => {
@@ -203,7 +168,7 @@
         }
 
         // Get the note, octave and cent from the pitch
-        const tune = tuneInstrument($selectedInstrument, pitch, $pitchShiftBy);
+        const tune = tuneInstrument(selectedInstrument.value, pitch, pitchShiftBy);
 
         Note = tune.note;
         Octave = tune.octave;
@@ -213,8 +178,8 @@
         const noteId = Note + Octave;
 
         if (
-            $selectedInstrument != "Chromatic" &&
-            $selectedInstrument != "none" &&
+            selectedInstrument.value != "Chromatic" &&
+            selectedInstrument.value != "none" &&
             Math.abs($Cent) < 8 &&
             Math.abs($Cent) > 0
         ) {
@@ -264,10 +229,10 @@
     async function loadAudioBuffers() {
         //load the selected instrument audio and adjust by the pitch shift
         try {
-            dividerFrequency = dividerMap.get($selectedInstrument) as number;
+            dividerFrequency = dividerMap.get(selectedInstrument.value) as number;
 
             const response = await fetch(
-                `/sounds/${$selectedInstrument.toLowerCase()}.mp3`,
+                `/sounds/${selectedInstrument.value.toLowerCase()}.mp3`,
             );
 
             const arrayBuffer = await response.arrayBuffer();
@@ -281,7 +246,7 @@
         }
     }
 
-    if (dividerMap.has($selectedInstrument)) {
+    if (dividerMap.has(selectedInstrument.value)) {
         loadAudioBuffers();
     }
 
@@ -475,7 +440,7 @@
                 {Math.round($Cent)} C {Math.abs($Cent) < 10 ? "😁" : "😢"}
             </div>
         </div>
-        {#if $selectedInstrument != "Chromatic"}
+        {#if selectedInstrument.value != "Chromatic"}
             {#if tunedNotes.size != 0 && tunedNotes.size == Object.values(notes).length}
                 <div class="conf" use:confetti></div>
             {/if}
@@ -510,7 +475,7 @@
                         showSign={true}
                         fieldName="pitchShiftBy"
                         fastStep={10}
-                        bind:value={$pitchShiftBy}
+                        bind:value={pitchShiftBy}
                         min={-100}
                         defaultVal={0}
                         max={100}

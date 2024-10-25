@@ -86,7 +86,7 @@
     }
 </script>
 
-<svelte:window on:keydown={KeyListener} />
+<svelte:window onkeydown={KeyListener} />
 
 <div class="range {fieldName}">
     <button

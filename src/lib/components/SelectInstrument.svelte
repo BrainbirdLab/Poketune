@@ -1,7 +1,7 @@
 <script lang="ts">
     //import animation libs to fly in the instrument buttons
     import { fly } from "svelte/transition";
-    import { instrumentNames } from "$lib/store";
+    import { instrumentNames } from "$lib/store.svelte";
     import { onMount } from "svelte";
     
     import Logo from "$lib/components/logo.svelte";

@@ -5,8 +5,7 @@
     import { showToastMessage } from "@itsfuad/domtoastmessage";
     import NavigationIndicator from "$lib/components/NavigationIndicator.svelte";
     import Logo from "$lib/components/logo.svelte";
-    import { activateWakeLock } from "$lib/store";
-    import type { Unsubscriber } from "svelte/motion";
+    import { activateWakeLock } from "$lib/store.svelte";
 
     let { children } = $props();
 
@@ -27,8 +26,6 @@
         });
     }
 
-    let timeout: number;
-
     let awakeLock: WakeLockSentinel | null = null;
 
     function keepAwake(val: boolean){
@@ -45,25 +42,21 @@
         }
     }
 
-
-    let unsub: Unsubscriber;
-
-    onDestroy(() => {
-        if (unsub){
-            unsub();
-        }
-        keepAwake(false);
-    });
-
     onMount(async () => {
         try{
             detectSWUpdate();
-            clearTimeout(timeout);
             loaded = true;
-            unsub = activateWakeLock.subscribe(keepAwake);
         } catch(e){
             console.log(e);
         }
+    });
+
+    $effect(() => {
+        keepAwake(activateWakeLock.value);
+    });
+
+    onDestroy(() => {
+        keepAwake(false);
     });
 </script>
 
