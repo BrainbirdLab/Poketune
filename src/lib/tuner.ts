@@ -1,4 +1,4 @@
-import type { InstrumentTypes } from "./store";
+import type { InstrumentTypes } from "$lib/store.svelte.ts";
 
 export type Tuning = {
     note: string;
