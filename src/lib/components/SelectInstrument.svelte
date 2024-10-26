@@ -69,7 +69,7 @@
             <div class="more">Musical instrument tuner. v{version}</div>
         </div>
         <div class="discord">
-            <a href="https://discord.gg/8v3GvJ9" target="_blank"
+            <a href="https://discord.gg/yQKcHhKzyn" target="_blank"
                 >
                 <i class="fa-brands fa-discord"></i>
                 Join Discord <i class="fa-solid fa-up-right-from-square"></i></a
