@@ -14,9 +14,10 @@
         save?: boolean;
         highKey: "ArrowRight" | "ArrowUp" | "W" | "D";
         lowKey: "ArrowLeft" | "ArrowDown" | "S" | "A";
+        onChange?: (value: number) => void ;
     }
 
-   let { min, max, defaultVal, fieldName, value = $bindable(), fastStep = 5, reference = 0, unit = "", showSign = false, save = true, highKey, lowKey }: Props = $props();
+   let { min, max, defaultVal, fieldName, value = $bindable(), fastStep = 5, reference = 0, unit = "", showSign = false, save = true, highKey, lowKey, onChange }: Props = $props();
 
     onMount(() => {
         if (!save){
@@ -37,6 +38,15 @@
         }
     });
 
+    $effect(() => {
+        if (onChange){
+            onChange(value);
+        }
+        if (save && localStorage){
+            localStorage.setItem(fieldName, value.toString());
+        }
+    });
+
     function KeyListener(e: KeyboardEvent) {
         if (e.key === lowKey) {
             rangeUpdate(-1);
@@ -44,15 +54,6 @@
             rangeUpdate(1);
         }
     }
-
-    $effect(() => {
-        if (!save){
-            return;
-        }
-        if (localStorage) {
-            localStorage.setItem(fieldName, value.toString());
-        }
-    });
 
     function rangeUpdate(val: number) {
         if (value + val >= min && value + val <= max) {

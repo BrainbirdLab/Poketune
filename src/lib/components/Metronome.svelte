@@ -9,8 +9,6 @@
 
     let bpm = $state(120);
 
-    let pattern: number = $state(0);
-
     let tickDirection = $state(1);
     
     let index = $state(-1);
@@ -23,17 +21,10 @@
     
     let tapBpm = $state(false);
 
+    let pattern = $state(4);
     let snareIndexes: number[] = $state([]);
 
     onMount(() => {
-
-        
-        if (localStorage.getItem('pattern')) {
-            pattern = parseInt(localStorage.getItem('pattern') as string);
-        } else {
-            pattern = 4;
-            localStorage.setItem('pattern', pattern.toString());
-        }
         
         let s = localStorage.getItem('snareIndexes');
 
@@ -46,31 +37,17 @@
                 if (!Array.isArray(parsedData) || parsedData.some(i => !([0, 1].includes(i)))) {
                     throw new Error('Invalid format');
                 }
-                console.log("parsedData", parsedData);
-                console.log("isArray: ", Array.isArray(parsedData));
             } else {
-                parsedData = Array.from({length: pattern}, () => 0);
-                localStorage.setItem('snareIndexes', JSON.stringify(parsedData));
+                parsedData = Array.from({length: 4}, () => 0);
             }
         } catch (_){
             console.log(_);
-            parsedData = Array.from({length: pattern}, () => 0);
-            localStorage.setItem('snareIndexes', JSON.stringify(parsedData));
+            parsedData = Array.from({length: 4}, () => 0);
         }
 
         snareIndexes = parsedData;
 
         mounted = true;
-    });
-
-    $effect(() => {
-        //if pattern changes, update the snareIndexes by adding or removing elements, and save it to local storage
-        if (pattern > snareIndexes.length) {
-            snareIndexes = [...snareIndexes, ...Array.from({length: pattern - snareIndexes.length}, () => 0)];
-        } else if (pattern < snareIndexes.length) {
-            snareIndexes = snareIndexes.slice(0, pattern);
-        }
-        localStorage.setItem('snareIndexes', JSON.stringify(snareIndexes));
     });
 
     const audioContext = new AudioContext();
@@ -188,6 +165,18 @@
         clearTimeout(timeoutId);
     });
 
+    function onChange(val: number) {
+        if (val == snareIndexes.length) {
+            return;
+        }
+        if (val > snareIndexes.length) {
+            snareIndexes.push(0);
+        } else if (val < snareIndexes.length) {
+            snareIndexes.pop();
+        }
+        localStorage.setItem('snareIndexes', JSON.stringify(snareIndexes));
+    }
+
 </script>
 
 <svelte:window 
@@ -238,7 +227,7 @@ onkeyup={(e) => {
         </div>
         <div class="input" title="Shortcut key: Up and down Arrow">
             <div class="label">Pattern <i class="fa-solid fa-dice"></i></div>
-            <Range fieldName="pattern" bind:value={pattern} min={3} defaultVal={4} max={16} fastStep={2} reference={4}
+            <Range bind:value={pattern} {onChange} save={false} fieldName="pattern" min={3} defaultVal={4} max={16} fastStep={2} reference={4}
             highKey={"ArrowUp"}
             lowKey={"ArrowDown"}
             />

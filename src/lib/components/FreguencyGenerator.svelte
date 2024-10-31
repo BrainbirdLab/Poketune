@@ -18,15 +18,6 @@
     let oscillator: OscillatorNode = $state<OscillatorNode>() as OscillatorNode;
     let analyserNode = audioCtx.createAnalyser();
 
-
-    $effect(() => {
-        if (!oscillator) {
-            return;
-        }
-        oscillator.frequency.value = frequency;
-        oscillator.type = waveType[selectedWaveType] as OscillatorType;
-    });
-
     let mounted = $state(false);
 
     onMount(() => {
@@ -37,6 +28,14 @@
             selectedWaveType = 0;
         }
         mounted = true;
+    });
+    
+    $effect(() => {
+        if (!oscillator) {
+            return;
+        }
+        oscillator.frequency.value = frequency;
+        oscillator.type = waveType[selectedWaveType] as OscillatorType;
     });
 
     function handleStart() {
