@@ -7,7 +7,7 @@
     import Logo from "$lib/components/logo.svelte";
     import InstrumentIcon from "$lib/components/InstrumentIcon.svelte";
     import { pushState } from "$app/navigation";
-    import { page } from "$app/stores";
+    import { page } from "$app/state";
 
     let mounted = $state(false);
 
@@ -58,7 +58,7 @@
         </div>
     </div>
 {/if}
-{#if $page.state.credits}    
+{#if page.state.credits}    
 <div class="creditsWrapper" use:handler>
     <div class="credits" transition:fly={{y: 10, duration: 200}}>
         <div class="info">

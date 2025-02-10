@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { navigating } from "$app/stores";
+    import { navigating } from "$app/state";
 </script>
 
-{#if !!$navigating}
+{#if !!navigating}
     <div class="navigationIndicator"></div>
 {/if}
 

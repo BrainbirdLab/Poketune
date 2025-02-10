@@ -3,7 +3,7 @@
     import FreguencyGenerator from "$lib/components/FreguencyGenerator.svelte";
     import Metronome from "$lib/components/Metronome.svelte";
     import Tuner from "$lib/components/Tuner.svelte";
-    import { selectedInstrument, type InstrumentTypes, lastPage } from "$lib/store.svelte";
+    import { selectedInstrument, lastPage } from "$lib/store.svelte";
     import { onMount } from "svelte";
     import { fly } from "svelte/transition";
 
