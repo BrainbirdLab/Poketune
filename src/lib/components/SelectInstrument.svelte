@@ -75,6 +75,13 @@
                 Join Discord <i class="fa-solid fa-up-right-from-square"></i></a
             >
         </div>
+        <div class="buymeacoffee">
+            <a href="https://www.buymeacoffee.com/itsfuad" target="_blank"
+                >
+                <i class="fa-solid fa-coffee"></i>
+                Buy me a coffee <i class="fa-solid fa-up-right-from-square"></i></a
+            >
+        </div>
         <div class="src">
             <a href="https://github.com/BrainbirdLab/Poketune" target="_blank"
                 >
@@ -136,6 +143,7 @@
 
         .discord,
         .src,
+        .buymeacoffee,
         .images {
             margin-top: 10px;
             font-size: 0.8rem;
